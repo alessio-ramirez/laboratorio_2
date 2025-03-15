@@ -5,7 +5,8 @@
 \usepackage{textcomp}
 \usepackage[italian]{babel}
 \usepackage{amsmath, amssymb}
-
+\usepackage{siunitx}
+\usepackage{caption}
 %dark mode
 \usepackage{darkmode}
 
@@ -26,19 +27,38 @@
 \begin{document}
 
 \section{introduzione}
-Il primo insieme di esperienze volge a verificare, tramite l'utilizzo di circuiti a 
+Il primo insieme di esperienze volge a verificare, tramite l'utilizzo di circuiti a
 corrente contuinua, fenomeni elettromagnetici. Più precisamente le misure effettuate sono mirate a:
 \begin{itemize}
-    \item valutare le caratteristiche degli strumenti di misura e verificare la legge di Ohm
-    \item realizzare un partitore e studiarne il funzionamento
-    \item misurare la caratteristica tensione-corrente di un diodo
-    \item osservare gli effetti del campo magnetico generato da una spira percorsa da corrente
+	\item valutare le caratteristiche degli strumenti di misura e verificare la legge di Ohm
+	\item realizzare un partitore e studiarne il funzionamento
+	\item misurare la caratteristica tensione-corrente di un diodo
+	\item osservare gli effetti del campo magnetico generato da una spira percorsa da corrente
 
 \end{itemize}
 \section{legge di ohm}
 
 %resistenza attesa 1 mega ohm, con errore 1\%
 %cofigurazione 2 (quella giusta con voltometro in parallelo al generatore)
+
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+	\hline
+	$R_{\text{atteso}}$            & $R_1$                           & $P_1$ & $R_2$ & $P_2$ \\
+	\hline
+	$1000 \pm 10 \si{\kilo\ohm}$   & $908.5 \pm 0.95 \si{\kilo\ohm}$ & $1$   &
+	$999.2 \pm 1.1 \si{\kilo\ohm}$ & $0.061$                                                 \\
+    \hline
+	$10 \pm 0.1 \si{\ohm}$          &                                 &       &       &       \\
+	\hline
+\end{tabular}
+\captionof{table}{Verifica legge di Ohm}
+\label{tab:Verfica legge di Ohm}
+
+
+
+
+
 
 \subsection{}
 
