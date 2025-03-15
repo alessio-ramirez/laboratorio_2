@@ -1,0 +1,35 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb}
+
+%dark mode
+\usepackage{darkmode}
+\enabledarkmode
+
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+\pdfsuppresswarningpagegroup=1
+
+\begin{document}
+
+
+Function:
+\begin{equation}\frac{- 1.8 x_{0} + x_{1}}{1.0 x_{0} - 9.44 \cdot 10^{-8} x_{1}}\end{equation}
+
+Propagated Error:
+\begin{equation}1.8 \left(\sigma_{0}^{2} \left(- \frac{0.556 \left(- 1.8 x_{0} + x_{1}\right)}{\left(x_{0} - 9.44 \cdot 10^{-8} x_{1}\right)^{2}} - \frac{1}{1.0 x_{0} - 9.44 \cdot 10^{-8} x_{1}}\right)^{2} + 0.309 \sigma_{1}^{2} \left(\frac{9.44 \cdot 10^{-8} \left(- 1.8 x_{0} + x_{1}\right)}{\left(x_{0} - 9.44 \cdot 10^{-8} x_{1}\right)^{2}} + \frac{1}{1.0 x_{0} - 9.44 \cdot 10^{-8} x_{1}}\right)^{2}\right)^{0.5}\end{equation}
+\end{document}
