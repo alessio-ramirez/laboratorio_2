@@ -293,7 +293,7 @@ def create_best_fit_line(*args):
             grado = int(input("qual è il grado? "))
             
             coeffs = np.polyfit(x, y, grado)
-            print(coeffs)
+            #print(coeffs)
 
             
             plt.scatter(list1, list2)

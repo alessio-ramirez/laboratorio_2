@@ -5,6 +5,8 @@ import sympy as sp
 import math
 import re
 from itertools import combinations
+from scipy.optimize import curve_fit
+from scipy.odr import RealData, Model, ODR
 
 def error_prop(f, variables, covariances=None, use_covariance=False, copy_latex=False, round_latex=3):
     # Convert variables to lists of (value, error) tuples
@@ -107,3 +109,57 @@ def error_prop(f, variables, covariances=None, use_covariance=False, copy_latex=
         results.append((f_value, sigma_f))
     
     return results
+
+
+def perform_fit(x, y, func, p0):
+    """
+    Perform a fit on data x and y with a given function, considering errors in x and/or y.
+
+    Parameters:
+    x (array or dict): Independent variable data. If a dict, must have 'value' and optionally 'error'.
+    y (array or dict): Dependent variable data. If a dict, must have 'value' and optionally 'error'.
+    func (callable): The model function, must have signature f(x, *params).
+    p0 (list): Initial guess for the parameters.
+
+    Returns:
+    tuple: (parameters, errors) as numpy arrays.
+    """
+    # Process x data
+    if isinstance(x, dict):
+        x_val = np.asarray(x['value'])
+        x_err = np.asarray(x['error']) if 'error' in x else np.zeros_like(x_val)
+    else:
+        x_val = np.asarray(x)
+        x_err = np.zeros_like(x_val)
+    
+    # Process y data
+    if isinstance(y, dict):
+        y_val = np.asarray(y['value'])
+        y_err = np.asarray(y['error']) if 'error' in y else np.zeros_like(y_val)
+    else:
+        y_val = np.asarray(y)
+        y_err = np.zeros_like(y_val)
+    
+    # Determine fitting method
+    use_odr = np.any(x_err != 0)
+    
+    if use_odr:
+        # Use Orthogonal Distance Regression (ODR)
+        odr_model = Model(func)
+        data = RealData(x_val, y_val, sx=x_err, sy=y_err)
+        odr = ODR(data, odr_model, beta0=p0)
+        output = odr.run()
+        params = output.beta
+        params_err = output.sd_beta
+    else:
+        # Use curve_fit (ordinary or weighted least squares)
+        if np.any(y_err != 0):
+            # Handle zero errors to avoid division by zero
+            y_err = np.where(y_err == 0, 1e-10, y_err)
+            popt, pcov = curve_fit(func, x_val, y_val, p0=p0, sigma=y_err, absolute_sigma=True)
+        else:
+            popt, pcov = curve_fit(func, x_val, y_val, p0=p0)
+        params = popt
+        params_err = np.sqrt(np.diag(pcov))
+    
+    return params, params_err
