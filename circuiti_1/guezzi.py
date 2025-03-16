@@ -9,6 +9,7 @@ import sympy as sp
 import math
 import re
 from itertools import combinations
+import scipy.stats as stats
 from scipy.optimize import curve_fit
 from scipy.odr import RealData, Model, ODR
 import inspect
@@ -186,7 +187,7 @@ def error_prop(f: Callable, variables: List[Dict], covariances: Optional[Dict] =
 
 # ---------------------------- Curve Fitting --------------------------------
 def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray], 
-                func: Callable, p0: Optional[List[float]] = None) -> tuple:
+                func: Callable, p0: Optional[List[float]] = None, chi_square=False) -> tuple:
     """
     Perform curve fitting with automatic error-aware method selection
     
@@ -256,6 +257,10 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         output = odr.run()
         params = output.beta
         params_err = output.sd_beta
+        if chi_square:
+            chi = output.sum_square
+            dof = len(y_val) - len(params)
+            return params, params_err, chi, dof
 
     else:
         # Use curve_fit directly
@@ -266,6 +271,15 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
             popt, pcov = curve_fit(func, x_val, y_val, p0=p0)
         params = popt
         params_err = np.sqrt(np.diag(pcov))
+        if chi_square:
+            y_pred = func(x_val, *params)
+            if np.any(y_err != 0):
+                residuals = (y_val - y_pred) / y_err
+            else:
+                residuals = y_val - y_pred  # Unweighted residuals
+            chi_squared = np.sum(residuals**2)
+            dof = len(y_val) - len(params)
+            return params, params_err, chi_squared, dof
 
     return params, params_err
 

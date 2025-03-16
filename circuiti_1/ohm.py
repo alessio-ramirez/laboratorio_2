@@ -3,6 +3,7 @@ from liblab import *
 import matplotlib.pyplot as plt
 from liblab import *
 from guezzi import error_prop, create_best_fit_line, perform_fit, create_dataset
+import scipy.stats as stats
 
 #definisco la funzione di fit
 def linear_func(x, a, b):
@@ -20,10 +21,10 @@ I_2_ = create_dataset(I_2, I_err)
 V_2_ = create_dataset(V_2, V_err)
 
 #spacchetto i risultati
-(a, R), (da, R_err) = perform_fit(I_2_, V_2_, linear_func, p0=[1,1000000]) #p0 è il guess iniziali dei paramteri (obbligatorio per adesso)
-
+(a, R), (da, R_err), chi, dof = perform_fit(I_2_, V_2_, linear_func, p0=[1,1000000], chi_square=True)
 R_bias = lambda V_2, I_2:(V_2 - I_2*1.8)/(I_2- V_2/10596157 + 1.8/10596157 * I_2)
 #print(error_prop(R_bias, [V_2_, I_2_]))
+print(chi, dof)
 
 #test di compatibilità, mettere il valore seguito dall'errore cosi
 test_comp(R, R_err, R_atteso, R_atteso_err)

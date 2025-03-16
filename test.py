@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from liblab import *
+import sys
+sys.path.append("./circuiti_1/")
 from guezzi import *
 
 def linear_func(x, a, b):
