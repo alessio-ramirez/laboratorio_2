@@ -1,55 +1,77 @@
+"""
+guezzi.py - A scientific utility library for error propagation, curve fitting, and data visualization.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pyperclip
 import sympy as sp
 import math
-import re 
+import re
 from itertools import combinations
 from scipy.optimize import curve_fit
 from scipy.odr import RealData, Model, ODR
 import inspect
+from typing import Union, List, Dict, Callable, Optional
 
-def create_dataset(values, errors=None):
+# ---------------------------- Dataset Creation ------------------------------
+def create_dataset(values: Union[float, List[float], Dict], errors: Union[float, List[float]] = None) -> Dict[str, np.ndarray]:
     """
-    Create a standardized dataset dictionary for measurements.
-    
+    Create a standardized dataset dictionary for measurements with errors.
+
     Parameters:
-    values (array-like or dict): Array of measured values or a dictionary where keys are values and values are errors.
-    errors (array-like/float, optional): Array of errors or a single scalar error. Default is None.
-    
+    values : float, list, or dict
+        - Single measurement (float)
+        - List of measured values
+        - Dictionary with {value: error} pairs (if provided errors should be None)
+    errors : float or list, optional
+        Single error value (same error for each measured value) or list of errors
+
     Returns:
-    dict: {'value': np.array, 'error': np.array} with float arrays.
+    dict: {'value': np.array, 'error': np.array}
+        Standard format of the measurements for this library
+
+    Examples:
+    >>> create_dataset(5.0, 1.0)  # Single measurement
+    {'value': array([5.]), 'error': array([1.])}
     
+    >>> create_dataset([2, 4], 0.5)  # Multiple measurements with uniform error
+    {'value': array([2., 4.]), 'error': array([0.5, 0.5])}
+    
+    >>> create_dataset({10: 0.1, 20: 0.2})  # Dictionary input
+    {'value': array([10., 20.]), 'error': array([0.1, 0.2])}
     """
-    # Handle case where values is a dictionary
-    if isinstance(values, dict):
+    # Scalar input case
+    if isinstance(values, (int, float)):
+        values = [float(values)] # Add a float just because
+    # Easy dictionary case
+    elif isinstance(values, dict):
         if errors is not None:
-            raise ValueError("If values is a dictionary, errors must be None")
-        # Convert keys and values to float arrays
-        value_arr = np.array(list(values.keys()), dtype=float)
-        error_arr = np.array(list(values.values()), dtype=float)
-        if len(value_arr) != len(error_arr):
-            raise ValueError("Dictionary keys and values must have the same length")
-        return {'value': value_arr, 'error': error_arr}
+            raise ValueError("Errors must be None when using dictionary input")
+        return {
+            'value' : np.array(list(values.keys()), dtype=float),
+            'error' : np.array(list(values.values()), dtype=float)
+        }
     
     # Convert values to a float array
-    values = np.asarray(values, dtype=float)
+    values = np.array(values, dtype=float)
     
     # Determine the errors array
     if errors is not None:
-        errors = np.asarray(errors, dtype=float)
+        errors = np.array(errors, dtype=float)
         if errors.ndim == 0:  # Scalar error
             errors = np.full(values.shape, errors.item())
         else:
             if errors.shape != values.shape:
-                raise ValueError("Errors must be a scalar or have the same shape as values")
+                raise ValueError("Errors length have to be the same of Values")
     else:
-        errors = np.zeros_like(values)
+        errors = np.zeros_like(values) # Zero errors if not provided
     
     return {'value': values, 'error': errors}
 
-
-def error_prop(f, variables, covariances=None, use_covariance=False, copy_latex=False, round_latex=3):
+# ---------------------------- Error Propagation -----------------------------
+def error_prop(f: Callable, variables: List[Dict], covariances: Optional[Dict] = None, 
+               use_covariance: bool = False, copy_latex: bool = False, round_latex: int = 3) -> List[tuple]:
     """
     Calculate error propagation through a function using partial derivatives
     
@@ -76,13 +98,8 @@ def error_prop(f, variables, covariances=None, use_covariance=False, copy_latex=
             raise TypeError("Each variable must be a dict with 'value' and 'error' keys.")
         values = var['value']
         errors = var['error']
-        if isinstance(errors, (int, float)):
-            errors = [errors] * len(values)
-        if len(errors) != len(values):
-            raise ValueError(f"Errors length ({len(errors)}) must match values ({len(values)}).")
         converted_vars.append(list(zip(values, errors)))
     
-    # Rest of the function remains the same...
     # Validate data points
     num_data_points = len(converted_vars[0])
     for var in converted_vars:
@@ -167,8 +184,9 @@ def error_prop(f, variables, covariances=None, use_covariance=False, copy_latex=
     
     return results
 
-
-def perform_fit(x, y, func, p0):
+# ---------------------------- Curve Fitting --------------------------------
+def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray], 
+                func: Callable, p0: Optional[List[float]] = None) -> tuple:
     """
     Perform curve fitting with automatic error-aware method selection
     
@@ -190,7 +208,14 @@ def perform_fit(x, y, func, p0):
     >>> x_data = create_dataset([1,2,3], 0.1)
     >>> y_data = create_dataset([2,4,6], 0.2)
     >>> params, errors = perform_fit(x_data, y_data, model, [1,1])
+    >>> params, errors = perform_fit(x_data, y_data, model)  # Auto p0 = [1,1]
     """
+    # Auto-generate p0 if not provided
+    if p0 is None:
+        sig = inspect.signature(func)
+        n_params = len(sig.parameters) - 1  # Subtract x parameter
+        p0 = [1.0] * n_params
+
     # Process x data
     if isinstance(x, dict):
         x_val = np.asarray(x['value'])
@@ -244,25 +269,35 @@ def perform_fit(x, y, func, p0):
 
     return params, params_err
 
-def create_best_fit_line(*args, func, p0, xlabel=None, ylabel=None, title=None, colors=None, labels=None, fit_line=True, label_fit=None):
+# ---------------------------- Visualization --------------------------------
+def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable, 
+                        p0: Optional[Union[List[float], List[List[float]]]] = None,
+                        xlabel: str = None, ylabel: str = None, title: str = None,
+                        colors: List[str] = None, labels: List[str] = None, 
+                        fit_line: bool = True, label_fit: List[str] = None) -> None:
     """
-    Create a plot with data points and best-fit lines
-    
+    Enhanced to handle flexible p0 formats and auto-generate initial parameters.
+
     Parameters:
-    *args: Alternating x-y data pairs (e.g., x1, y1, x2, y2)
-    func: Model function for fitting
-    p0: Initial parameter guesses (list for each dataset)
-    xlabel/ylabel: Axis labels
-    title: Plot title
-    colors: Colors for each dataset
-    labels: Legend labels for datasets
-    fit_line: Whether to plot fit lines
-    
+    p0 : Can be:
+        - Single list for one dataset (e.g., [1,1])
+        - List of lists for multiple datasets (e.g., [[1,1], [2,2]])
+        - None for auto-generated 1's
+
     Example:
     >>> x = create_dataset([1,2,3], 0.1)
     >>> y = create_dataset([2,4,6], 0.2)
-    >>> create_best_fit_line(x, y, func=linear_func, p0=[1,1])
+    >>> create_best_fit_line(x, y, func=lambda x,a,b: a*x+b)  # Auto p0
     """
+    # Parameter normalization
+    num_datasets = len(args) // 2
+    if p0 is None:
+        sig = inspect.signature(func)
+        n_params = len(sig.parameters) - 1  # Infer from function
+        p0 = [[1.0]*n_params for _ in range(num_datasets)]
+    elif not isinstance(p0[0], (list, np.ndarray)):  # Single dataset format
+        p0 = [p0]
+
     if len(args) % 2 != 0:
         raise ValueError("Arguments must be pairs of x and y datasets.")
     num_datasets = len(args) // 2
@@ -276,6 +311,7 @@ def create_best_fit_line(*args, func, p0, xlabel=None, ylabel=None, title=None, 
     # Defaults
     colors = colors or [None] * num_datasets
     labels = labels or [None] * num_datasets
+    label_fit = label_fit or [None] * num_datasets
     
     plt.figure()
     if title: plt.title(title)
@@ -310,3 +346,21 @@ def create_best_fit_line(*args, func, p0, xlabel=None, ylabel=None, title=None, 
     
     plt.legend()
     plt.show()
+
+# ---------------------------- Statistical Test -----------------------------
+def test_comp(a: float, sigma_a: float, b: float, sigma_b: float) -> float:
+    """
+    Compare two measurements with error propagation.
+    
+    Returns:
+    float: Probability that the difference exceeds |a-b|
+    """
+     #si suppongono le variabili indipendenti
+    sigma_eq = math.sqrt(sigma_a**2 + sigma_b**2)
+    t_sigma =  abs(a-b)/sigma_eq
+    t = sp.symbols('t')
+    prob_entro_t_sigma = sp.erf(t / sp.sqrt(2)).subs(t, t_sigma).evalf()
+    if prob_entro_t_sigma > 0.95:
+        print("Ci che hai fatto")
+    print("probabilità entro t sigma =", prob_entro_t_sigma)
+    return 1 - prob_entro_t_sigma

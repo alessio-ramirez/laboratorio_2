@@ -1,5 +1,6 @@
 import numpy as np
-from liblab import *
+from liblab import test_comp
+from guezzi import *
 import math
 
 """per avere V_out = 0.5 V_in imponiamo R_1 = R_2 (metà della caduta di potenziale si ha dopo R_1).
