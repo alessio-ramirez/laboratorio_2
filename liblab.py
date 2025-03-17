@@ -1,3 +1,6 @@
+""" this library is just a funny memory, look at guezzi.py for
+the new library.
+"""
 import math
 import pyperclip
 import numpy as np
