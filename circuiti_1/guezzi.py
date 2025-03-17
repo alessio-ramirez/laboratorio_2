@@ -1,5 +1,11 @@
 """
-guezzi.py - A scientific utility library for error propagation, curve fitting, and data visualization.
+guezzi.py - A scientific utility library to help Bicocca's physics students, like Mr Guezzi did.
+the documentation is not updated, and the code is generally inefficient, but it works :D.
+convert every set of measurements with create_dataset before using other functions,
+the only one that returns (value, error) format (so not usable by the other functions) is error_prop.
+the fits are made with ODR or least squares, in both cases the chi square is intended to be a useful
+test only for fits linear with the parameters, for non linear fits the code might work, but the chi square
+test will be useless.
 """
 
 import numpy as np
@@ -16,7 +22,7 @@ import inspect
 from typing import Union, List, Dict, Callable, Optional
 
 # ---------------------------- Dataset Creation ------------------------------
-def create_dataset(values: Union[float, List[float], Dict], errors: Union[float, List[float]] = None) -> Dict[str, np.ndarray]:
+def create_dataset(values: Union[float, List[float], Dict], errors: Union[float, List[float]] = None, magnitude=0) -> Dict[str, np.ndarray]:
     """
     Create a standardized dataset dictionary for measurements with errors.
 
@@ -68,7 +74,7 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
     else:
         errors = np.zeros_like(values) # Zero errors if not provided
     
-    return {'value': values, 'error': errors}
+    return {'value': values*10**(magnitude), 'error': errors*10**(magnitude)}
 
 # ---------------------------- Error Propagation -----------------------------
 def error_prop(f: Callable, variables: List[Dict], covariances: Optional[Dict] = None, 
@@ -258,9 +264,9 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         params = output.beta
         params_err = output.sd_beta
         if chi_square:
-            chi = output.sum_square
+            chi_squared = output.sum_square
             dof = len(y_val) - len(params)
-            return params, params_err, chi, dof
+            return params, params_err, chi_squared, dof
 
     else:
         # Use curve_fit directly
@@ -288,7 +294,8 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
                         p0: Optional[Union[List[float], List[List[float]]]] = None,
                         xlabel: str = None, ylabel: str = None, title: str = None,
                         colors: List[str] = None, labels: List[str] = None, 
-                        fit_line: bool = True, label_fit: List[str] = None) -> None:
+                        fit_line: bool = True, label_fit: List[str] = None,
+                        together = True) -> None:
     """
     Enhanced to handle flexible p0 formats and auto-generate initial parameters.
 
@@ -327,12 +334,18 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
     labels = labels or [None] * num_datasets
     label_fit = label_fit or [None] * num_datasets
     
-    plt.figure()
-    if title: plt.title(title)
-    if xlabel: plt.xlabel(xlabel)
-    if ylabel: plt.ylabel(ylabel)
+    if together:
+        plt.figure()
+        if title: plt.title(title)
+        if xlabel: plt.xlabel(xlabel)
+        if ylabel: plt.ylabel(ylabel)
     
     for i in range(num_datasets):
+        if not together:
+            plt.figure()
+            if title: plt.title(title)
+            if xlabel: plt.xlabel(xlabel)
+            if ylabel: plt.ylabel(ylabel)
         x_data = args[2*i]
         y_data = args[2*i+1]
         
@@ -357,9 +370,13 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
             x_fit = np.linspace(x_val.min(), x_val.max(), 1000)
             plt.plot(x_fit, func(x_fit, *params), 
                     color=colors[i], linestyle='--', label=label_fit[i])
-    
-    plt.legend()
-    plt.show()
+        if not together:
+            plt.legend()
+            plt.show()
+            
+    if together:
+        plt.legend()
+        plt.show()
 
 # ---------------------------- Statistical Test -----------------------------
 def test_comp(a: float, sigma_a: float, b: float, sigma_b: float) -> float:
@@ -378,3 +395,136 @@ def test_comp(a: float, sigma_a: float, b: float, sigma_b: float) -> float:
         print("Ci che hai fatto")
     print("probabilità entro t sigma =", prob_entro_t_sigma)
     return 1 - prob_entro_t_sigma
+
+# ---------------------------- Latex Formatting -----------------------------
+def latex_table(*args, orientation="h"):
+    """
+    Generate a LaTeX table from provided datasets with homogeneous order of magnitude for each dataset,
+    and copy it to the clipboard. Values are rounded based on the error's first significant digit.
+
+    Parameters:
+    *args : str, dict pairs
+        Pairs of names and datasets. Each dataset is a dict with 'value' and 'error' arrays.
+    orientation : str, optional
+        'h' for horizontal (names as row headers), 'v' for vertical (names as column headers).
+
+    Returns:
+    str: LaTeX table code.
+    """
+    # Validate input pairs
+    if len(args) % 2 != 0:
+        raise ValueError("Arguments must be in pairs of name and dataset")
+    pairs = []
+    for i in range(0, len(args), 2):
+        name = args[i]
+        dataset = args[i+1]
+        if not isinstance(dataset, dict) or 'value' not in dataset or 'error' not in dataset:
+            raise ValueError("Dataset must be a dict with 'value' and 'error' keys")
+        if len(dataset['value']) != len(dataset['error']):
+            raise ValueError("Dataset value and error arrays must have the same length")
+        pairs.append((name, dataset))
+    
+    # Check all datasets have the same length
+    lengths = [len(d['value']) for (_, d) in pairs]
+    if len(set(lengths)) != 1:
+        raise ValueError("All datasets must have the same length")
+    n_entries = lengths[0]
+    
+    formatted_data = []
+    for name, dataset in pairs:
+        values = dataset['value']
+        errors = dataset['error']
+        
+        # Determine scaling factor based on the maximum error or value
+        if np.all(errors == 0):
+            # Use max value if all errors are zero
+            max_val = np.max(np.abs(values)) if len(values) > 0 else 0.0
+            if np.isclose(max_val, 0.0, atol=1e-12):
+                scaling_factor = 1.0
+                exponent = 0
+            else:
+                rounded_max = float(f"{max_val:.1g}")
+                if rounded_max == 0:
+                    scaling_factor = 1.0
+                    exponent = 0
+                else:
+                    exponent = np.floor(np.log10(rounded_max))
+                    scaling_factor = 10 ** exponent
+        else:
+            # Use max error
+            max_error = np.max(np.abs(errors))
+            rounded_max = float(f"{max_error:.1g}")
+            if rounded_max == 0:
+                scaling_factor = 1.0
+                exponent = 0
+            else:
+                exponent = np.floor(np.log10(rounded_max))
+                scaling_factor = 10 ** exponent
+        
+        # Handle potential division by zero or invalid scaling factor
+        if scaling_factor == 0:
+            scaling_factor = 1.0
+            exponent = 0
+        
+        # Create the new name with magnitude
+        if exponent != 0:
+            magnitude_str = f" $\\times 10^{{{int(exponent)}}}$"
+        else:
+            magnitude_str = ""
+        new_name = f"{name}{magnitude_str}"
+        
+        # Process each entry in the dataset
+        entries = []
+        for v, e in zip(values, errors):
+            scaled_v = v / scaling_factor
+            scaled_e = e / scaling_factor
+            
+            if np.isclose(scaled_e, 0.0, atol=1e-12):
+                # No error, format value with up to 3 significant digits
+                entries.append(f"{scaled_v:.3g}")
+            else:
+                # Round error to one significant digit
+                rounded_e = float(f"{scaled_e:.1g}")
+                # Determine decimal places based on rounded error
+                if rounded_e == 0:
+                    decimal_places = 0
+                else:
+                    exp_e = np.floor(np.log10(abs(rounded_e))) if rounded_e != 0 else 0
+                    decimal_places = int(-exp_e) if exp_e < 0 else 0
+                
+                # Round value to the determined decimal places
+                rounded_v = round(scaled_v, decimal_places)
+                
+                # Format value and error strings
+                str_v = f"{rounded_v:.{decimal_places}f}".rstrip('0').rstrip('.') if decimal_places !=0 else f"{int(rounded_v)}"
+                str_e = f"{rounded_e:.{decimal_places}f}".rstrip('0').rstrip('.') if decimal_places !=0 else f"{int(rounded_e)}"
+                
+                entries.append(f"${str_v} \\pm {str_e}$")
+        
+        formatted_data.append((new_name, entries))
+    
+    # Generate LaTeX code based on orientation
+    if orientation == 'h':
+        # Horizontal: each name is a row with its entries
+        columns = 'l' + ' c' * n_entries
+        latex = f"\\begin{{tabular}}{{{columns}}}\n\\hline\n"
+        for name, entries in formatted_data:
+            row = [name] + entries
+            latex += " & ".join(row) + " \\\\\n"
+        latex += "\\hline\n\\end{tabular}"
+    elif orientation == 'v':
+        # Vertical: names are column headers, entries are in columns
+        num_columns = len(pairs)
+        latex = f"\\begin{{tabular}}{{{'|c' * num_columns}}}\n\\hline\n"
+        headers = [name for (name, _) in formatted_data]
+        latex += " & ".join(headers) + " \\\\\n\\hline\n"
+        for i in range(n_entries):
+            row = [entries[i] for (_, entries) in formatted_data]
+            latex += " & ".join(row) + " \\\\\n"
+        latex += "\\hline\n\\end{tabular}"
+    else:
+        raise ValueError("Orientation must be 'h' or 'v'")
+    
+    # Copy to clipboard and return
+    pyperclip.copy(latex)
+    return latex
