@@ -22,7 +22,7 @@ import inspect
 from typing import Union, List, Dict, Callable, Optional
 
 # ---------------------------- Dataset Creation ------------------------------
-def create_dataset(values: Union[float, List[float], Dict], errors: Union[float, List[float]] = None, magnitude=0) -> Dict[str, np.ndarray]:
+def create_dataset(values: Union[float, List[float], Dict], errors: Union[float, List[float]] = None, magnitude:int=0) -> Dict[str, np.ndarray]:
     """
     Create a standardized dataset dictionary for measurements with errors.
 
@@ -33,6 +33,8 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
         - Dictionary with {value: error} pairs (if provided errors should be None)
     errors : float or list, optional
         Single error value (same error for each measured value) or list of errors
+    magnitude: int, optional
+        values and errors will be multiplied by 10^(magnitude), default is zero
 
     Returns:
     dict: {'value': np.array, 'error': np.array}
@@ -48,20 +50,19 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
     >>> create_dataset({10: 0.1, 20: 0.2})  # Dictionary input
     {'value': array([10., 20.]), 'error': array([0.1, 0.2])}
     """
-    # Scalar input case
+    # Scalar value
     if isinstance(values, (int, float)):
-        values = [float(values)] # Add a float just because
-    # Easy dictionary case
+        values = [float(values)] # Scalar error has to be a list too
+    # Values dictionary
     elif isinstance(values, dict):
-        if errors is not None:
+        if errors is not None: # We want just a set of errors
             raise ValueError("Errors must be None when using dictionary input")
         return {
-            'value' : np.array(list(values.keys()), dtype=float),
-            'error' : np.array(list(values.values()), dtype=float)
+            'value' : np.array(list(values.keys()), dtype=float)*10**(magnitude),
+            'error' : np.array(list(values.values()), dtype=float)*10**(magnitude)
         }
-    
-    # Convert values to a float array
-    values = np.array(values, dtype=float)
+    # Values list
+    values = np.array(values, dtype=float) # Numpy arrays are better
     
     # Determine the errors array
     if errors is not None:
@@ -71,6 +72,7 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
         else:
             if errors.shape != values.shape:
                 raise ValueError("Errors length have to be the same of Values")
+
     else:
         errors = np.zeros_like(values) # Zero errors if not provided
     
@@ -266,6 +268,7 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         if chi_square:
             chi_squared = output.sum_square
             dof = len(y_val) - len(params)
+            pyperclip.copy(f"$\\chi_0^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi_0^2}} = {(chi_squared/dof):.3f}$")
             return params, params_err, chi_squared, dof
 
     else:
@@ -285,6 +288,8 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
                 residuals = y_val - y_pred  # Unweighted residuals
             chi_squared = np.sum(residuals**2)
             dof = len(y_val) - len(params)
+            pyperclip.copy(f"$\\chi_0^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi_0^2}} = {(chi_squared/dof):.3f}$")
+
             return params, params_err, chi_squared, dof
 
     return params, params_err
@@ -362,14 +367,14 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
         params, params_err = perform_fit(x_data, y_data, func, p0[i])
         
         # Plot data
-        plt.errorbar(x_val, y_val, xerr=x_err, yerr=y_err, fmt='o', 
+        plt.errorbar(x_val, y_val, xerr=x_err, yerr=y_err, fmt='+', 
                     color=colors[i], label=labels[i])
         
         # Plot fit
         if fit_line:
             x_fit = np.linspace(x_val.min(), x_val.max(), 1000)
             plt.plot(x_fit, func(x_fit, *params), 
-                    color=colors[i], linestyle='--', label=label_fit[i])
+                    color=colors[i], linestyle='solid', label=label_fit[i])
         if not together:
             plt.legend()
             plt.show()
