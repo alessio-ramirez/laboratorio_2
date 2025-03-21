@@ -53,6 +53,7 @@ import pyperclip
 import sympy as sp
 import math
 import re
+import warnings
 from itertools import combinations
 import scipy.stats as stats
 from scipy.optimize import curve_fit
@@ -84,7 +85,7 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
     Returns:
     --------
     dict: {'value': np.array, 'error': np.array}
-        Standard format dataset for use with other functions in this library.
+        Standard format dataset to use with other functions in this library.
     
     Examples:
     ---------
@@ -136,7 +137,7 @@ def create_dataset(values: Union[float, List[float], Dict], errors: Union[float,
 
 # ---------------------------- Error Propagation -----------------------------
 
-def error_prop(f: Callable, *variables, covariance_matrix=None, copy_latex: bool = False, round_latex: int = 3) -> List[tuple]:
+def error_prop(f: Callable, *variables, covariance_matrix=None, copy_latex: bool = False, round_latex: int = 3) -> Dict[str, np.ndarray]:
     """
     Calculate error propagation through a function using partial derivatives.
     Among the hypothesis for the formula with partial derivatives and covariances to be
@@ -162,7 +163,8 @@ def error_prop(f: Callable, *variables, covariance_matrix=None, copy_latex: bool
     
     Returns:
     --------
-    list: [(result, error)] for each data point.
+    dict: {'value': np.array, 'error': np.array}
+        Results and errors in standard format
     
     Example:
     --------
@@ -238,7 +240,8 @@ def error_prop(f: Callable, *variables, covariance_matrix=None, copy_latex: bool
         pyperclip.copy(f"Function:\n{f_latex}\n\nPropagated Error:\n{sigma_latex}")
     
     # Calculate results for each data point
-    results = []
+    values = []
+    errors = []
     for i in range(n_points):
         # Get values for this data point
         point_values = [values[i] for values in values_list]
@@ -266,17 +269,20 @@ def error_prop(f: Callable, *variables, covariance_matrix=None, copy_latex: bool
                         error_squared += 2 * deriv_values[i] * deriv_values[j] * covariance_matrix[i, j]
         
         error = np.sqrt(error_squared)
-        results.append((value, error))
+        values.append(value)
+        errors.append(error)
     
-    return results
+    return create_dataset(values, errors)
 
 # ---------------------------- Curve Fitting --------------------------------
 
 def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray], 
-                func: Callable, p0: Optional[List[float]] = None, 
-                chi_square: bool = False, method: str = 'auto') -> tuple:
+                func: Callable, p0: Optional[Union[List[float], float]] = None, 
+                chi_square: bool = False, method: str = 'auto',
+                parameter_names: Optional[List[str]] = None,
+                mask: Optional[Union[np.ndarray, List[bool]]] = None) -> Dict:
     """
-    Perform curve fitting with automatic error-aware method selection.
+    Perform curve fitting with automatic error-aware method selection and data masking.
     
     Parameters:
     -----------
@@ -285,9 +291,8 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
     y : dict or array
         Dependent variable data. If dict, must have 'value' and optionally 'error' keys.
     func : callable
-        Model function in the form f(x, *params) for curve_fit or f(params, x) for ODR,
-        a wrapper is used if f(x, *params) is passed with ODR method.
-    p0 : list, optional
+        Model function in the form f(x, *params).
+    p0 : list or float, optional
         Initial parameter guesses. If None, defaults to [1.0, 1.0, ...].
     chi_square : bool, optional (default=False)
         If True, calculate and return chi-square statistics.
@@ -296,25 +301,47 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         - 'auto': Use ODR if x has errors, otherwise use curve_fit
         - 'curve_fit': Force use of scipy.optimize.curve_fit
         - 'odr': Force use of scipy.odr.ODR
+    parameter_names : list of str, optional
+        Names for the parameters. If None, defaults to ["param1", "param2", ...].
+    mask : array-like of bool, optional
+        Boolean mask to select which data points to use in the fit.
+        True values indicate data points to include.
+        Will be applied to both x and y data arrays.
     
     Returns:
     --------
-    tuple: 
-        If chi_square=False: (parameters, parameter_errors)
-        If chi_square=True: (parameters, parameter_errors, chi_squared, degrees_of_freedom)
+    dict: A dictionary with fit results formatted for easy table creation:
+        {
+            'parameters': {
+                'value': np.array of parameter values,
+                'error': np.array of parameter errors
+            },
+            'parameter_names': list of parameter names,
+            'stats': {
+                'chi_square': value (if requested),
+                'dof': degrees of freedom (if chi_square=True),
+                'reduced_chi_square': value (if chi_square=True)
+            },
+            'method': the method used ('curve_fit' or 'odr'),
+            'mask': the mask used for the fit (if provided)
+        }
     
     Notes:
     ------
     - ODR is used when x errors are present or method='odr'
     - curve_fit is used when no x errors are present or method='curve_fit'
     - Function signature is automatically detected and adapted for the chosen method
+    - The mask will be applied to both x and y datasets, with the same indices masked
     
     Example:
     --------
     >>> model = lambda x, a, b: a*x + b
-    >>> x_data = create_dataset([1,2,3], 0.1)
-    >>> y_data = create_dataset([2,4,6], 0.2)
-    >>> params, errors = perform_fit(x_data, y_data, model)
+    >>> x_data = create_dataset([1,2,3,4,5], 0.1)
+    >>> y_data = create_dataset([2,4,6,7,10], 0.2)
+    >>> # Use only the first 3 data points
+    >>> mask = [True, True, True, False, False]
+    >>> fit_results = perform_fit(x_data, y_data, model, mask=mask, parameter_names=["slope", "intercept"])
+    >>> latex_table_from_fit(fit_results, title="Linear Fit Results")
     """
     # Process x data
     if isinstance(x, dict):
@@ -332,11 +359,33 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         y_val = np.asarray(y)
         y_err = np.zeros_like(y_val)
     
-    # Auto-generate initial parameters if not provided
-    if p0 is None:
+    # Process mask if provided
+    if mask is not None:
+        mask = np.asarray(mask, dtype=bool)
+        if len(mask) != len(x_val):
+            raise ValueError(f"Mask length ({len(mask)}) must match data length ({len(x_val)})")
+        
+        # Apply mask to all arrays
+        x_val = x_val[mask]
+        x_err = x_err[mask]
+        y_val = y_val[mask]
+        y_err = y_err[mask]
+    
+    # Handle p0 cases
+    n_params = len(sig.parameters) - 1  # Subtract the x parameter
+    if p0 is None: # Auto-generate initial parameters if not provided
         sig = inspect.signature(func)
-        n_params = len(sig.parameters) - 1  # Subtract the x parameter
         p0 = [1.0] * n_params
+    elif isinstance(p0, (int, float)):
+        p0 = [p0] * n_params
+    elif len(p0) != n_params:
+        raise TypeError(f"The length of p0 ({len(p0)}) must match the number of parameters ({n_params})")
+
+    # Auto-generate parameter names if not provided
+    if parameter_names is None:
+        parameter_names = [f"param{i+1}" for i in range(n_params)]
+    elif len(parameter_names) != len(p0):
+        raise ValueError(f"Number of parameter names ({len(parameter_names)}) must match number of parameters ({len(p0)})")
     
     # Determine fitting method
     has_x_errors = np.any(x_err > 0)
@@ -350,21 +399,25 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
     else:
         raise ValueError("Method must be 'auto', 'curve_fit', or 'odr'")
     
+    # Prepare result dictionary
+    result = {
+        'parameter_names': parameter_names,
+        'stats': {},
+        'method': 'odr' if use_odr else 'curve_fit'
+    }
+    
+    # Store mask in result if provided
+    if mask is not None:
+        result['mask'] = mask
+    
     # Perform fitting
     if use_odr:
-        # Check function signature and adapt if needed
-        sig = inspect.signature(func)
-        params = list(sig.parameters.values())
-        
-        if len(params) > 0 and params[0].name == 'x':
-            # Convert from curve_fit style to ODR style
-            def odr_wrapper(beta, x):
-                return func(x, *beta)
-            fit_func = odr_wrapper
-        else:
-            fit_func = func
-        
+        def odr_wrapper(beta, x): # Convert from curve_fit style to ODR style
+            return func(x, *beta)
+        fit_func = odr_wrapper
+    
         # Prepare data for ODR
+        from scipy.odr import Model, ODR, RealData
         odr_model = Model(fit_func)
         data = RealData(x_val, y_val, sx=x_err, sy=y_err)
         odr = ODR(data, odr_model, beta0=p0)
@@ -373,51 +426,81 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         params = output.beta
         params_err = output.sd_beta
         
+        # Store parameters in result dictionary
+        result['parameters'] = {
+            'value': np.array(params),
+            'error': np.array(params_err)
+        }
+        
         if chi_square:
             chi_squared = output.sum_square
             dof = len(y_val) - len(params)
             reduced_chi_sq = chi_squared / dof if dof > 0 else np.nan
             
-            # Copy chi-square statistics to clipboard
-            if pyperclip:
-                pyperclip.copy(f"$\\chi^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi^2}} = {reduced_chi_sq:.3f}$")
+            # Store statistics in result dictionary
+            result['stats'] = {
+                'chi_square': chi_squared,
+                'dof': dof,
+                'reduced_chi_square': reduced_chi_sq
+            }
             
-            return params, params_err, chi_squared, dof
+            # Copy chi-square statistics to clipboard if available
+            try:
+                import pyperclip
+                pyperclip.copy(f"$\\chi^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi^2}} = {reduced_chi_sq:.3f}$")
+            except (ImportError, AttributeError):
+                pass
         
     else:  # Use curve_fit
         # Handle y errors
+        from scipy.optimize import curve_fit
         if np.any(y_err > 0):
             # Replace zero errors with small values to avoid division by zero
             y_err_adj = np.where(y_err == 0, 1e-10, y_err)
-            popt, pcov = curve_fit(func, x_val, y_val, p0=p0, sigma=y_err_adj, absolute_sigma=True)
+            popt, pcov = curve_fit(func, x_val, y_val, p0=p0, sigma=y_err_adj, absolute_sigma=True) #Doesn't change y errors
         else:
             popt, pcov = curve_fit(func, x_val, y_val, p0=p0)
         
         params = popt
         params_err = np.sqrt(np.diag(pcov))
         
+        # Store parameters in result dictionary
+        result['parameters'] = {
+            'value': np.array(params),
+            'error': np.array(params_err)
+        }
+        
         if chi_square:
             # Calculate chi-square
             y_pred = func(x_val, *params)
             
             if np.any(y_err > 0):
-                y_err_adj = np.where(y_err == 0, 1e-10, y_err)
+                y_err_adj = np.where(y_err == 0, 1e-10, y_err) # Check for zero division
                 residuals = (y_val - y_pred) / y_err_adj
                 chi_squared = np.sum(residuals**2)
             else:
-                residuals = y_val - y_pred
+                residuals = y_val - y_pred # It has no statistical meaning
                 chi_squared = np.sum(residuals**2)
+                warnings.warn("Chi squared test with no y errors has no meaning")
             
             dof = len(y_val) - len(params)
             reduced_chi_sq = chi_squared / dof if dof > 0 else np.nan
             
-            # Copy chi-square statistics to clipboard
-            if pyperclip:
-                pyperclip.copy(f"$\\chi^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi^2}} = {reduced_chi_sq:.3f}$")
+            # Store statistics in result dictionary
+            result['stats'] = {
+                'chi_square': chi_squared,
+                'dof': dof,
+                'reduced_chi_square': reduced_chi_sq
+            }
             
-            return params, params_err, chi_squared, dof
+            # Copy chi-square statistics to clipboard if available
+            try:
+                import pyperclip
+                pyperclip.copy(f"$\\chi^2 = {chi_squared:.3f}$, dof$={dof}$, $\\tilde{{\\chi^2}} = {reduced_chi_sq:.3f}$")
+            except (ImportError, AttributeError):
+                pass
     
-    return params, params_err
+    return result
 
 # ---------------------------- Latex Formatting -----------------------------
 
@@ -565,7 +648,172 @@ def latex_table(*args, orientation="h", magnitude=None):
     pyperclip.copy(latex)
     return latex
 
+def fit_results_table(*args, orientation="h", parameter_labels: Optional[List[str]] = None,
+                      include_stats: List[str] = None, precision: int = 3) -> str:
+    """
+    Generate a LaTeX table of fit results.
+    
+    Parameters:
+    -----------
+    *args : Dict
+        Fit result dictionaries from perform_fit, with optional labels
+    orientation : str
+        Table orientation: 'h' (horizontal) or 'v' (vertical)
+    parameter_labels : Optional[List[str]]
+        Custom labels for parameters (overrides parameter_names in fit results)
+    include_stats : List[str]
+        Statistics to include in the table (e.g., 'chi_square', 'r_squared')
+    precision : int
+        Decimal precision for values
+        
+    Returns:
+    --------
+    str
+        LaTeX code for the table
+    """
+    # Process arguments
+    results = []
+    labels = []
+    
+    for i, arg in enumerate(args):
+        if i % 2 == 0 and i + 1 < len(args) and isinstance(args[i+1], dict) and 'parameters' in args[i+1]:
+            # This is a label for the next fit result
+            labels.append(str(arg))
+        elif isinstance(arg, dict) and 'parameters' in arg:
+            # This is a fit result
+            results.append(arg)
+            # If no label was provided
+            if len(labels) < len(results):
+                labels.append(f"Fit {len(results)}")
+    
+    if not results:
+        raise ValueError("No fit results provided")
+    
+    # Default statistics to include
+    if include_stats is None:
+        include_stats = ['chi_square', 'reduced_chi_square', 'r_squared', 'dof']
+    
+    # Get all parameter names
+    all_param_names = []
+    for result in results:
+        param_names = result.get('parameter_names', [])
+        for name in param_names:
+            if name not in all_param_names:
+                all_param_names.append(name)
+    
+    # Use custom parameter labels if provided
+    if parameter_labels is not None:
+        if len(parameter_labels) != len(all_param_names):
+            raise ValueError(f"Number of parameter labels ({len(parameter_labels)}) must match number of parameters ({len(all_param_names)})")
+        param_display_names = parameter_labels
+    else:
+        param_display_names = all_param_names
+    
+    # Format values with errors
+    def format_value_error(value, error):
+        if np.isclose(error, 0.0):
+            return f"{value:.{precision}g}"
+        else:
+            # Find appropriate decimal places based on error
+            if error < 1e-10:
+                decimal_places = precision
+            else:
+                decimal_places = -int(np.floor(np.log10(error))) + (precision - 1)
+                decimal_places = max(0, decimal_places)
+            
+            formatted_value = f"{value:.{decimal_places}f}"
+            formatted_error = f"{error:.{decimal_places}f}"
+            return f"${formatted_value} \\pm {formatted_error}$"
+    
+    # Format statistic value
+    def format_stat_value(value):
+        if isinstance(value, (int, np.integer)):
+            return f"{value}"
+        else:
+            return f"{value:.{precision}g}"
+    
+    # Generate horizontal table (parameters as rows, fits as columns)
+    if orientation == 'h':
+        # Create header row
+        header = ["Parameter"] + labels
+        rows = []
+        
+        # Add parameter rows
+        for i, param_name in enumerate(all_param_names):
+            row = [param_display_names[i]]
+            for result in results:
+                param_index = result.get('parameter_names', []).index(param_name) if param_name in result.get('parameter_names', []) else -1
+                if param_index >= 0:
+                    value = result['parameters']['value'][param_index]
+                    error = result['parameters']['error'][param_index]
+                    row.append(format_value_error(value, error))
+                else:
+                    row.append("--")
+            rows.append(row)
+        
+        # Add statistics rows
+        for stat in include_stats:
+            if any(stat in result.get('stats', {}) for result in results):
+                row = [stat.replace("_", " ").title()]
+                for result in results:
+                    if stat in result.get('stats', {}):
+                        row.append(format_stat_value(result['stats'][stat]))
+                    else:
+                        row.append("--")
+                rows.append(row)
+        
+        # Generate LaTeX code
+        cols = "|l|" + "c|" * len(results)
+        latex = f"\\begin{{tabular}}{{{cols}}}\n\\hline\n"
+        latex += " & ".join(header) + " \\\\\n\\hline\\hline\n"
+        for row in rows:
+            latex += " & ".join(row) + " \\\\\n\\hline\n"
+        latex += "\\end{tabular}"
+        
+    # Generate vertical table (fits as rows, parameters as columns)
+    else:  # orientation == 'v'
+        # Create header row with parameter names
+        header = ["Fit"] + param_display_names + [stat.replace("_", " ").title() for stat in include_stats if any(stat in result.get('stats', {}) for result in results)]
+        rows = []
+        
+        # Add a row for each fit
+        for i, (label, result) in enumerate(zip(labels, results)):
+            row = [label]
+            
+            # Add parameter values
+            for param_name in all_param_names:
+                param_index = result.get('parameter_names', []).index(param_name) if param_name in result.get('parameter_names', []) else -1
+                if param_index >= 0:
+                    value = result['parameters']['value'][param_index]
+                    error = result['parameters']['error'][param_index]
+                    row.append(format_value_error(value, error))
+                else:
+                    row.append("--")
+            
+            # Add statistics
+            for stat in include_stats:
+                if any(stat in res.get('stats', {}) for res in results):
+                    if stat in result.get('stats', {}):
+                        row.append(format_stat_value(result['stats'][stat]))
+                    else:
+                        row.append("--")
+            
+            rows.append(row)
+        
+        # Generate LaTeX code
+        cols = "|l|" + "c|" * (len(all_param_names) + sum(1 for stat in include_stats if any(stat in result.get('stats', {}) for result in results)))
+        latex = f"\\begin{{tabular}}{{{cols}}}\n\\hline\n"
+        latex += " & ".join(header) + " \\\\\n\\hline\\hline\n"
+        for row in rows:
+            latex += " & ".join(row) + " \\\\\n\\hline\n"
+        latex += "\\end{tabular}"
+    
+    # Copy to clipboard and return
+    pyperclip.copy(latex)
+    return latex
+
 # ---------------------------- Visualization --------------------------------
+
 def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable, 
                          p0: Optional[Union[List[float], List[List[float]]]] = None,
                          xlabel: str = None, ylabel: str = None, title: str = None,
@@ -582,9 +830,16 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
                          show_chi_squared: bool = False,
                          xlim: tuple = None, ylim: tuple = None,
                          capsize: float = 3, axis_fontsize: int = 12,
-                         title_fontsize: int = 14) -> plt.Figure:
+                         title_fontsize: int = 14,
+                         masks: List[np.ndarray] = None,
+                         parameter_names: List[List[str]] = None,
+                         method: str = 'auto',
+                         show_masked_points: bool = True,
+                         masked_fmt: str = 'x',
+                         masked_color: str = None,
+                         masked_alpha: float = 0.5) -> plt.Figure:
     """
-    Create a plot with data points and their best-fit curves.
+    Create a plot with data points and their best-fit curves, using perform_fit for the fitting.
     
     Parameters:
     -----------
@@ -647,6 +902,21 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
         Font size for axis labels.
     title_fontsize : int, optional (default=14)
         Font size for the title.
+    masks : list of arrays, optional
+        List of boolean masks for each dataset. True values indicate data points to include in the fit.
+        Each mask will be applied to the corresponding dataset pair.
+    parameter_names : list of lists, optional
+        Names for parameters in each fit. Can be a list of lists for multiple datasets.
+    method : str, optional (default='auto')
+        Fitting method: 'auto', 'curve_fit', or 'odr' to pass to perform_fit.
+    show_masked_points : bool, optional (default=True)
+        If True, also display the masked (excluded) points with a different style.
+    masked_fmt : str, optional (default='x')
+        Format string for the masked data points.
+    masked_color : str, optional
+        Color for masked points. If None, uses the same color as unmasked but with transparency.
+    masked_alpha : float, optional (default=0.5)
+        Alpha transparency for masked points.
     
     Returns:
     --------
@@ -660,13 +930,18 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
     >>> model = lambda x, a, b: a*x + b
     >>> fig = create_best_fit_line(x, y, func=model, show_fit_params=True)
     
-    >>> # Multiple datasets
+    >>> # Multiple datasets with masks
     >>> x1 = create_dataset([1, 2, 3, 4, 5], 0.1)
     >>> y1 = create_dataset([2.1, 3.9, 6.2, 8.1, 9.8], 0.2)
     >>> x2 = create_dataset([1, 2, 3, 4, 5], 0.1)
     >>> y2 = create_dataset([1.1, 1.9, 3.2, 4.1, 4.8], 0.2)
-    >>> fig = create_best_fit_line(x1, y1, x2, y2, func=model, labels=['Dataset 1', 'Dataset 2'])
+    >>> # Mask to exclude the last point of the first dataset
+    >>> mask1 = [True, True, True, True, False]
+    >>> fig = create_best_fit_line(x1, y1, x2, y2, func=model, 
+    ...                            masks=[mask1, None], 
+    ...                            labels=['Dataset 1', 'Dataset 2'])
     """
+    
     # Parameter normalization
     if len(args) % 2 != 0:
         raise ValueError("Arguments must be pairs of x and y datasets.")
@@ -684,6 +959,20 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
         p0 = [p0] * num_datasets
     elif len(p0) != num_datasets:
         raise ValueError(f"p0 length ({len(p0)}) must match number of datasets ({num_datasets}).")
+    
+    # Handle parameter_names
+    if parameter_names is None:
+        parameter_names = [[f"p{j}" for j in range(n_params)] for _ in range(num_datasets)]
+    elif not isinstance(parameter_names[0], (list, tuple)):
+        parameter_names = [parameter_names] * num_datasets
+    elif len(parameter_names) != num_datasets:
+        raise ValueError(f"parameter_names length ({len(parameter_names)}) must match number of datasets ({num_datasets}).")
+    
+    # Handle masks
+    if masks is None:
+        masks = [None] * num_datasets
+    elif len(masks) != num_datasets:
+        raise ValueError(f"masks length ({len(masks)}) must match number of datasets ({num_datasets}).")
     
     # Ensure other parameters are lists of the right length
     def ensure_list(param, name):
@@ -745,43 +1034,88 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
     for i in range(num_datasets):
         x_data = args[2*i]
         y_data = args[2*i+1]
+        mask = masks[i]
         
         # Extract data
-        x_val = np.array(x_data['value'])
-        x_err = x_data.get('error', np.zeros_like(x_val))
-        if np.isscalar(x_err):
-            x_err = np.full_like(x_val, x_err)
-        
-        y_val = np.array(y_data['value'])
-        y_err = y_data.get('error', np.zeros_like(y_val))
-        if np.isscalar(y_err):
-            y_err = np.full_like(y_val, y_err)
-        
-        # Perform fit
-        if show_chi_squared:
-            params, params_err, chi_squared, dof = perform_fit(x_data, y_data, func, p0[i], chi_square=True)
-            chi_squared_values.append((chi_squared, dof))
+        if isinstance(x_data, dict):
+            x_val = np.array(x_data['value'])
+            x_err = x_data.get('error', np.zeros_like(x_val))
+            if np.isscalar(x_err):
+                x_err = np.full_like(x_val, x_err)
         else:
-            params, params_err = perform_fit(x_data, y_data, func, p0[i])
+            x_val = np.array(x_data)
+            x_err = np.zeros_like(x_val)
         
-        # Format fit parameters for display
-        if show_fit_params:
-            param_str = []
-            for j, (p, e) in enumerate(zip(params, params_err)):
-                param_str.append(f"p{j} = {p:.4g} ± {e:.4g}")
-            fit_params_text.append(", ".join(param_str))
+        if isinstance(y_data, dict):
+            y_val = np.array(y_data['value'])
+            y_err = y_data.get('error', np.zeros_like(y_val))
+            if np.isscalar(y_err):
+                y_err = np.full_like(y_val, y_err)
+        else:
+            y_val = np.array(y_data)
+            y_err = np.zeros_like(y_val)
         
         # Create data label
         data_label = labels[i]
         if data_label is None and labels == [None] * num_datasets:
             data_label = f"Dataset {i+1}"
         
-        # Plot data
-        ax_main.errorbar(x_val, y_val, xerr=x_err, yerr=y_err, fmt=fmt, 
-                         color=colors[i], label=data_label, markersize=markersize,
-                         capsize=capsize)
+        # Create inverse mask for displaying masked points
+        if mask is not None:
+            inverse_mask = ~np.array(mask)
+        else:
+            inverse_mask = np.zeros_like(x_val, dtype=bool)
         
-        # Plot fit
+        # Perform fit using the mask
+        if show_chi_squared:
+            fit_result = perform_fit(x_data, y_data, func, p0=p0[i], 
+                                  chi_square=True, mask=mask, 
+                                  parameter_names=parameter_names[i],
+                                  method=method)
+            params = fit_result['parameters']['value']
+            params_err = fit_result['parameters']['error']
+            chi_squared = fit_result['stats']['chi_square']
+            dof = fit_result['stats']['dof']
+            reduced_chi_sq = fit_result['stats']['reduced_chi_square']
+            chi_squared_values.append((chi_squared, dof, reduced_chi_sq))
+        else:
+            fit_result = perform_fit(x_data, y_data, func, p0=p0[i], 
+                                  mask=mask,
+                                  parameter_names=parameter_names[i],
+                                  method=method)
+            params = fit_result['parameters']['value']
+            params_err = fit_result['parameters']['error']
+        
+        # Format fit parameters for display
+        if show_fit_params:
+            param_str = []
+            param_names = parameter_names[i]
+            for j, (name, p, e) in enumerate(zip(param_names, params, params_err)):
+                param_str.append(f"{name} = {p:.4g} ± {e:.4g}")
+            fit_params_text.append(", ".join(param_str))
+        
+        # Plot unmasked data points
+        if mask is not None:
+            # Plot points included in the fit
+            ax_main.errorbar(x_val[mask], y_val[mask], xerr=x_err[mask], yerr=y_err[mask], 
+                             fmt=fmt, color=colors[i], label=data_label, 
+                             markersize=markersize, capsize=capsize)
+            
+            # Plot masked points if requested
+            if show_masked_points and np.any(inverse_mask):
+                masked_c = masked_color if masked_color else colors[i]
+                ax_main.errorbar(x_val[inverse_mask], y_val[inverse_mask], 
+                                 xerr=x_err[inverse_mask], yerr=y_err[inverse_mask], 
+                                 fmt=masked_fmt, color=masked_c, alpha=masked_alpha,
+                                 markersize=markersize, capsize=capsize,
+                                 label=f"{data_label} (excluded)")
+        else:
+            # Plot all data points if no mask
+            ax_main.errorbar(x_val, y_val, xerr=x_err, yerr=y_err, fmt=fmt, 
+                             color=colors[i], label=data_label, markersize=markersize,
+                             capsize=capsize)
+        
+        # Plot fit line
         if fit_line:
             # Determine fit range
             if fit_range is None:
@@ -807,7 +1141,7 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
                 from scipy.stats import t
                 
                 alpha = 1.0 - confidence_interval
-                n = len(x_val)
+                n = len(x_val) if mask is None else np.sum(mask)
                 p = len(params)
                 dof = max(0, n - p)
                 
@@ -815,8 +1149,15 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
                     t_val = t.ppf(1 - alpha/2, dof)
                     
                     # Standard error of the regression
-                    y_pred = func(x_val, *params)
-                    ss_residuals = np.sum((y_val - y_pred)**2)
+                    if mask is not None:
+                        x_val_fit = x_val[mask]
+                        y_val_fit = y_val[mask]
+                    else:
+                        x_val_fit = x_val
+                        y_val_fit = y_val
+                    
+                    y_pred = func(x_val_fit, *params)
+                    ss_residuals = np.sum((y_val_fit - y_pred)**2)
                     mse = ss_residuals / dof if dof > 0 else 0
                     se = np.sqrt(mse)
                     
@@ -827,10 +1168,15 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
                         h = 1e-8
                         new_params = params.copy()
                         new_params[j] += h
-                        X[:, j] = (func(x_val, *new_params) - y_pred) / h
+                        X[:, j] = (func(x_val_fit, *new_params) - y_pred) / h
                     
                     # Covariance matrix
-                    covariance = np.linalg.inv(X.T @ X) if dof > 0 else np.eye(p)
+                    try:
+                        covariance = np.linalg.inv(X.T @ X) if dof > 0 else np.eye(p)
+                    except np.linalg.LinAlgError:
+                        # Handle singular matrix
+                        covariance = np.eye(p)
+                        print(f"Warning: Singular matrix in confidence interval calculation for dataset {i+1}")
                     
                     # Confidence interval
                     y_err_fit = np.zeros_like(x_fit)
@@ -849,40 +1195,61 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
             
             # Plot residuals if requested
             if residuals:
-                y_pred = func(x_val, *params)
-                residual = y_val - y_pred
-                ax_res.errorbar(x_val, residual, yerr=y_err, fmt=fmt, 
+                if mask is not None:
+                    x_val_fit = x_val[mask]
+                    y_val_fit = y_val[mask]
+                    y_err_fit = y_err[mask]
+                else:
+                    x_val_fit = x_val
+                    y_val_fit = y_val
+                    y_err_fit = y_err
+                
+                y_pred = func(x_val_fit, *params)
+                residual = y_val_fit - y_pred
+                ax_res.errorbar(x_val_fit, residual, yerr=y_err_fit, fmt=fmt, 
                                 color=colors[i], markersize=markersize,
                                 capsize=capsize)
-                ax_res.axhline(y=0, color='k', linestyle='--', alpha=0.7)
+                
+                # Also show excluded points in residuals plot if requested
+                if show_masked_points and mask is not None and np.any(inverse_mask):
+                    x_val_excl = x_val[inverse_mask]
+                    y_val_excl = y_val[inverse_mask]
+                    y_pred_excl = func(x_val_excl, *params)
+                    residual_excl = y_val_excl - y_pred_excl
+                    y_err_excl = y_err[inverse_mask]
+                    masked_c = masked_color if masked_color else colors[i]
+                    ax_res.errorbar(x_val_excl, residual_excl, yerr=y_err_excl, 
+                                    fmt=masked_fmt, color=masked_c, alpha=masked_alpha,
+                                    markersize=markersize, capsize=capsize)
+                
+                # Add a horizontal line at y=0 for reference
+                ax_res.axhline(y=0, color='black', linestyle='-', alpha=0.3)
     
-    # Add legend
-    if any(label is not None for label in labels) or any(label is not None for label in label_fit):
+    # Display fit parameters and chi-squared if requested
+    if show_fit_params:
+        for i, param_text in enumerate(fit_params_text):
+            ax_main.annotate(param_text, xy=(0.02, 0.98 - i*0.05), xycoords='axes fraction',
+                             fontsize=10, va='top', color=colors[i])
+    
+    if show_chi_squared:
+        for i, (chi_sq, dof, red_chi_sq) in enumerate(chi_squared_values):
+            chi_sq_text = f"χ²={chi_sq:.4g}, dof={dof}, χ²/dof={red_chi_sq:.4g}"
+            y_pos = 0.98 - i*0.05
+            if show_fit_params:
+                y_pos -= len(fit_params_text) * 0.05
+            ax_main.annotate(chi_sq_text, xy=(0.02, y_pos), xycoords='axes fraction',
+                            fontsize=10, va='top', color=colors[i])
+    
+    # Add legend if appropriate
+    if any(l is not None for l in labels) or (fit_line and any(l is not None for l in label_fit)):
         ax_main.legend(loc=legend_loc)
     
-    # Add fit parameters to plot
-    if show_fit_params:
-        for i, text in enumerate(fit_params_text):
-            ax_main.text(0.02, 0.98 - i*0.05, text, transform=ax_main.transAxes, 
-                         fontsize=10, verticalalignment='top', color=colors[i])
     
-    # Add chi-squared values to plot
-    if show_chi_squared:
-        for i, (chi_sq, dof) in enumerate(chi_squared_values):
-            reduced_chi_sq = chi_sq / dof if dof > 0 else np.nan
-            chi_sq_text = f"χ² = {chi_sq:.4g}, dof = {dof}, χ²/dof = {reduced_chi_sq:.4g}"
-            ax_main.text(0.02, 0.98 - i*0.05 - (len(fit_params_text) * 0.05), 
-                         chi_sq_text, transform=ax_main.transAxes, 
-                         fontsize=10, verticalalignment='top', color=colors[i])
-    
-    # Adjust layout
-    plt.tight_layout()
-    
-    # Save the figure if requested
+    # Save the figure if a path is provided
     if save_path:
         plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
     
-    # Show the plot if not in a notebook
+    # Show the figure if in a Jupyter notebook
     if not in_notebook():
         plt.show()
     
@@ -1106,10 +1473,6 @@ def test_comp(a: float, sigma_a: float, b: float, sigma_b: float,
         plt.show()
     
     return result
-
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
 
 def test_comp_advanced(a, sigma_a, b, sigma_b, method='normal', alpha=0.05, 
                       n_a=None, n_b=None, corr_coef=0.0, test_type='equivalence',

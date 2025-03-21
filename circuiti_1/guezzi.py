@@ -275,7 +275,7 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         # Use curve_fit directly
         if np.any(y_err != 0):
             y_err = np.where(y_err == 0, 1e-10, y_err)
-            popt, pcov = curve_fit(func, x_val, y_val, p0=p0, sigma=y_err, absolute_sigma=True)
+            popt, pcov = curve_fit(func, x_val, y_val, p0=p0, sigma=y_err, absolute_sigma=True) # Don't change errors
         else:
             popt, pcov = curve_fit(func, x_val, y_val, p0=p0)
         params = popt
