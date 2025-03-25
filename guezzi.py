@@ -1252,8 +1252,7 @@ def create_best_fit_line(*args: Union[Dict, np.ndarray], func: Callable,
         plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
     
     # Show the figure if in a Jupyter notebook
-    if not in_notebook():
-        plt.show()
+    plt.show()
     
     return fig
 
