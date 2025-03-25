@@ -372,6 +372,8 @@ def perform_fit(x: Union[Dict, np.ndarray], y: Union[Dict, np.ndarray],
         y_err = y_err[mask]
     
     # Handle p0 cases
+     # Get function parameter count
+    sig = inspect.signature(func)
     n_params = len(sig.parameters) - 1  # Subtract the x parameter
     if p0 is None: # Auto-generate initial parameters if not provided
         sig = inspect.signature(func)
