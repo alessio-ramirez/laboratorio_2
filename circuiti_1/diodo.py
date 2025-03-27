@@ -44,6 +44,6 @@ create_best_fit_line(V_1, I_1, V_2, I_2, func=expon, p0=[[10**(-10), 1],[10**(-1
                     title="Diodo", 
                     label_fit=["configurazione 1", "configurazione 2"], # Nome delle linee
                     show_chi_squared=True, show_fit_params=True, show_masked_points=False,
-                    residuals=True) # Plotta separatamente i grafici
+                    residuals=True, parameter_names=[["a", "b"]["a", "b"]]) # Plotta separatamente i grafici
 
 
