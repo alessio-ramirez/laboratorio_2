@@ -7,7 +7,7 @@ and FitResult objects, suitable for inclusion in reports.
 """
 
 import numpy as np
-from typing import List, Optional, Dict, Union, Sequence # Added Sequence
+from typing import List, Optional, Dict, Union, Sequence, Any # Added Sequence
 import warnings
 try:
     # pyperclip allows copying the generated LaTeX code to the clipboard
