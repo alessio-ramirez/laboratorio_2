@@ -1,11 +1,40 @@
-\begin{tabular}{|l|c|}
-    \hline
-    Parameter & random \\
-    \hline\hline
-    $V_g$ & $-0.130180 \pm 0.000714$ \\
-    \hline
-    $\tau$ & $0.00095959 \pm 0.00000527$ \\
-    \hline
-    c & $-0.172057 \pm 0.000498$ \\
-    \hline
-    \end{tabular}
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb}
+
+%dark mode
+\usepackage{darkmode}
+\enabledarkmode
+
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+\pdfsuppresswarningpagegroup=1
+
+\begin{document}
+
+
+    \begin{table}[htbp]
+\centering
+\begin{tabular}{|l|cccccc|}
+\hline
+Fit Label & k & tau & c & $\chi^2$ & DoF & $\chi^2/\text{DoF}$ \\\hline\hline
+Fit 1 & -494.91000000 ± 0.74000000 m & 140.75000000000000 ± 0.50000000000000 µ & 245.19000000 ± 0.47000000 m & 6.06 & 31 & 0.196 \\\hline
+\end{tabular}
+\end{table}
+
+
+\end{document}

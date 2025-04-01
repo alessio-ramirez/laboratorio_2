@@ -170,16 +170,7 @@ class Measurement:
         # NumPy handles scalar vs array results automatically based on key
         new_value = self.value[key]
         new_error = self.error[key]
-        # Ensure the result is still wrapped in Measurement
-        # If indexing results in a scalar, it needs to be re-wrapped
-        if np.isscalar(new_value):
-             return Measurement(new_value, new_error)
-        else:
-             # If result is an array, create new Measurement directly
-             # Need a way to init from arrays without rescaling or checks... maybe a private constructor?
-             # For now, standard init works but is slightly less efficient.
-             return Measurement(new_value, new_error)
-
+        return Measurement(new_value, new_error)
 
     # --- String Representations ---
 
@@ -198,7 +189,7 @@ class Measurement:
              val_str = f"{val:.3g}" # General format, up to 3 sig figs
              err_str = f"{err:.2g}" # General format, up to 2 sig figs for error
              return f"{val_str} ± {err_str}"
-        elif self.size <= 10: # Small array, show elements
+        elif self.size <= 30: # Small array, show elements
             parts = [f"{v:.3g} ± {e:.2g}"
                      for v, e in zip(self.value.flat, self.error.flat)]
             # Attempt to format based on original dimensions
@@ -230,7 +221,7 @@ class Measurement:
              warnings.warn(f"Infinity value encountered during {operation_name}", RuntimeWarning)
         # Check error array (Errors should ideally not be NaN/Inf unless value is also problematic)
         # Suppress warnings if error is NaN/Inf only where value is also NaN/Inf
-        error_is_problematic = (np.isnan(error) & ~np.isnan(value)) | (np.isinf(error) & ~np.isinf(value))
+        error_is_problematic = ((np.isnan(error) | np.isinf(error)) & (~np.isnan(value) & ~np.isinf(value) ))
         if np.any(error_is_problematic):
              warnings.warn(f"NaN or Infinity error encountered during {operation_name} "
                            "where value is finite/valid.", RuntimeWarning)
@@ -289,9 +280,7 @@ class Measurement:
             self._check_nan_inf(result.value, result.error, "subtraction")
             return result
         else:
-            # Let __sub__ handle Measurement - Measurement via -(M2 - M1) if necessary,
-            # but direct implementation is usually done via `a - b`.
-            # If `other` is not Number/ndarray, standard mechanisms apply.
+            # Let __sub__ handle Measurement - Measurement
             return NotImplemented
 
     def __mul__(self, other: Any) -> 'Measurement':
@@ -303,12 +292,12 @@ class Measurement:
             # Calculate variance terms, np.hypot is good for sqrt(x²+y²)
             # This form avoids division by zero if a or b is zero.
             with np.errstate(invalid='ignore'): # Ignore potential 0*inf warnings if errors are inf
-                 term1_sq = (b * sa)**2
-                 term2_sq = (a * sb)**2
-                 # If a value is exactly zero, its contribution to the other term's error is zero
-                 term1_sq = np.where(b == 0.0, 0.0, term1_sq)
-                 term2_sq = np.where(a == 0.0, 0.0, term2_sq)
-                 new_error = np.sqrt(term1_sq + term2_sq)
+                 term1 = b * sa
+                 term2 = a * sb
+                 # Handles 0 * inf, where NaN is returned, but if b is exactly zero then error is zero
+                 term1 = np.where(b == 0.0, 0.0, term1)
+                 term2 = np.where(a == 0.0, 0.0, term2)
+                 new_error = np.hypot(term1, term2) # Again, np.hypot is better with edge cases and efficiency
 
             result = Measurement(new_value, new_error)
             self._check_nan_inf(result.value, result.error, "multiplication")
@@ -340,17 +329,17 @@ class Measurement:
                 # Calculate error terms carefully
                 # term1 = sa / b
                 # term2 = a * sb / b**2 = new_value * sb / b
-                term1_sq = (sa / b)**2
-                term2_sq = (new_value * sb / b)**2
+                term1 = sa / b
+                term2 = new_value * sb / b
 
                 # Handle cases involving zero explicitly to avoid NaN/Inf from calculation itself
                 # if b is zero, error should be inf (unless a is also zero?)
-                term1_sq = np.where(b == 0.0, np.inf, term1_sq)
-                term2_sq = np.where(b == 0.0, np.inf, term2_sq)
+                term1 = np.where(b == 0.0, np.inf, term1)
+                term2 = np.where(b == 0.0, np.inf, term2)
                 # If a is zero, the second term contribution is zero (unless b is also zero)
-                term2_sq = np.where((a == 0.0) & (b != 0.0), 0.0, term2_sq)
+                term2 = np.where((a == 0.0) & (b != 0.0), 0.0, term2)
 
-                new_error = np.sqrt(term1_sq + term2_sq)
+                new_error = np.hypot(term1, term2)
 
             elif isinstance(other, (Number, np.ndarray)):
                 # M / k: σ = σ_M / |k|
@@ -415,7 +404,7 @@ class Measurement:
 
             elif isinstance(other, Measurement):
                 # M1 ** M2: f(a,b) = a^b
-                # σ² = (∂f/∂a * σₐ)² + (∂f/∂b * σ<0xE2><0x82><0x99>)²
+                # σ² = (∂f/∂a * σₐ)² + (∂f/∂b * σb)²
                 # ∂f/∂a = b * a^(b-1)
                 # ∂f/∂b = a^b * ln(a) = value * ln(a)
                 a, sa = self.value, self.error
@@ -436,18 +425,18 @@ class Measurement:
                 df_da = b * (a ** (b - 1))
                 df_db = new_value * np.log(a) # This will be nan if a <= 0
 
-                term_a_sq = (df_da * sa)**2
-                term_b_sq = (df_db * sb)**2
+                term_a = df_da * sa
+                term_b= df_db * sb
 
                 # Handle NaNs from derivatives appropriately
                 # If derivative is NaN, variance contribution should be NaN unless error is 0
-                term_a_sq = np.where(np.isnan(df_da) & (sa != 0.0), np.nan, term_a_sq)
-                term_b_sq = np.where(np.isnan(df_db) & (sb != 0.0), np.nan, term_b_sq)
+                term_a = np.where(np.isnan(df_da) & (sa != 0.0), np.nan, term_a)
+                term_b = np.where(np.isnan(df_db) & (sb != 0.0), np.nan, term_b)
                 # If an error is zero, its term's contribution is zero
-                term_a_sq = np.where(sa == 0.0, 0.0, term_a_sq)
-                term_b_sq = np.where(sb == 0.0, 0.0, term_b_sq)
+                term_a = np.where(sa == 0.0, 0.0, term_a)
+                term_b = np.where(sb == 0.0, 0.0, term_b)
 
-                new_error = np.sqrt(term_a_sq + term_b_sq)
+                new_error = np.hypot(term_a, term_b)
 
             else:
                 return NotImplemented

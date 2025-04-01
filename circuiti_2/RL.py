@@ -17,7 +17,7 @@ scarica_tempi_induttore = [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 92, 100, 108, 1
 scarica_tensione_induttore = [-248, -224, -196, -172, -148, -128, -108, -88, -68, -52, -12, 0, 16, 28, 52, 72, 88, 108, 120, 132, 144, 152, 164, 168, 176, 188, 196, 208, 220, 224, 228, 232, 236, 240] #millivolt
 scarica_tempi = create_dataset(scarica_tempi_induttore, 1, magnitude=-6)
 scarica_tensione = create_dataset(scarica_tensione_induttore, 2, magnitude=-3)
-#create_best_fit_line(scarica_tempi, scarica_tensione, func=V_l, show_chi_squared=True, show_fit_params=True, p0=[[-0.500, 0.0010, -1]])
+create_best_fit_line(scarica_tempi, scarica_tensione, func=V_l, show_chi_squared=True, show_fit_params=True, p0=[[0.500, 0.0010, -1]])
 parametri = perform_fit(scarica_tempi, scarica_tensione, func=V_l, p0=[0.500, 0.0010, -1])['parameters']
 
 tau = create_dataset(parametri['value'][1], parametri['error'][1])
