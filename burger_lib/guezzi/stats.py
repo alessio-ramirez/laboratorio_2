@@ -11,7 +11,15 @@ from scipy import stats as scistats
 from typing import Tuple, Union, List, Dict, Optional, Any
 import warnings
 
-from .measurement import Measurement
+# Assuming Measurement class is in the same directory or package
+try:
+    from .measurement import Measurement
+except ImportError:
+    # Handle case where structure might differ or testing standalone
+    warnings.warn("Could not import Measurement from .measurement", ImportWarning)
+    # Define a placeholder if needed for linting/testing, but real code needs the import
+    class Measurement: pass
+
 
 def test_comp(m1: Union[Measurement, Tuple[float, float]],
               m2: Union[Measurement, Tuple[float, float]],
@@ -61,21 +69,26 @@ def test_comp(m1: Union[Measurement, Tuple[float, float]],
 
     Returns:
         Dict containing:
-        - 'difference': Value of m1 - m2 (Measurement object).
-        - 'z_score': Compatibility score Z = |m1 - m2| / σ_diff.
-        - 'p_value': Two-tailed p-value for the Z-test. Probability of observing
+        - 'difference': Value of m1 - m2 (Measurement object). Note: its error
+                        always assumes independence.
+        - 'z_score': Compatibility score Z = |m1 - m2| / σ_diff (float).
+        - 'p_value': Two-tailed p-value for the Z-test (float). Probability of observing
                      a Z-score this large or larger if the measurements were compatible.
         - 'compatible': Boolean, True if p_value >= alpha.
-        - 'alpha': Significance level used.
+        - 'alpha': Significance level used (float).
         - 'interpretation': String summarizing the compatibility result.
 
     Raises:
         TypeError: If m1 or m2 are not Measurement objects or (value, error) tuples.
         ValueError: If uncertainties are negative.
     """
-    # Input processing and validation
+    # --- Input processing and validation ---
+    s1: float # Type hint for clarity
+    s2: float
     if isinstance(m1, Measurement):
-        v1, s1 = m1.value, m1.error
+        # Extract value/error, ensure they are treated as scalars if possible
+        v1 = m1.value.item() if isinstance(m1.value, np.ndarray) else m1.value
+        s1 = m1.error.item() if isinstance(m1.error, np.ndarray) else m1.error
         meas1 = m1 # Keep original Measurement object
     elif isinstance(m1, (tuple, list)) and len(m1) == 2:
         v1, s1 = float(m1[0]), float(m1[1])
@@ -84,7 +97,8 @@ def test_comp(m1: Union[Measurement, Tuple[float, float]],
         raise TypeError("m1 must be a Measurement or a (value, error) tuple/list")
 
     if isinstance(m2, Measurement):
-        v2, s2 = m2.value, m2.error
+        v2 = m2.value.item() if isinstance(m2.value, np.ndarray) else m2.value
+        s2 = m2.error.item() if isinstance(m2.error, np.ndarray) else m2.error
         meas2 = m2 # Keep original Measurement object
     elif isinstance(m2, (tuple, list)) and len(m2) == 2:
         v2, s2 = float(m2[0]), float(m2[1])
@@ -95,52 +109,59 @@ def test_comp(m1: Union[Measurement, Tuple[float, float]],
     if s1 < 0 or s2 < 0:
         raise ValueError("Uncertainties must be non-negative.")
 
-    # Calculate difference using Measurement subtraction for error propagation
-    # By default, Measurement subtraction assumes independence: sigma_diff^2 = s1^2 + s2^2
+    # --- Calculate difference ---
+    # Measurement subtraction handles propagation assuming independence
     diff_meas = meas1 - meas2
-    diff_val = diff_meas.value
-    diff_err_independent = diff_meas.error
+    # Ensure diff_val is a scalar float for calculations below
+    diff_val = diff_meas.value.item() if isinstance(diff_meas.value, np.ndarray) else diff_meas.value
+    diff_err_independent = diff_meas.error.item() if isinstance(diff_meas.error, np.ndarray) else diff_meas.error
 
-    # Use the appropriate error for the Z-test based on correlation assumption
+    # --- Determine error for Z-test based on correlation assumption ---
+    diff_err: float # Ensure this is treated as float
     if assume_correlated:
-        # Recalculate error assuming max negative correlation (corr = -1)
-        # sigma_diff^2 = s1^2 + s2^2 - 2*corr*s1*s2
-        # sigma_diff^2 = s1^2 + s2^2 + 2*s1*s2 = (s1 + s2)^2
+        # Max negative correlation error
         diff_err = s1 + s2
         warnings.warn("Assuming maximum negative correlation (corr=-1) for compatibility test. "
                       "This provides a conservative estimate (lower Z-score). "
-                      "The calculated 'difference' Measurement object still uses independent errors.", UserWarning)
+                      "The returned 'difference' Measurement object still uses independent errors.", UserWarning)
     else:
         # Assume independence
         diff_err = diff_err_independent
-        # If independence was explicitly assumed and errors add up, the diff_meas.error is correct.
 
-    # Calculate Z-score and p-value
-    # Handle potential division by zero if errors are zero
+    # --- Calculate Z-score and p-value (ensure results are float) ---
+    z_score: float
+    p_value: float
     if np.isclose(diff_err, 0.0):
-        # If error is zero, measurements are only compatible if values are identical
+        # Handle zero error case
         is_identical = np.isclose(diff_val, 0.0)
         z_score = 0.0 if is_identical else np.inf
         p_value = 1.0 if is_identical else 0.0
     else:
         # Standard Z-test calculation
+        # Calculation itself should yield float if inputs are float
         z_score = np.abs(diff_val / diff_err)
         # p-value from standard normal CDF (two-tailed test)
         p_value = 2 * (1.0 - scistats.norm.cdf(z_score))
 
-    # Determine compatibility based on p-value and alpha
+    # Ensure results stored are floats, even if np.inf was involved
+    z_score = float(z_score)
+    p_value = float(p_value)
+
+    # --- Determine compatibility ---
     compatible = p_value >= alpha
 
-    # Generate interpretation string
+    # --- Generate interpretation string (using confirmed floats) ---
     corr_assumption_str = " (assuming max negative correlation)" if assume_correlated else " (assuming independence)"
+    # Format using the guaranteed float versions
     interp = f"Measurements are {'compatible' if compatible else 'NOT compatible'} " \
              f"at alpha={alpha:.3f}{corr_assumption_str}. " \
              f"(Z={z_score:.2f}, p={p_value:.3g})"
 
+    # --- Return results ---
     return {
-        'difference': diff_meas, # Note: This difference Measurement assumes independence
-        'z_score': z_score,
-        'p_value': p_value,
+        'difference': diff_meas, # Note: This difference Measurement still assumes independence
+        'z_score': z_score,      # Return the float value
+        'p_value': p_value,      # Return the float value
         'compatible': compatible,
         'alpha': alpha,
         'interpretation': interp
@@ -187,24 +208,32 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
     Raises:
         ValueError: If the input list is empty, if any uncertainty is negative,
                     or if inconsistent measurements with zero error are found.
+        TypeError: If list contains non-Measurement objects.
     """
     if not measurements:
         raise ValueError("Input list of measurements cannot be empty.")
     if not all(isinstance(m, Measurement) for m in measurements):
          raise TypeError("All items in the input list must be Measurement objects.")
 
-    # Extract values and errors, ensuring they are flat arrays
-    values = np.array([m.value for m in measurements]).flatten()
-    errors = np.array([m.error for m in measurements]).flatten()
+    # Extract values and errors as numpy arrays
+    # Use .item() if ndarray to ensure calculations use scalars if possible
+    # This assumes weighted_mean is primarily for combining scalar measurements
+    values_list = []
+    errors_list = []
+    for m in measurements:
+        val = m.value.item() if isinstance(m.value, np.ndarray) else m.value
+        err = m.error.item() if isinstance(m.error, np.ndarray) else m.error
+        values_list.append(val)
+        errors_list.append(err)
 
-    if len(values) != len(errors):
-         # This should typically not happen if inputs are Measurements, but safeguard
-         raise ValueError("Internal shape mismatch between values and errors after flattening.")
+    values = np.array(values_list, dtype=float)
+    errors = np.array(errors_list, dtype=float)
 
+    # --- Validations ---
     if np.any(errors < 0):
         raise ValueError("Uncertainties must be non-negative.")
 
-    # Handle measurements with zero error (infinite weight)
+    # --- Handle measurements with zero error (infinite weight) ---
     zero_error_indices = np.where(np.isclose(errors, 0.0))[0]
     if len(zero_error_indices) > 0:
         first_zero_idx = zero_error_indices[0]
@@ -218,23 +247,30 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
         res_unit = origin_meas.unit
         res_name = f"Weighted Mean ({origin_meas.name})" if origin_meas.name else "Weighted Mean"
         warnings.warn("Found measurements with zero error. Result is taken directly from these measurements.", UserWarning)
+        # Return scalar Measurement
         return Measurement(values[first_zero_idx], 0.0, unit=res_unit, name=res_name)
 
-    # Standard calculation for non-zero errors
-    # Calculate weights (handle potential division by zero if errors very small but not zero)
+    # --- Standard calculation for non-zero errors ---
+    # Calculate weights (1 / variance)
     variances = errors**2
-    # Avoid division by zero in weights calculation for safety, though zero errors handled above
+    # Avoid division by zero in weights for safety (use small epsilon if variance is near zero)
     variances = np.where(np.isclose(variances, 0.0), np.finfo(float).eps, variances)
     weights = 1.0 / variances
 
     # Calculate weighted mean value
     weighted_sum = np.sum(weights * values)
     sum_of_weights = np.sum(weights)
-    mean_value = weighted_sum / sum_of_weights
-
-    # Calculate uncertainty of the weighted mean
-    mean_variance = 1.0 / sum_of_weights
-    mean_error = np.sqrt(mean_variance)
+    # Ensure sum_of_weights is not zero before division
+    if np.isclose(sum_of_weights, 0.0):
+        # This should only happen if all weights are zero (e.g., all errors infinite)
+        warnings.warn("Sum of weights is zero. Cannot compute weighted mean.", RuntimeWarning)
+        mean_value = np.nan
+        mean_error = np.inf
+    else:
+        mean_value = weighted_sum / sum_of_weights
+        # Calculate uncertainty of the weighted mean
+        mean_variance = 1.0 / sum_of_weights
+        mean_error = np.sqrt(mean_variance)
 
     # Handle units - preserve only if all inputs have the same, non-empty unit
     first_unit = measurements[0].unit
@@ -246,6 +282,7 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
     # Construct a generic name
     res_name = "Weighted Mean"
 
-    return Measurement(mean_value, mean_error, unit=res_unit, name=res_name)
+    # Return scalar Measurement
+    return Measurement(float(mean_value), float(mean_error), unit=res_unit, name=res_name)
 
 # --- END OF FILE stats.py ---
