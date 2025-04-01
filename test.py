@@ -16,11 +16,12 @@ def V_l(x, k, tau, c):
 
 scarica_tempi_induttore = [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 92, 100, 108, 116, 132, 148, 160, 180, 192, 208, 224, 236, 252, 264, 280, 304, 324, 364, 412, 448, 488, 516, 556, 604] #microsecondi
 scarica_tensione_induttore = [-248, -224, -196, -172, -148, -128, -108, -88, -68, -52, -12, 0, 16, 28, 52, 72, 88, 108, 120, 132, 144, 152, 164, 168, 176, 188, 196, 208, 220, 224, 228, 232, 236, 240] #millivolt
-scarica_tempi = Measurement(scarica_tempi_induttore, 1, magnitude=-6)
-scarica_tensione = Measurement(scarica_tensione_induttore, 2, magnitude=-3)
+scarica_tempi = Measurement(scarica_tempi_induttore, 1, magnitude=-6, unit='s', name='scarica: tempo')
+scarica_tensione = Measurement(scarica_tensione_induttore, 2, magnitude=-3, unit='V', name='scarica: tensione')
 statistica = perform_fit(scarica_tempi, scarica_tensione, V_l, [0.500, 0.0010, -1], ['k', 'tau', 'c'])
-plot_fit(statistica, plot_residuals=True, n_fit_points=10000, xlabel='tempi', show_stats=True, show_plot=False, show_params=True)
-latex_table_fit(statistica, orientation='v')
+plot_fit(statistica, plot_residuals=True, n_fit_points=10000, xlabel='tempi', show_stats=True, show_plot=True, show_params=True)
+#latex_table_fit(statistica, orientation='v')
+latex_table_data(scarica_tempi, scarica_tensione, orientation='v', caption='Circuito RL - Scarica')
 
 """
 tau = create_dataset(parametri['value'][1], parametri['error'][1])
