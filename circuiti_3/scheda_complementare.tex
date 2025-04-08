@@ -1,0 +1,410 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{float} % Per il posizionamento [H] delle figure
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{siunitx} % Per unità di misura corrette
+\usepackage{textcomp} % Per simboli aggiuntivi
+
+% Impostazioni geometria pagina
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+% Definizioni comandi utili
+\newcommand{\jj}{\mathrm{j}} % Unità immaginaria
+\newcommand{\ee}{\mathrm{e}} % Numero di Eulero
+\newcommand{\dd}{\mathrm{d}} % Differenziale
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\argum}[1]{\arg\left(#1\right)}
+\newcommand{\mean}[1]{\left\langle#1\right\rangle}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Complemento Teorico Circuiti 3},
+    pdfpagemode=FullScreen,
+}
+
+% Titolo
+\title{Complemento Teorico ed Esercizi Svolti \\ Laboratorio Circuiti 3}
+\author{Spiegazioni dettagliate sulla base della scheda di laboratorio}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Questo documento fornisce una spiegazione teorica dettagliata e lo svolgimento dei calcoli preliminari richiesti per l'esperienza di laboratorio "Circuiti 3", focalizzata sull'analisi in frequenza di circuiti RC, RL ed RLC. L'obiettivo è offrire una comprensione intuitiva e rigorosa dei concetti, integrando le informazioni presenti nella scheda di laboratorio originale. Vengono inoltre affrontate le domande guida proposte nella scheda.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduzione: Corrente Alternata e Fasori}
+
+Prima di addentrarci nei circuiti specifici, è fondamentale comprendere come analizzare circuiti elettrici quando le tensioni e le correnti variano sinusoidalmente nel tempo. Questa è la base dell'analisi in corrente alternata (AC).
+
+\subsection*{Segnali Sinusoidali}
+Un segnale sinusoidale (tensione o corrente) può essere descritto matematicamente come:
+\begin{equation}
+    v(t) = V_0 \cos(\omega t + \phi)
+\end{equation}
+dove:
+\begin{itemize}
+    \item $V_0$ è l'\textbf{ampiezza} (il valore massimo del segnale). A volte si usa l'ampiezza picco-picco ($V_{pp} = 2V_0$) o il valore efficace (\textit{Root Mean Square}, RMS), $V_{rms} = V_0 / \sqrt{2}$. È importante essere consistenti!
+    \item $\omega$ è la \textbf{pulsazione} (o frequenza angolare), legata alla frequenza $f$ dalla relazione $\omega = 2\pi f$. Si misura in radianti al secondo (\si{rad/s}). La frequenza $f$ si misura in Hertz (\si{Hz}).
+    \item $\phi$ è la \textbf{fase} iniziale (o semplicemente fase), che indica lo sfasamento temporale della sinusoide rispetto a un riferimento (solitamente $\cos(\omega t)$). Si misura in radianti o gradi.
+\end{itemize}
+
+\subsection*{Il Metodo dei Fasori (Impedenze Complesse)}
+Analizzare circuiti con segnali sinusoidali usando direttamente le equazioni differenziali che li governano può essere complesso. Il \textbf{metodo dei fasori} semplifica enormemente l'analisi trasformando le equazioni differenziali lineari in equazioni algebriche nel dominio dei numeri complessi.
+
+L'idea chiave si basa sulla formula di Eulero: $\ee^{\jj \theta} = \cos(\theta) + \jj \sin(\theta)$, dove $\jj = \sqrt{-1}$ è l'unità immaginaria. Un segnale sinusoidale $v(t) = V_0 \cos(\omega t + \phi)$ può essere visto come la parte reale di un segnale complesso:
+\begin{equation}
+    v(t) = \text{Re}\left[ V_0 \ee^{\jj(\omega t + \phi)} \right] = \text{Re}\left[ (V_0 \ee^{\jj \phi}) \ee^{\jj \omega t} \right]
+\end{equation}
+Il termine complesso $\tilde{V} = V_0 \ee^{\jj \phi}$ è chiamato \textbf{fasore} associato al segnale $v(t)$. Il fasore è un numero complesso la cui ampiezza ($\abs{\tilde{V}} = V_0$) rappresenta l'ampiezza del segnale sinusoidale e il cui argomento ($\argum{\tilde{V}} = \phi$) rappresenta la fase del segnale. Il fasore "congela" il segnale all'istante $t=0$, mantenendo le informazioni su ampiezza e fase.
+
+\textbf{Perché funziona?} Nei circuiti lineari, se l'ingresso è una sinusoide di pulsazione $\omega$, tutte le tensioni e correnti nel circuito saranno sinusoidi alla \textit{stessa} pulsazione $\omega$, ma con ampiezze e fasi diverse. Lavorando con i fasori (che non dipendono dal tempo), possiamo usare regole simili a quelle della corrente continua (DC), ma sostituendo le resistenze con le \textbf{impedenze complesse}.
+
+\subsection*{Impedenze Complesse (Z)}
+L'impedenza $\tilde{Z}$ è l'analogo della resistenza per i circuiti AC. È definita come il rapporto tra il fasore della tensione ai capi di un componente e il fasore della corrente che lo attraversa: $\tilde{Z} = \tilde{V} / \tilde{I}$.
+
+\begin{itemize}
+    \item \textbf{Resistore (R):} La legge di Ohm vale istante per istante: $v(t) = R i(t)$. Passando ai fasori, $\tilde{V} = R \tilde{I}$. L'impedenza del resistore è semplicemente:
+        \begin{equation}
+            \tilde{Z}_R = R
+        \end{equation}
+        È un numero reale, quindi tensione e corrente sono in fase.
+
+    \item \textbf{Induttore (L):} La relazione tensione-corrente è $v(t) = L \frac{\dd i(t)}{\dd t}$. Se $i(t) = \text{Re}[\tilde{I} \ee^{\jj \omega t}]$, allora $v(t) = \text{Re}[L (\jj \omega \tilde{I}) \ee^{\jj \omega t}]$. Quindi, $\tilde{V} = \jj \omega L \tilde{I}$. L'impedenza dell'induttore è:
+        \begin{equation}
+            \tilde{Z}_L = \jj \omega L
+        \end{equation}
+        È un numero immaginario puro positivo. La sua ampiezza (reattanza induttiva) $X_L = \omega L$ aumenta con la frequenza. La tensione sull'induttore è in anticipo di fase di 90° ($\pi/2$) rispetto alla corrente. \textit{Intuizione:} L'induttore si oppone alle variazioni di corrente ($\dd i / \dd t$). Maggiore la frequenza, più rapida la variazione, maggiore l'opposizione ($\tilde{Z}_L$ aumenta con $\omega$). A $\omega \to 0$ (DC), $\tilde{Z}_L \to 0$ (corto circuito). A $\omega \to \infty$, $\tilde{Z}_L \to \infty$ (circuito aperto).
+
+    \item \textbf{Condensatore (C):} La relazione corrente-tensione è $i(t) = C \frac{\dd v(t)}{\dd t}$. Se $v(t) = \text{Re}[\tilde{V} \ee^{\jj \omega t}]$, allora $i(t) = \text{Re}[C (\jj \omega \tilde{V}) \ee^{\jj \omega t}]$. Quindi, $\tilde{I} = \jj \omega C \tilde{V}$. L'impedenza del condensatore è:
+        \begin{equation}
+            \tilde{Z}_C = \frac{\tilde{V}}{\tilde{I}} = \frac{1}{\jj \omega C} = -\frac{\jj}{\omega C}
+        \end{equation}
+        È un numero immaginario puro negativo. La sua ampiezza (reattanza capacitiva) $X_C = 1/(\omega C)$ diminuisce con la frequenza. La tensione sul condensatore è in ritardo di fase di 90° ($-\pi/2$) rispetto alla corrente. \textit{Intuizione:} Il condensatore si oppone alle variazioni di tensione ($\dd v / \dd t$). A bassa frequenza, ha molto tempo per caricarsi e si oppone al passaggio di corrente (sembra un circuito aperto, $\tilde{Z}_C \to \infty$ per $\omega \to 0$). Ad alta frequenza, la tensione cambia così rapidamente che il condensatore non fa in tempo a caricarsi significativamente e la corrente passa facilmente (sembra un corto circuito, $\tilde{Z}_C \to 0$ per $\omega \to \infty$).
+\end{itemize}
+
+Con le impedenze complesse, possiamo analizzare i circuiti AC usando le stesse regole delle reti resistive in DC:
+\begin{itemize}
+    \item \textbf{Impedenze in Serie:} $\tilde{Z}_{eq} = \tilde{Z}_1 + \tilde{Z}_2 + \dots$
+    \item \textbf{Impedenze in Parallelo:} $1/\tilde{Z}_{eq} = 1/\tilde{Z}_1 + 1/\tilde{Z}_2 + \dots$
+    \item \textbf{Partitore di Tensione:} Per due impedenze $\tilde{Z}_1, \tilde{Z}_2$ in serie con tensione totale $\tilde{V}_{in}$, la tensione ai capi di $\tilde{Z}_2$ è $\tilde{V}_2 = \tilde{V}_{in} \frac{\tilde{Z}_2}{\tilde{Z}_1 + \tilde{Z}_2}$.
+    \item \textbf{Legge di Ohm Generalizzata:} $\tilde{V} = \tilde{Z} \tilde{I}$.
+\end{itemize}
+
+\section{Studio di circuiti RC e RL in corrente alternata}
+
+\subsection{Prima di arrivare in laboratorio: Funzioni di Trasferimento}
+
+La \textbf{funzione di trasferimento} $\tilde{H}(\omega)$ descrive come un circuito modifica l'ampiezza e la fase di un segnale di ingresso sinusoidale per produrre un segnale di uscita, in funzione della pulsazione $\omega$. È definita come il rapporto tra il fasore del segnale di uscita $\tilde{V}_{out}$ e il fasore del segnale di ingresso $\tilde{V}_{in}$:
+\begin{equation}
+    \tilde{H}(\omega) = \frac{\tilde{V}_{out}(\omega)}{\tilde{V}_{in}(\omega)}
+\end{equation}
+Essendo un numero complesso, $\tilde{H}(\omega)$ ha un'ampiezza (o modulo) e una fase (o argomento):
+\begin{itemize}
+    \item \textbf{Guadagno di Ampiezza:} $G(\omega) = \abs{\tilde{H}(\omega)} = \frac{\abs{\tilde{V}_{out}}}{\abs{\tilde{V}_{in}}} = \frac{V_{out,0}}{V_{in,0}}$. Indica di quanto l'ampiezza del segnale viene modificata.
+    \item \textbf{Sfasamento:} $\phi(\omega) = \argum{\tilde{H}(\omega)} = \argum{\tilde{V}_{out}} - \argum{\tilde{V}_{in}}$. Indica la differenza di fase tra uscita e ingresso.
+\end{itemize}
+La funzione di trasferimento caratterizza completamente la risposta in frequenza del circuito lineare.
+
+Consideriamo il circuito in Figura 1 della scheda. $\tilde{V}_A$ è la tensione di ingresso (dopo la resistenza interna del generatore $R_g$) e $\tilde{V}_B$ è la tensione ai capi di $R$. La tensione ai capi di $Z$ è $\tilde{V}_{A-B} = \tilde{V}_A - \tilde{V}_B$. Useremo il partitore di tensione nel dominio dei fasori. L'impedenza totale vista da $V_A$ è $\tilde{Z}_{tot} = \tilde{Z} + R$.
+
+\subsubsection{Caso Z = C (Circuito RC)}
+L'impedenza del condensatore è $\tilde{Z}_C = 1/(\jj \omega C)$.
+
+\begin{itemize}
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{B/A}(\omega) = \tilde{V}_B / \tilde{V}_A$}:
+        $\tilde{V}_B$ è la tensione ai capi di $R$. Usando il partitore di tensione:
+        \begin{equation}
+            \tilde{V}_B = \tilde{V}_A \frac{R}{\tilde{Z}_C + R} = \tilde{V}_A \frac{R}{\frac{1}{\jj \omega C} + R} = \tilde{V}_A \frac{\jj \omega R C}{1 + \jj \omega R C}
+        \end{equation}
+        Quindi:
+        \begin{equation} \label{eq:H_RC_VBVA}
+            \tilde{H}_{B/A}(\omega) = \frac{\jj \omega R C}{1 + \jj \omega R C}
+        \end{equation}
+        \textbf{Modulo (Guadagno):}
+        \begin{equation}
+            \abs{\tilde{H}_{B/A}(\omega)} = \frac{\abs{\jj \omega R C}}{\abs{1 + \jj \omega R C}} = \frac{\omega R C}{\sqrt{1^2 + (\omega R C)^2}}
+        \end{equation}
+        \textbf{Fase:}
+        \begin{equation}
+            \argum{\tilde{H}_{B/A}(\omega)} = \argum{\jj \omega R C} - \argum{1 + \jj \omega R C} = \frac{\pi}{2} - \arctan(\omega R C)
+        \end{equation}
+        Questa è una funzione di trasferimento \textbf{passa-alto}. Per $\omega \to 0$, $\abs{H} \to 0$. Per $\omega \to \infty$, $\abs{H} \to 1$. La frequenza di taglio $\omega_c = 1/(RC)$ è dove $\abs{H} = 1/\sqrt{2}$.
+
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{(A-B)/A}(\omega) = \tilde{V}_{A-B} / \tilde{V}_A$}:
+        $\tilde{V}_{A-B}$ è la tensione ai capi di $Z=C$. Usando il partitore di tensione:
+        \begin{equation}
+            \tilde{V}_{A-B} = \tilde{V}_A \frac{\tilde{Z}_C}{\tilde{Z}_C + R} = \tilde{V}_A \frac{\frac{1}{\jj \omega C}}{\frac{1}{\jj \omega C} + R} = \tilde{V}_A \frac{1}{1 + \jj \omega R C}
+        \end{equation}
+        Quindi:
+        \begin{equation} \label{eq:H_RC_VABVA}
+            \tilde{H}_{(A-B)/A}(\omega) = \frac{1}{1 + \jj \omega R C}
+        \end{equation}
+        \textbf{Modulo (Guadagno):}
+        \begin{equation}
+            \abs{\tilde{H}_{(A-B)/A}(\omega)} = \frac{1}{\abs{1 + \jj \omega R C}} = \frac{1}{\sqrt{1^2 + (\omega R C)^2}}
+        \end{equation}
+        \textbf{Fase:}
+        \begin{equation}
+            \argum{\tilde{H}_{(A-B)/A}(\omega)} = \argum{1} - \argum{1 + \jj \omega R C} = 0 - \arctan(\omega R C) = -\arctan(\omega R C)
+        \end{equation}
+        Questa è una funzione di trasferimento \textbf{passa-basso}. Per $\omega \to 0$, $\abs{H} \to 1$. Per $\omega \to \infty$, $\abs{H} \to 0$. La frequenza di taglio è sempre $\omega_c = 1/(RC)$, dove $\abs{H} = 1/\sqrt{2}$.
+\end{itemize}
+
+\subsubsection{Caso Z = L (Circuito RL)}
+L'impedenza dell'induttore è $\tilde{Z}_L = \jj \omega L$.
+
+\begin{itemize}
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{B/A}(\omega) = \tilde{V}_B / \tilde{V}_A$}:
+        $\tilde{V}_B$ è la tensione ai capi di $R$. Usando il partitore di tensione:
+        \begin{equation}
+            \tilde{V}_B = \tilde{V}_A \frac{R}{\tilde{Z}_L + R} = \tilde{V}_A \frac{R}{\jj \omega L + R} = \tilde{V}_A \frac{R}{R + \jj \omega L}
+        \end{equation}
+        Quindi:
+        \begin{equation} \label{eq:H_RL_VBVA}
+            \tilde{H}_{B/A}(\omega) = \frac{R}{R + \jj \omega L} = \frac{1}{1 + \jj \omega L / R}
+        \end{equation}
+        \textbf{Modulo (Guadagno):}
+        \begin{equation}
+            \abs{\tilde{H}_{B/A}(\omega)} = \frac{R}{\abs{R + \jj \omega L}} = \frac{R}{\sqrt{R^2 + (\omega L)^2}} = \frac{1}{\sqrt{1 + (\omega L / R)^2}}
+        \end{equation}
+        \textbf{Fase:}
+        \begin{equation}
+            \argum{\tilde{H}_{B/A}(\omega)} = \argum{R} - \argum{R + \jj \omega L} = 0 - \arctan(\omega L / R) = -\arctan(\omega L / R)
+        \end{equation}
+        Questa è una funzione di trasferimento \textbf{passa-basso}. Per $\omega \to 0$, $\abs{H} \to 1$. Per $\omega \to \infty$, $\abs{H} \to 0$. La frequenza di taglio $\omega_c = R/L$ è dove $\abs{H} = 1/\sqrt{2}$.
+
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{(A-B)/A}(\omega) = \tilde{V}_{A-B} / \tilde{V}_A$}:
+        $\tilde{V}_{A-B}$ è la tensione ai capi di $Z=L$. Usando il partitore di tensione:
+        \begin{equation}
+            \tilde{V}_{A-B} = \tilde{V}_A \frac{\tilde{Z}_L}{\tilde{Z}_L + R} = \tilde{V}_A \frac{\jj \omega L}{R + \jj \omega L}
+        \end{equation}
+        Quindi:
+        \begin{equation} \label{eq:H_RL_VABVA}
+            \tilde{H}_{(A-B)/A}(\omega) = \frac{\jj \omega L / R}{1 + \jj \omega L / R}
+        \end{equation}
+        \textbf{Modulo (Guadagno):}
+        \begin{equation}
+            \abs{\tilde{H}_{(A-B)/A}(\omega)} = \frac{\abs{\jj \omega L}}{\abs{R + \jj \omega L}} = \frac{\omega L}{\sqrt{R^2 + (\omega L)^2}} = \frac{\omega L / R}{\sqrt{1 + (\omega L / R)^2}}
+        \end{equation}
+        \textbf{Fase:}
+        \begin{equation}
+            \argum{\tilde{H}_{(A-B)/A}(\omega)} = \argum{\jj \omega L} - \argum{R + \jj \omega L} = \frac{\pi}{2} - \arctan(\omega L / R)
+        \end{equation}
+        Questa è una funzione di trasferimento \textbf{passa-alto}. Per $\omega \to 0$, $\abs{H} \to 0$. Per $\omega \to \infty$, $\abs{H} \to 1$. La frequenza di taglio è sempre $\omega_c = R/L$, dove $\abs{H} = 1/\sqrt{2}$.
+\end{itemize}
+
+\subsection{Procedimento: Misure e Analisi}
+
+\begin{itemize}
+    \item \textbf{Realizzazione del circuito:} Seguire lo schema. Prestare attenzione ai collegamenti di massa. L'oscilloscopio misura sempre tensioni rispetto a massa. Per misurare $V_A(t)$, collegare la sonda del Canale 1 (CH1) al nodo A e la sua massa al nodo di massa del circuito. Per misurare $V_B(t)$, collegare la sonda del Canale 2 (CH2) al nodo B e la sua massa al nodo di massa del circuito.
+    \item \textbf{Misure con Oscilloscopio:}
+        \begin{itemize}
+            \item \textbf{Ampiezze $V_A$, $V_B$:} Leggere i valori di ampiezza (Vpp o Vmax) dai canali CH1 e CH2. Assicurarsi che la scala verticale sia adeguata per una buona lettura. Convertire a $V_0$ se necessario ($V_0 = V_{pp}/2 = V_{max}$).
+            \item \textbf{Ampiezza $V_{A-B}$:} Usare la funzione MATH dell'oscilloscopio per calcolare la differenza CH1 - CH2. Leggere l'ampiezza di questo segnale differenza. Rappresenta l'ampiezza della tensione ai capi dell'impedenza $Z$.
+            \item \textbf{Differenza di Fase $\Delta\phi'$ (tra $V_{A-B}$ e $V_A$):} L'oscilloscopio ha funzioni per misurare la differenza di fase tra due canali. Misurare la fase tra il segnale MATH (CH1-CH2) e il segnale CH1 ($V_A$). Questo corrisponde a $\argum{\tilde{H}_{(A-B)/A}(\omega)}$.
+            \item \textbf{Differenza di Fase $\Delta\phi''$ (tra $V_A$ e $V_B$):} Misurare la differenza di fase tra CH1 ($V_A$) e CH2 ($V_B$). Attenzione al segno: la misura dell'oscilloscopio potrebbe dare $\argum{V_B} - \argum{V_A}$ o viceversa. Confrontare con la teoria: $\Delta\phi''$ dovrebbe corrispondere a $\argum{\tilde{H}_{B/A}(\omega)}$.
+        \end{itemize}
+    \item \textbf{Raccolta Dati:} Variare la frequenza $f$ del generatore di segnale in un intervallo ampio (es. \SI{100}{Hz} - \SI{150}{kHz} o più, a seconda dei valori di R, L, C). Raccogliere i dati di ampiezza e fase in una tabella. È utile usare una spaziatura logaritmica delle frequenze (es. 5-10 punti per decade). Associare un errore a ciascuna misura (errore di lettura sullo schermo, fluttuazioni).
+    \item \textbf{Analisi Grafica (Bode Plot):}
+        \begin{itemize}
+            \item \textbf{Grafico del Modulo $\abs{H(\omega)}$:} Riportare $\abs{H(\omega)}$ (calcolato dai rapporti di ampiezze misurate, es. $\abs{V_B}/\abs{V_A}$) in funzione della frequenza $f$ (o pulsazione $\omega = 2\pi f$). È molto istruttivo usare una scala \textbf{log-log} (logaritmo del modulo vs logaritmo della frequenza). In questa scala:
+                \begin{itemize}
+                    \item Le regioni passa-basso/passa-alto appaiono come rette orizzontali.
+                    \item Le regioni di transizione (attorno alla frequenza di taglio) appaiono come rette con pendenza. Per filtri RC/RL del primo ordine, la pendenza è di $\pm 20$ dB/decade ($\pm 6$ dB/ottava). (Nota: $G_{dB} = 20 \log_{10}(\abs{H})$).
+                    \item La frequenza di taglio $f_c$ si individua come l'incrocio tra le asymptoti delle due rette.
+                \end{itemize}
+            \item \textbf{Grafico della Fase $\argum{H(\omega)}$:} Riportare $\Delta\phi'$ o $\Delta\phi''$ in funzione della frequenza $f$ (o $\omega$) su scala \textbf{log-lin} (fase lineare vs logaritmo della frequenza).
+        \end{itemize}
+    \item \textbf{Fit dei Dati:} Usare un software di analisi dati (es. Python con SciPy, Origin, QtiPlot) per eseguire un fit non lineare delle formule teoriche di $\abs{H(\omega)}$ (es. Eq. \ref{eq:H_RC_VBVA}-\ref{eq:H_RL_VABVA}) ai dati sperimentali.
+        \begin{itemize}
+            \item Per il fit di $\abs{\tilde{H}_{B/A}(\omega)}$ nel caso RC (Eq. \ref{eq:H_RC_VBVA}), i parametri del fit sono $R$ e $C$. Se $R$ è noto da misura indipendente (con multimetro), si può fissare $R$ e ricavare $C$.
+            \item Similmente per gli altri casi, si ricava $C$ o $L$.
+            \item L'incertezza sul valore fittato di $C$ o $L$ viene fornita dal software di fit.
+        \end{itemize}
+    \item \textbf{Identificazione Filtro e Frequenza di Taglio:} Dal grafico $\abs{H(\omega)}$ vs $f$, identificare se il comportamento è passa-basso (guadagno alto a basse frequenze, basso ad alte frequenze) o passa-alto (viceversa). La frequenza di taglio $f_c$ sperimentale può essere stimata come la frequenza alla quale il guadagno scende a $1/\sqrt{2} \approx 0.707$ del suo valore massimo, oppure dal grafico log-log come punto di ginocchio. Confrontare $f_c$ sperimentale con quella teorica attesa ($f_c = 1/(2\pi RC)$ o $f_c = R/(2\pi L)$) usando i valori noti/misurati/fittati di $R, C, L$. Verificare la coerenza.
+\end{itemize}
+
+\subsection{Note (Approfondimenti)}
+
+\begin{itemize}
+    \item \textbf{Coerenza Ampiezza Generatore-Oscilloscopio:} Verificare che l'ampiezza $V_A$ misurata dall'oscilloscopio sia ragionevole rispetto a quella impostata sul generatore ($V_g$). Non saranno identiche a causa della resistenza interna del generatore $R_g$ (tipicamente \SI{50}{\ohm}). $V_A$ è la tensione effettiva all'ingresso del nostro circuito (R-Z), data da $V_A = V_g \frac{\tilde{Z}_{in}}{R_g + \tilde{Z}_{in}}$, dove $\tilde{Z}_{in} = R + \tilde{Z}$ è l'impedenza del nostro circuito. Poiché $\tilde{Z}_{in}$ dipende dalla frequenza, anche $V_A$ dipenderà leggermente dalla frequenza, anche se $V_g$ è costante. Per questo è importante misurare $V_A$ direttamente con CH1.
+    \item \textbf{Scelta di R e C:}
+        \begin{itemize}
+            \item \textbf{R:} Deve essere molto maggiore di $R_g$ (es. $R \ge 10 R_g = \SI{500}{\ohm}$) per minimizzare l'effetto di $R_g$ su $V_A$. Deve essere molto minore della resistenza di ingresso dell'oscilloscopio $R_{scope}$ (tipicamente \SI{1}{M\ohm}) per evitare che l'oscilloscopio "carichi" il circuito e alteri $V_B$. Una scelta comune è $R$ nell'ordine dei \si{k\ohm} (es. \SI{1}{k\ohm} - \SI{10}{k\ohm}).
+            \item \textbf{C:} La capacità di ingresso dell'oscilloscopio $C_{scope}$ (tipicamente \SI{10}{pF} - \SI{20}{pF}) si somma in parallelo alla capacità del nostro componente $Z=C$ (se misuriamo ai capi di C) o influenza il nodo B. Per rendere trascurabile $C_{scope}$, scegliere $C \gg C_{scope}$ (es. $C$ nell'ordine dei \si{nF} o \si{\micro F}).
+        \end{itemize}
+    \item \textbf{Intervallo di Frequenze:} Scegliere l'intervallo in modo da coprire almeno una decade sotto e una decade sopra la frequenza di taglio $f_c$ attesa, per visualizzare bene sia la banda passante che la banda attenuata e la transizione. $f_c = 1/(2\pi RC)$ o $R/(2\pi L)$. Esempio: se $R=\SI{1}{k\ohm}$ e $C=\SI{100}{nF}$, $f_c \approx \SI{1.6}{kHz}$. Un intervallo da \SI{100}{Hz} a \SI{100}{kHz} sarebbe adeguato.
+    \item \textbf{Resistenza Interna Generatore ($R_g$):} Come detto, $R_g$ forma un partitore con $\tilde{Z}_{in}$. L'analisi fatta finora assume $\tilde{V}_A$ come ingresso. Se si volesse la funzione di trasferimento rispetto a $\tilde{V}_g$, sarebbe $\tilde{H}_{B/g} = \frac{\tilde{V}_B}{\tilde{V}_g} = \frac{\tilde{V}_A}{\tilde{V}_g} \frac{\tilde{V}_B}{\tilde{V}_A} = \frac{\tilde{Z}_{in}}{R_g + \tilde{Z}_{in}} \tilde{H}_{B/A}(\omega)$. Per minimizzare questo effetto, si usa $R \gg R_g$.
+    \item \textbf{Pulsazione $\omega$ vs Frequenza $f$:} Scegliere cosa riportare nei grafici (di solito $f$ è più pratico), ma indicarlo chiaramente sull'asse. Ricordare $\omega = 2\pi f$. Le formule teoriche sono spesso più compatte con $\omega$.
+    \item \textbf{Problemi Misure di Fase:} Se la fase misurata non corrisponde a quella attesa:
+        1. \textit{Collegamenti:} Controllare che le sonde siano collegate correttamente e che le masse siano comuni e collegate al punto giusto.
+        2. \textit{Ordine Segnali:} Assicurarsi che l'oscilloscopio calcoli la fase nell'ordine corretto (es. fase di CH2 - fase di CH1). Potrebbe essere necessario invertire il segno del risultato.
+        3. \textit{Valori Componenti:} R, L, C potrebbero avere valori diversi da quelli nominali. La resistenza interna dell'induttore può influenzare significativamente la fase, specialmente a basse frequenze o vicino alla risonanza.
+        4. \textit{Triggering Oscilloscopio:} Assicurarsi che il trigger sia stabile e impostato sul canale di riferimento (di solito CH1, $V_A$).
+    \item \textbf{Resistenza Interna Induttore ($r_L$):} Un induttore reale non è ideale, possiede sempre una resistenza dovuta al filo avvolto. Si modella come un induttore ideale $L$ in serie con una resistenza $r_L$. L'impedenza diventa $\tilde{Z}_{L,real} = r_L + \jj \omega L$. Questo termine resistivo addizionale modifica le funzioni di trasferimento calcolate. Ad esempio, per il circuito RL, $\tilde{Z}_{tot} = (r_L + R) + \jj \omega L$. Le nuove funzioni di trasferimento si ottengono sostituendo $\tilde{Z}_L$ con $\tilde{Z}_{L,real}$ e $R$ (nei denominatori) con $(R+r_L)$. L'effetto di $r_L$ è più marcato quando $\omega L$ è piccolo (basse frequenze) o quando $r_L$ è paragonabile a $R$. Si può misurare $r_L$ con un multimetro in modalità ohmmetro.
+\end{itemize}
+
+\subsection{Domande e considerazioni guida}
+
+1.  \textbf{Misura Fase (Massimi vs Zero-Crossing):}
+    *   \textit{Metodi:} La fase $\Delta\phi$ tra due sinusoidi $V_1(t) = A\cos(\omega t)$ e $V_2(t) = B\cos(\omega t + \Delta\phi)$ si può misurare dal ritardo temporale $\Delta t$ tra eventi corrispondenti (es. passaggi per lo zero con stessa pendenza, o picchi massimi): $\Delta\phi = \omega \Delta t = 2\pi f \Delta t$.
+    *   \textit{Precisione:} Il passaggio per lo zero è spesso più ripido del picco (dove la derivata è zero), rendendo la determinazione del tempo $\Delta t$ potenzialmente più precisa, \textit{se} il segnale è privo di rumore e centrato su zero volt. I picchi sono meno sensibili a piccoli offset DC ma più sensibili al rumore che può spostare la posizione del massimo. Gli oscilloscopi digitali moderni usano algoritmi sofisticati per entrambe le misure, ma il rumore e la risoluzione temporale limitano sempre la precisione.
+    *   \textit{Relazione Rumore/Risoluzione:} Il rumore in tensione ($\sigma_n$) sovrapposto al segnale causa incertezza nella determinazione del livello (es. zero volt o picco). La risoluzione temporale ($\sigma_T$, limitata dal campionamento e dalla banda passante dello strumento) limita la precisione con cui si può determinare l'istante $\Delta t$. L'incertezza sulla fase $\sigma_{\Delta\phi}$ dipenderà da entrambi: $\sigma_{\Delta\phi} \approx \omega \sigma_{\Delta t}$. L'incertezza $\sigma_{\Delta t}$ nel passaggio per lo zero dipende da $\sigma_n$ e dalla pendenza del segnale ($dV/dt$); l'incertezza nel picco dipende da $\sigma_n$ e dalla curvatura ($d^2V/dt^2$). A parità di condizioni, il metodo più robusto dipende dalle specifiche caratteristiche del segnale e del rumore.
+
+2.  \textbf{Relazione $V_A$ vs $V_g$:} Come discusso nella Nota 1.3, $V_A$ è la tensione all'ingresso del circuito R-Z, mentre $V_g$ è la tensione ideale (a vuoto) del generatore. Sono legate dalla relazione $V_A = V_g \frac{\tilde{Z}_{in}}{R_g + \tilde{Z}_{in}}$, dove $\tilde{Z}_{in} = R + \tilde{Z}$ e $R_g$ è la resistenza interna del generatore (solitamente \SI{50}{\ohm}). Poiché $\tilde{Z}_{in}$ dipende dalla frequenza (attraverso $\tilde{Z}$), $V_A$ sarà generalmente minore di $V_g$ (specialmente se $\abs{\tilde{Z}_{in}}$ non è $\gg R_g$) e avrà una fase diversa rispetto a $V_g$. L'esperimento misura la risposta del circuito R-Z rispetto all'ingresso effettivo $V_A$, non rispetto a $V_g$.
+
+3.  \textbf{Scambio R e C (o R e L):} Consideriamo il circuito RC (Z=C). Originariamente $V_B$ è ai capi di R (passa-alto) e $V_{A-B}$ ai capi di C (passa-basso). Se scambiamo R e C, la nuova impedenza $Z'$ è $R$ e il resistore $R'$ è $C$. La tensione $V_B'$ sarà ai capi di $C$ e $V_{A-B}'$ ai capi di $R$. Le funzioni di trasferimento si scambiano: la tensione ai capi del componente che ora è al posto di R (cioè C) avrà la funzione di trasferimento che prima aveva $V_B$ (passa-alto), e la tensione ai capi del componente che ora è al posto di Z (cioè R) avrà la funzione di trasferimento che prima aveva $V_{A-B}$ (passa-basso). In pratica, scambiare R e C (o R e L) inverte il tipo di filtro osservato ai capi di ciascun componente.
+    *   \textit{Intuizione:} Se l'uscita è presa sul condensatore, alle basse frequenze $Z_C \to \infty$, il condensatore blocca la corrente, quasi tutta la tensione cade su di esso (passa-basso). Se l'uscita è sul resistore, alle basse frequenze $Z_C \to \infty$, non passa corrente, la caduta su R è zero (passa-alto). Ad alte frequenze, $Z_C \to 0$, la tensione cade quasi tutta su R (passa-alto per V su R), mentre la tensione su C tende a zero (passa-basso per V su C).
+
+4.  \textbf{Importanza Resistenza Induttore ($r_L$):} Sì, $r_L$ va considerata. Come visto nella Nota 1.3, modifica l'impedenza dell'induttore a $\tilde{Z}_{L,real} = r_L + \jj \omega L$. Questo è importante:
+    *   \textbf{A basse frequenze:} $\omega L$ può essere piccolo, e $r_L$ può diventare una parte significativa dell'impedenza totale, alterando il comportamento atteso (es. un filtro passa-alto RL potrebbe non raggiungere guadagno zero a $\omega=0$).
+    *   \textbf{Nei circuiti RLC (Sezione 2):} $r_L$ si somma a $R$, modificando la resistenza totale $R_{tot} = R + r_L$. Questo influenza direttamente il fattore di qualità $Q = \omega_0 L / R_{tot}$ e quindi la larghezza e l'altezza della risonanza. Se $r_L$ non è trascurabile rispetto a $R$, ignorarla porta a stime errate di $Q$ e della risposta del circuito.
+    *   \textbf{Nelle misure:} Misurare $r_L$ con un multimetro è una buona pratica.
+
+5.  \textbf{Interpretazione Risposta Onda Quadra (Circuiti 2):} Un'onda quadra può essere vista come la somma di infinite sinusoidi (serie di Fourier): una fondamentale alla frequenza dell'onda quadra e armoniche dispari a frequenze multiple (3f, 5f, 7f...).
+    *   Il transiente veloce (salita/discesa) corrisponde alle componenti ad alta frequenza.
+    *   La parte costante nel tempo corrisponde alla componente a frequenza zero (DC) e alle basse frequenze.
+    *   La funzione di trasferimento $\tilde{H}_{(A-B)/A}(\omega)$ rappresenta la risposta della tensione ai capi del primo elemento ($Z$ nel nostro schema).
+        *   \textbf{RC: $V_{A-B}$ su C (Passa-basso):} Questo filtro attenua le alte frequenze. Quando un'onda quadra attraversa un passa-basso, i fronti ripidi (alte freq.) vengono smussati, la salita/discesa diventa più lenta (esponenziale). La parte costante (basse freq.) passa bene. Vedremo un'onda "arrotondata".
+        *   \textbf{RL: $V_{A-B}$ su L (Passa-alto):} Questo filtro attenua le basse frequenze e la DC, lasciando passare le alte frequenze. Quando un'onda quadra attraversa un passa-alto, la componente costante viene bloccata. I fronti ripidi (alte freq.) passano, generando dei picchi ("spike") all'inizio della salita/discesa. Durante la parte costante dell'ingresso, l'uscita decade esponenzialmente verso zero. Vedremo dei picchi seguiti da un decadimento.
+    *   \textbf{Relazione col grafico $\tilde{H}_{(A-B)/A}(\omega)$:} Il grafico mostra quali frequenze sono "tagliate" e quali "fatte passare". Se il grafico mostra un passa-basso, significa che le armoniche ad alta frequenza dell'onda quadra saranno attenuate, risultando in un segnale smussato. Se mostra un passa-alto, le armoniche a bassa frequenza (inclusa la DC) sono attenuate, portando a un segnale con picchi e decadimenti. L'analisi in frequenza (funzione di trasferimento) predice il comportamento nel dominio del tempo.
+
+\newpage
+\section{Funzioni di trasferimento nei circuiti RLC}
+
+\subsection{Prima di arrivare in laboratorio: Calcoli Preliminari}
+
+Consideriamo il circuito RLC serie di Figura 5. La tensione di ingresso $\tilde{V}_A$ è applicata all'intera serie RLC. La corrente $\tilde{I}$ è la stessa in tutti i componenti. L'impedenza totale è:
+\begin{equation}
+    \tilde{Z}_{tot}(\omega) = R + \tilde{Z}_L + \tilde{Z}_C = R + \jj \omega L + \frac{1}{\jj \omega C} = R + \jj \left( \omega L - \frac{1}{\omega C} \right)
+\end{equation}
+La corrente nel circuito è $\tilde{I}(\omega) = \tilde{V}_A / \tilde{Z}_{tot}(\omega)$.
+Le tensioni ai capi dei singoli componenti sono:
+\begin{itemize}
+    \item $\tilde{V}_R = \tilde{I} R = \tilde{V}_A \frac{R}{\tilde{Z}_{tot}}$
+    \item $\tilde{V}_L = \tilde{I} \tilde{Z}_L = \tilde{V}_A \frac{\jj \omega L}{\tilde{Z}_{tot}}$
+    \item $\tilde{V}_C = \tilde{I} \tilde{Z}_C = \tilde{V}_A \frac{1/(\jj \omega C)}{\tilde{Z}_{tot}}$
+\end{itemize}
+Le funzioni di trasferimento richieste sono quindi:
+
+\begin{itemize}
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{R/A}(\omega) = \tilde{V}_R / \tilde{V}_A$ (uscita su R):}
+        \begin{equation} \label{eq:H_RLC_R}
+            \tilde{H}_{R/A}(\omega) = \frac{R}{R + \jj (\omega L - 1/(\omega C))}
+        \end{equation}
+        Questa funzione descrive la risposta della corrente (dato che $\tilde{I} = \tilde{V}_R/R$), normalizzata rispetto a $\tilde{V}_A/R$. Ha un comportamento \textbf{passa-banda}.
+        Il modulo è massimo quando il termine immaginario al denominatore è zero, cioè $\omega L = 1/(\omega C)$. Questa è la \textbf{pulsazione di risonanza} $\omega_0$:
+        \begin{equation}
+            \omega_0 = \frac{1}{\sqrt{LC}} \quad \implies \quad f_0 = \frac{1}{2\pi\sqrt{LC}}
+        \end{equation}
+        Alla risonanza ($\omega = \omega_0$), $\tilde{Z}_{tot}(\omega_0) = R$, l'impedenza è minima e reale. La corrente è massima e in fase con $\tilde{V}_A$. Il guadagno $\abs{\tilde{H}_{R/A}(\omega_0)} = R/R = 1$.
+        Lontano dalla risonanza ($\omega \to 0$ o $\omega \to \infty$), il termine immaginario domina, $\abs{\tilde{Z}_{tot}} \to \infty$, e $\abs{\tilde{H}_{R/A}(\omega)} \to 0$.
+
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{L/A}(\omega) = \tilde{V}_L / \tilde{V}_A$ (uscita su L):}
+        \begin{equation} \label{eq:H_RLC_L}
+            \tilde{H}_{L/A}(\omega) = \frac{\jj \omega L}{R + \jj (\omega L - 1/(\omega C))}
+        \end{equation}
+        Questa funzione ha un comportamento \textbf{passa-alto risonante}.
+        Per $\omega \to 0$, $\tilde{H}_{L/A} \to 0$.
+        Per $\omega \to \infty$, il termine $1/(\omega C)$ diventa trascurabile. $\tilde{H}_{L/A} \approx \frac{\jj \omega L}{R + \jj \omega L} = \frac{\jj \omega L/R}{1 + \jj \omega L/R}$. Il modulo tende a 1.
+        Attorno a $\omega_0$, può mostrare un picco di risonanza se il circuito è sottosmorzato.
+
+    \item \textbf{Funzione di trasferimento $\tilde{H}_{C/A}(\omega) = \tilde{V}_C / \tilde{V}_A$ (uscita su C):}
+        \begin{equation} \label{eq:H_RLC_C}
+            \tilde{H}_{C/A}(\omega) = \frac{1/(\jj \omega C)}{R + \jj (\omega L - 1/(\omega C))} = \frac{1}{1 - \omega^2 LC + \jj \omega RC}
+        \end{equation}
+        (Moltiplicando numeratore e denominatore per $\jj \omega C$). Questa funzione ha un comportamento \textbf{passa-basso risonante}.
+        Per $\omega \to 0$, $\tilde{H}_{C/A} \to 1 / (1 - 0 + 0) = 1$.
+        Per $\omega \to \infty$, il termine $\omega^2 LC$ domina al denominatore, $\abs{\tilde{H}_{C/A}} \to 0$.
+        Attorno a $\omega_0$, può mostrare un picco di risonanza se il circuito è sottosmorzato.
+\end{itemize}
+
+\textbf{Fattore di Qualità (Q):} Un parametro importante per i circuiti RLC è il fattore di qualità $Q$, che misura la "nitidezza" della risonanza. È definito come:
+\begin{equation}
+    Q = \frac{\omega_0 L}{R} = \frac{1}{\omega_0 C R} = \frac{1}{R} \sqrt{\frac{L}{C}}
+\end{equation}
+Un $Q$ alto significa una risonanza stretta e alta (circuito poco smorzato). Un $Q$ basso significa una risonanza larga e bassa (circuito molto smorzato).
+La larghezza di banda a metà potenza ($\Delta \omega$) della risonanza della corrente (e quindi di $\tilde{V}_R$) è legata a $Q$:
+\begin{equation}
+    \Delta \omega = \omega_0 / Q = R / L
+\end{equation}
+
+\subsection{Procedimento}
+Simile a RC/RL, ma ora si misurano le tensioni ai capi di R, L, C (sempre rispetto a massa). Se R, L, C sono in serie come in Figura 5:
+\begin{itemize}
+    \item $V_A$: Tra l'inizio della serie e massa.
+    \item $V_{punto tra L e C}$: Rispetto a massa.
+    \item $V_B$ (punto tra R e massa, se R è l'ultimo elemento verso massa): $V_B$ è la tensione su R.
+\end{itemize}
+Attenzione a come misurare le tensioni ai capi di L e C, poiché l'oscilloscopio misura rispetto a massa. Se R non è a massa, misurare $V_R$ richiede la funzione MATH (tensione a un capo - tensione all'altro capo). Stessa cosa per L e C se non sono collegate direttamente a massa.
+Lo schema in Figura 5 sembra avere R connesso a massa, quindi $V_B$ è la tensione su R, $V_R = V_B$. La tensione su C è quella nel nodo tra L e C. La tensione su L è $V_A - V_{nodoLC}$.
+
+Si raccolgono dati di ampiezza e fase per $V_R/V_A$, $V_L/V_A$, $V_C/V_A$ al variare della frequenza. Si fittano i moduli e le fasi con le formule teoriche (\ref{eq:H_RLC_R}, \ref{eq:H_RLC_L}, \ref{eq:H_RLC_C}), includendo eventualmente la resistenza $r_L$ dell'induttore ($R_{tot} = R + r_L$).
+Il fit permette di stimare $L$ e $C$ (assumendo $R$ e $r_L$ noti). Il fit è più robusto se si usano simultaneamente i dati di modulo e fase. Confrontare i valori ottenuti con quelli attesi.
+
+\subsection{Domande e considerazioni guida}
+
+1.  \textbf{Forma Risonanza su R ($V_R/V_A$):} La risposta in frequenza $\abs{\tilde{H}_{R/A}(\omega)} = \abs{\tilde{V}_R / \tilde{V}_A}$ ha la forma di una "campana" (curva di Lorentz o di risonanza).
+    *   \textbf{Altezza:} Il picco della campana si trova a $\omega = \omega_0 = 1/\sqrt{LC}$. L'altezza del picco è $\abs{\tilde{H}_{R/A}(\omega_0)} = 1$. L'altezza è indipendente dai valori RLC (è sempre 1 alla risonanza). (Nota: se si includesse $R_g$, l'altezza sarebbe $R/(R+R_g)$). Se si considera $r_L$, $R_{tot}=R+r_L$, l'altezza a $\omega_0$ è $R/R_{tot}$.
+    *   \textbf{Larghezza:} La larghezza della campana è inversamente proporzionale al fattore di qualità $Q$. La larghezza a metà potenza (dove $\abs{H}^2 = 1/2$, quindi $\abs{H} = 1/\sqrt{2} \approx 0.707$) è $\Delta \omega = \omega_0 / Q = R_{tot} / L$. Una $Q$ alta (bassa $R_{tot}$, alta $L$) dà una risonanza stretta. Una $Q$ bassa (alta $R_{tot}$, bassa $L$) dà una risonanza larga.
+
+2.  \textbf{Comportamento Frequenza/Tempo e Smorzamento (misura su R):} Il comportamento in frequenza (forma della risonanza) e nel dominio del tempo (risposta a un gradino o a un impulso) sono due facce della stessa medaglia, entrambe determinate dai parametri R, L, C e in particolare dal fattore di smorzamento $\zeta = \frac{R_{tot}}{2} \sqrt{\frac{C}{L}} = \frac{1}{2Q}$.
+    *   \textbf{Sottosmorzato ($\zeta < 1$ o $Q > 1/2$):} Corrisponde a $R_{tot} < 2\sqrt{L/C}$.
+        *   \textit{Frequenza:} Si osserva un chiaro picco di risonanza in $\abs{H_{R/A}(\omega)}$ a $\omega_0$. Più $Q$ è alto (più $\zeta$ è piccolo), più il picco è stretto e alto (relativamente alla larghezza).
+        *   \textit{Tempo (risposta a gradino):} L'uscita $V_R(t)$ (proporzionale alla corrente) mostra oscillazioni smorzate attorno al valore finale. La frequenza di queste oscillazioni è $\omega_d = \omega_0 \sqrt{1-\zeta^2}$, leggermente inferiore a $\omega_0$. Il decadimento è più lento per $Q$ alto.
+    *   \textbf{Smorzamento Critico ($\zeta = 1$ o $Q = 1/2$):} Corrisponde a $R_{tot} = 2\sqrt{L/C}$.
+        *   \textit{Frequenza:} La risposta $\abs{H_{R/A}(\omega)}$ è la più larga possibile senza diventare monotona. Il picco a $\omega_0$ è appena accennato.
+        *   \textit{Tempo:} La risposta a gradino raggiunge il valore finale nel modo più rapido possibile senza overshoot (sovraelongazione).
+    *   \textbf{Sovrasmorzato ($\zeta > 1$ o $Q < 1/2$):} Corrisponde a $R_{tot} > 2\sqrt{L/C}$.
+        *   \textit{Frequenza:} La risposta $\abs{H_{R/A}(\omega)}$ non ha un vero picco a $\omega_0$; il massimo è a $\omega=0$ (se non fosse per C) o comunque la curva è molto larga e piatta, decrescendo monotonicamente dopo una certa frequenza.
+        *   \textit{Tempo:} La risposta a gradino è lenta, senza oscillazioni, e raggiunge il valore finale in modo esponenziale (combinazione di due esponenziali reali).
+
+\subsection{Tips and Tricks}
+
+1.  \textbf{Forma Risonanza su R:} (Vedi risposta 2.3.1). Larghezza determinata da $\Delta\omega = R_{tot}/L = \omega_0/Q$. Altezza (picco) normalizzata a 1 (o $R/R_{tot}$ se si misura $V_R$ e si considera $r_L$).
+2.  \textbf{Frequenza/Tempo e Smorzamento:} (Vedi risposta 2.3.2). Collega $Q$ e $\zeta$ alla forma della risonanza (frequenza) e alle oscillazioni/velocità di risposta (tempo).
+3.  \textbf{Capire Intuitivamente la Risposta in Frequenza (Asintoti):} Analizzare il comportamento del circuito per $\omega \to 0$ (DC) e $\omega \to \infty$ è estremamente utile per capire il tipo di filtro. Si usano le impedenze limite (vedi Figura 6):
+    *   \textbf{$\omega \to 0$ (Bassa Frequenza):}
+        *   Resistore: $Z_R = R$ (costante)
+        *   Induttore: $Z_L = \jj \omega L \to 0$ (si comporta come un \textbf{corto circuito})
+        *   Condensatore: $Z_C = 1/(\jj \omega C) \to \infty$ (si comporta come un \textbf{circuito aperto})
+    *   \textbf{$\omega \to \infty$ (Alta Frequenza):}
+        *   Resistore: $Z_R = R$ (costante)
+        *   Induttore: $Z_L = \jj \omega L \to \infty$ (si comporta come un \textbf{circuito aperto})
+        *   Condensatore: $Z_C = 1/(\jj \omega C) \to 0$ (si comporta come un \textbf{corto circuito})
+
+    \textbf{Esempio: Circuito RC Passa-Basso (uscita su C, Figura 7):}
+    *   \textit{$\omega \to 0$:} C è aperto. Non scorre corrente in R. La tensione ai capi di R è zero. Tutta la tensione $V_{in}$ cade ai capi di C. $V_{out} = V_{in}$. Quindi $\abs{H(0)} = 1$.
+    *   \textit{$\omega \to \infty$:} C è un corto circuito. Collega direttamente $V_{out}$ a massa. $V_{out} = 0$. Quindi $\abs{H(\infty)} = 0$.
+    *   \textit{Conclusione:} Guadagno 1 a basse frequenze, 0 ad alte frequenze $\implies$ \textbf{Filtro Passa-Basso}. Questo conferma l'analisi asintotica mostrata in Figura 7.
+
+    \textbf{Applichiamo all'RLC (uscita su R):}
+    *   \textit{$\omega \to 0$:} L è corto, C è aperto. Il circuito è interrotto da C. Non passa corrente. $V_R = I R = 0$. $\abs{H_{R/A}(0)} = 0$.
+    *   \textit{$\omega \to \infty$:} L è aperto, C è corto. Il circuito è interrotto da L. Non passa corrente. $V_R = I R = 0$. $\abs{H_{R/A}(\infty)} = 0$.
+    *   \textit{$\omega = \omega_0$:} $Z_L$ e $Z_C$ si cancellano ($Z_L + Z_C = 0$). $Z_{tot} = R$. $V_R = V_A (R/R) = V_A$. $\abs{H_{R/A}(\omega_0)} = 1$.
+    *   \textit{Conclusione:} Guadagno zero a frequenze molto basse e molto alte, guadagno massimo a $\omega_0$. $\implies$ \textbf{Filtro Passa-Banda}.
+
+Questo approccio asintotico è potente per una comprensione qualitativa rapida del comportamento in frequenza di qualsiasi rete RLC.
+
+\section*{Riferimenti Bibliografici}
+I riferimenti indicati nella scheda [1-4] sono standard e appropriati per approfondire la teoria dei circuiti AC, l'uso dell'oscilloscopio e le analisi di Fourier.
+
+\vspace{1cm}
+\textit{Questo documento complementare ha lo scopo di chiarire e approfondire i concetti necessari per l'esperienza "Circuiti 3". Si raccomanda di studiare questi concetti parallelamente all'esecuzione pratica dell'esperimento e all'analisi dei dati.}
+
+\end{document}
