@@ -74,7 +74,8 @@ class Measurement:
 
     Features:
         - Automatic error propagation for +, -, *, /, **, and NumPy ufuncs.
-        - Support for scalar and array-based measurements.
+        - Support for scalar and array-based measurements, including operations
+          between scalars and arrays.
         - Basic unit tracking (units propagated correctly for +/- if identical,
           cleared otherwise; unit consistency is user's responsibility for * / **).
         - String formatting methods (`__str__`, `to_eng_string`, `round_to_error`)
@@ -194,6 +195,7 @@ class Measurement:
                  was_scalar_input = isinstance(_values_in, Number) and \
                                     (errors is None or isinstance(_errors_in, Number))
 
+                 # Store value/error as scalar floats if input was scalar AND result is 0-dim
                  if was_scalar_input and self.value.ndim == 0:
                       self.value = self.value.item() # Convert 0-dim array to Python float
                       self.error = self.error.item()
@@ -280,8 +282,10 @@ class Measurement:
             # Return a new Measurement object
             # Important: pass scalar values if result is scalar, else pass arrays
             if is_result_scalar:
-                 return Measurement(new_value.item(), new_error.item() if np.ndim(new_error) == 0 else new_error,
-                                    unit=self.unit, name=new_name)
+                 # If result is scalar, store value/error as Python scalars
+                 val_item = new_value.item()
+                 err_item = new_error.item() if np.ndim(new_error) == 0 else new_error # Handle case where error was array but slice yields scalar
+                 return Measurement(val_item, err_item, unit=self.unit, name=new_name)
             else:
                  return Measurement(new_value, new_error, unit=self.unit, name=new_name)
 
@@ -316,9 +320,9 @@ class Measurement:
         """
         name_str = f", name='{self.name}'" if self.name else ""
         unit_str = f", unit='{self.unit}'" if self.unit else ""
-        # Use np.repr for array representation if needed
-        val_repr = np.array_repr(self.value) if isinstance(self.value, np.ndarray) else repr(self.value)
-        err_repr = np.array_repr(self.error) if isinstance(self.error, np.ndarray) else repr(self.error)
+        # Use np.repr for array representation if needed, handle scalar case
+        val_repr = np.array_repr(np.asarray(self.value)) if isinstance(self.value, np.ndarray) else repr(self.value)
+        err_repr = np.array_repr(np.asarray(self.error)) if isinstance(self.error, np.ndarray) else repr(self.error)
         return f"Measurement(value={val_repr}, error={err_repr}{name_str}{unit_str})"
 
     def __str__(self) -> str:
@@ -352,7 +356,8 @@ class Measurement:
 
         # Return scalar string or formatted array string
         if is_scalar:
-            return formatted_array.item() # Extract scalar string from 0-dim array
+            # Ensure scalar output even if internal storage was temporarily array
+            return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
         else:
              # Use numpy's array2string for clean array output, prevent truncation
              with np.printoptions(threshold=np.inf):
@@ -397,7 +402,7 @@ class Measurement:
         formatted_array = formatter(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
 
         if is_scalar:
-            return formatted_array.item()
+            return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
         else:
              # Format array output cleanly
              with np.printoptions(threshold=np.inf):
@@ -435,7 +440,7 @@ class Measurement:
         formatted_array = formatter(value=self.value, error=self.error, n_sig_figs=n_sig_figs)
 
         if is_scalar:
-             return formatted_array.item()
+             return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
         else:
              with np.printoptions(threshold=np.inf):
                  return np.array2string(formatted_array, separator=', ',
@@ -519,13 +524,14 @@ class Measurement:
         is_other_meas = isinstance(other, Measurement)
         other_unit = other.unit if is_other_meas else None
         other_name = other.name if is_other_meas else None
+        other_is_const = isinstance(other, (Number, np.ndarray)) and not is_other_meas
 
         # --- Unit Logic ---
         if operation in ['add', 'sub']:
             # Addition/Subtraction: Require identical units for the result to have that unit.
             if self.unit and other_unit and self.unit == other_unit:
                 res_unit = self.unit # Units match, preserve it
-            elif self.unit and other_unit is None and isinstance(other, (Number, np.ndarray)):
+            elif self.unit and (other_unit is None or other_is_const):
                  res_unit = self.unit # Adding/subtracting a dimensionless constant preserves unit
             elif not self.unit and other_unit:
                  res_unit = other_unit # Adding/subtracting to a dimensionless constant preserves unit
@@ -547,22 +553,23 @@ class Measurement:
 
         # --- Name Logic (Basic) ---
         # Try to generate a simple name indicating the operation.
-        op_symbols = {'add': '+', 'sub': '-', 'mul': '*', 'div': '/', 'pow': '**'}
+        op_symbols = {'add': '+', 'sub': '-', 'mul': '*', 'div': '/', 'pow': '**',
+                      'radd': '+', 'rsub': '-', 'rmul': '*', 'rtruediv': '/', 'rpow': '**'}
         op_sym = op_symbols.get(operation, operation) # Use symbol or operation name
 
         # Represent operands in the name
         self_name_part = f"({self.name})" if self.name else 'm1'
         if is_other_meas:
             other_name_part = f"({other_name})" if other_name else 'm2'
-        elif isinstance(other,(Number, np.ndarray)):
+        elif other_is_const:
             other_name_part = 'const' # Indicate a constant value
         else:
-            other_name_part = 'other'
+            other_name_part = 'other' # Fallback for unknown types
 
         if operation in ['neg', 'pos', 'abs']:
              # Unary operations
              res_name = f"{op_sym}{self_name_part}"
-        elif is_other_meas or isinstance(other, (Number, np.ndarray)):
+        elif is_other_meas or other_is_const:
              # Binary operations
              # Special case for r-operations (e.g., const + m1)
              if operation.startswith('r') and len(operation) > 1:
@@ -599,288 +606,322 @@ class Measurement:
                            RuntimeWarning)
 
 
-    # --- Arithmetic Operations ---
-    # Each operation calculates the new value and error based on propagation rules,
-    # propagates metadata (unit, name), checks for NaN/Inf, and returns a new Measurement.
+    # --- Broadcasting Helper ---
+    def _get_broadcasted_operands(self, other: Any) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+        """
+        Internal helper to get value and error arrays for self and other,
+        broadcasted to a common shape. Handles Measurement, scalar, or ndarray inputs.
+
+        Returns:
+            Tuple(self_val, self_err, other_val, other_err) broadcasted, or None if incompatible.
+        """
+        self_val = np.asarray(self.value)
+        self_err = np.asarray(self.error)
+
+        if isinstance(other, Measurement):
+            other_val = np.asarray(other.value)
+            other_err = np.asarray(other.error)
+        elif isinstance(other, (Number, np.ndarray)):
+            other_val = np.asarray(other)
+            # Assume zero error for constants/arrays unless they are Measurement objects
+            other_err = np.zeros_like(other_val, dtype=float)
+        else:
+            # Indicate incompatible type
+            return None
+
+        # Perform broadcasting
+        try:
+            bcast = np.broadcast(self_val, self_err, other_val, other_err)
+            shape = bcast.shape
+            return (np.broadcast_to(self_val, shape),
+                    np.broadcast_to(self_err, shape),
+                    np.broadcast_to(other_val, shape),
+                    np.broadcast_to(other_err, shape))
+        except ValueError:
+             # Broadcasting failed
+             raise ValueError(f"Operands with shapes {self_val.shape} and {other_val.shape} "
+                              "cannot be broadcast together.")
+
+
+    # --- Arithmetic Operations (Revised with Broadcasting) ---
 
     def __add__(self, other: Any) -> 'Measurement':
         op = "add"
         res_name, res_unit = self._propagate_metadata(other, op)
-        if isinstance(other, Measurement):
-            # (x ± σx) + (y ± σy) = (x+y) ± sqrt(σx² + σy²)
-            new_value = self.value + other.value
-            new_error = np.hypot(self.error, other.error) # sqrt(sx^2 + sy^2)
-        elif isinstance(other, (Number, np.ndarray)):
-            # (x ± σx) + k = (x+k) ± σx (error unchanged)
-            other_arr = np.asarray(other)
-            new_value = self.value + other_arr
-            new_error = self.error # Additive constant doesn't change error
-        else:
-            return NotImplemented # Indicate operation is not supported for this type
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented # Incompatible type
+
+        a, sa, b, sb = operands
+        new_value = a + b
+        # Errors add in quadrature, assuming independence
+        new_error = np.hypot(sa, sb)
+
         # Create result and check for issues
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __radd__(self, other: Any) -> 'Measurement':
-        # k + (x ± σx) = (k+x) ± σx. Same logic as __add__.
-        # We can just call __add__ because addition is commutative.
+        # Use __add__ since addition is commutative.
+        # Metadata handled correctly by __add__ when called as other + self.
         return self.__add__(other)
 
     def __sub__(self, other: Any) -> 'Measurement':
         op = "sub"
         res_name, res_unit = self._propagate_metadata(other, op)
-        if isinstance(other, Measurement):
-            # (x ± σx) - (y ± σy) = (x-y) ± sqrt(σx² + σy²) (errors add in quadrature)
-            new_value = self.value - other.value
-            new_error = np.hypot(self.error, other.error)
-        elif isinstance(other, (Number, np.ndarray)):
-            # (x ± σx) - k = (x-k) ± σx (error unchanged)
-            other_arr = np.asarray(other)
-            new_value = self.value - other_arr
-            new_error = self.error # Subtractive constant doesn't change error
-        else:
-            return NotImplemented
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
+
+        a, sa, b, sb = operands
+        new_value = a - b
+        # Errors add in quadrature for subtraction too (variances add)
+        new_error = np.hypot(sa, sb)
+
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __rsub__(self, other: Any) -> 'Measurement':
-        # k - (x ± σx) = (k-x) ± σx
-        op = "rsub" # Use specific name for metadata if needed, though propagate handles it
-        # Correct metadata propagation for k - M
-        res_name, res_unit = self._propagate_metadata(other, op) # Will generate 'const - (m1)' etc.
+        # k - (a ± sa) = (k-a) ± sa
+        op = "rsub"
+        res_name, res_unit = self._propagate_metadata(other, op) # Correct metadata order
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
 
-        if isinstance(other, (Number, np.ndarray)):
-            other_arr = np.asarray(other)
-            new_value = other_arr - self.value
-            new_error = self.error # Error magnitude is the same as for -(x ± σx)
-        else:
-             return NotImplemented
+        # Note: _get_broadcasted_operands returns (k, 0, a, sa)
+        k, _, a, sa = operands # Error on k (other) is zero if it wasn't a Measurement
+        new_value = k - a
+        new_error = sa # Error is just the error from self
+
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __mul__(self, other: Any) -> 'Measurement':
         op = "mul"
-        res_name, res_unit = self._propagate_metadata(other, op) # Unit will be cleared by default
-        if isinstance(other, Measurement):
-            # (x ± σx) * (y ± σy) ≈ (x*y) ± sqrt( (y*σx)² + (x*σy)² )
-            a, sa = self.value, self.error
-            b, sb = other.value, other.error
-            new_value = a * b
-            # Use np.errstate to suppress potential warnings during intermediate calculation
-            # (e.g., inf*0 results in nan, which is handled below)
-            with np.errstate(invalid='ignore'):
-                 term1 = b * sa
-                 term2 = a * sb
-                 # Handle cases where a or b is exactly zero: the corresponding error term is zero.
-                 term1 = np.where(np.isclose(b, 0.0), 0.0, term1)
-                 term2 = np.where(np.isclose(a, 0.0), 0.0, term2)
-                 # Combine terms in quadrature
-                 new_error = np.hypot(term1, term2)
-        elif isinstance(other, (Number, np.ndarray)):
-            # k * (x ± σx) = (k*x) ± |k|*σx
-            k = np.asarray(other)
-            new_value = self.value * k
-            # Error scales by the absolute value of the constant factor
-            new_error = np.abs(k) * self.error
-        else:
-            return NotImplemented
+        res_name, res_unit = self._propagate_metadata(other, op)
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
+
+        a, sa, b, sb = operands
+        new_value = a * b
+
+        # Error: sqrt( (b*sa)² + (a*sb)² )
+        with np.errstate(invalid='ignore'): # Handle potential 0*inf etc.
+             term1 = b * sa
+             term2 = a * sb
+             # Handle cases where a or b is exactly zero: the corresponding error term is zero.
+             # (hypot handles NaN correctly, but explicit zeroing is safer for clarity)
+             term1 = np.where(np.isclose(b, 0.0), 0.0, term1)
+             term2 = np.where(np.isclose(a, 0.0), 0.0, term2)
+             new_error = np.hypot(term1, term2)
+
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __rmul__(self, other: Any) -> 'Measurement':
-        # k * M is the same as M * k. Multiplication is commutative.
+        # k * M is the same as M * k.
         return self.__mul__(other)
 
+    # --- REPLACE this method in measurement.py ---
     def __truediv__(self, other: Any) -> 'Measurement':
         op = "div"
-        res_name, res_unit = self._propagate_metadata(other, op) # Unit cleared by default
-        # Use errstate to manage division by zero warnings during calculation
+        res_name, res_unit = self._propagate_metadata(other, op)
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
+
+        a, sa, b, sb = operands
+
         with np.errstate(divide='ignore', invalid='ignore'):
-            if isinstance(other, Measurement):
-                # (x ± σx) / (y ± σy) ≈ (x/y) ± sqrt( (σx/y)² + (x*σy / y²)² )
-                #                        = (x/y) ± sqrt( (σx/y)² + ((x/y)*σy / y)² )
-                a, sa = self.value, self.error
-                b, sb = other.value, other.error
-                new_value = a / b # Let numpy handle 0/0 -> nan, x/0 -> inf
+            new_value = a / b # Let numpy handle 0/0 -> nan, x/0 -> inf
 
-                # Calculate error terms, carefully handling potential zeros
-                # Term 1: (∂f/∂a * sa) = (1/b * sa)
-                term1 = sa / b # Might be inf if b=0
-                # Term 2: (∂f/∂b * sb) = (-a/b² * sb) = -(a/b)*(sb/b) = -new_value*(sb/b)
-                term2 = new_value * (sb / b) # Might involve inf/inf=nan, 0/0=nan etc.
+            # Error: sqrt( (sa/b)² + (a*sb / b²)² )
+            #      = sqrt( (sa/b)² + (new_value * sb / b)² )
+            term1 = sa / b
+            term2 = new_value * (sb / b)
 
-                # Refine error terms where inputs are zero
-                term1 = np.where(np.isclose(b, 0.0), np.inf if not np.isclose(sa, 0.0) else 0.0, term1)
-                term2 = np.where(np.isclose(b, 0.0), np.inf if not (np.isclose(a, 0.0) or np.isclose(sb, 0.0)) else 0.0, term2)
-                # If a is zero, only the sa/b term contributes (unless b is also zero)
-                term2 = np.where(np.isclose(a, 0.0) & ~np.isclose(b, 0.0), 0.0, term2)
+            # --- Refine error terms ---
+            # Where denominator b is zero:
+            # The term1 contribution (from sa) is inf if sa is non-zero, else 0.
+            value_if_b_is_zero_for_term1 = np.where(np.isclose(sa, 0.0), 0.0, np.inf)
+            term1 = np.where(np.isclose(b, 0.0), value_if_b_is_zero_for_term1, term1)
 
-                # Combine in quadrature
-                new_error = np.hypot(term1, term2)
+            # The term2 contribution (from sb) is inf if b=0, unless the numerator (a*sb or new_value*sb) is also zero.
+            # Check if b is zero AND the numerator components (new_value and sb) are NOT both effectively zero.
+            # Note: Using new_value = a/b. If b=0, new_value is inf (if a!=0) or nan (if a=0).
+            # It's safer to check based on original a and sb.
+            # term2 should be inf if b=0 and a!=0 and sb!=0
+            is_inf_term2 = np.isclose(b, 0.0) & ~np.isclose(a, 0.0) & ~np.isclose(sb, 0.0)
+            term2 = np.where(is_inf_term2, np.inf, term2)
 
-            elif isinstance(other, (Number, np.ndarray)):
-                # (x ± σx) / k = (x/k) ± (|1/k|) * σx = (x/k) ± σx / |k|
-                k = np.asarray(other)
-                new_value = self.value / k
-                # Error scales by absolute value of 1/k
-                new_error = np.abs(self.error / k) # Will be inf if k=0
+            # Where numerator a is zero (and b is not zero):
+            # term1 = sa/b (can be non-zero)
+            # term2 = 0 * (sb/b) = 0
+            term2 = np.where(np.isclose(a, 0.0) & ~np.isclose(b, 0.0), 0.0, term2)
 
-            else:
-                return NotImplemented
+            # Where error sb is zero (and b is not zero):
+            # term2 = new_value * (0/b) = 0
+            term2 = np.where(np.isclose(sb, 0.0) & ~np.isclose(b, 0.0), 0.0, term2)
+
+            # Combine in quadrature
+            new_error = np.hypot(term1, term2)
+
+            # Final check: if value is 0, error might need adjustment (e.g. 0/1)
+            # If new_value is exactly 0 (e.g., 0 / non_zero_b), then error is |sa/b|.
+            new_error = np.where(np.isclose(new_value, 0.0) & ~np.isclose(b, 0.0), np.abs(term1), new_error)
 
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __rtruediv__(self, other: Any) -> 'Measurement':
-        # k / (x ± σx) ≈ (k/x) ± | -k*σx / x² | = (k/x) ± | (k/x) * σx / x |
+        # k / (a ± sa)
         op = "rtruediv"
-        res_name, res_unit = self._propagate_metadata(other, op) # Unit cleared by default
-        if isinstance(other, (Number, np.ndarray)):
-            with np.errstate(divide='ignore', invalid='ignore'):
-                k = np.asarray(other)
-                a, sa = self.value, self.error
-                new_value = k / a # Numpy handles k/0 -> inf
+        res_name, res_unit = self._propagate_metadata(other, op)
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
 
-                # Calculate error: | new_value * sa / a |
-                new_error = np.abs(new_value * sa / a)
-                # Handle cases involving zero
-                new_error = np.where(np.isclose(a, 0.0), np.inf if not np.isclose(k*sa, 0.0) else 0.0, new_error)
-                # If k=0, result is 0 with 0 error (unless a=0, which gives nan handled above)
-                new_error = np.where(np.isclose(k, 0.0) & ~np.isclose(a, 0.0), 0.0, new_error)
-        else:
-            return NotImplemented
+        k, _, a, sa = operands # other_err (sk) is 0
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            new_value = k / a
+
+            # Error: | (-k*sa / a²) | = | (k/a) * sa / a | = | new_value * sa / a |
+            new_error = np.abs(new_value * (sa / a))
+
+            # Handle cases involving zero
+            # If a=0, error is inf (unless k=0 or sa=0)
+            new_error = np.where(np.isclose(a, 0.0),
+                                 np.inf if not (np.isclose(k, 0.0) or np.isclose(sa, 0.0)) else 0.0,
+                                 new_error)
+            # If k=0, result is 0 with 0 error (unless a=0, gives nan/inf handled above)
+            new_error = np.where(np.isclose(k, 0.0) & ~np.isclose(a, 0.0), 0.0, new_error)
+            # If sa=0, error is 0 (unless a=0)
+            new_error = np.where(np.isclose(sa, 0.0) & ~np.isclose(a, 0.0), 0.0, new_error)
+
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
     def __pow__(self, other: Any) -> 'Measurement':
         op = "pow"
-        res_name, res_unit = self._propagate_metadata(other, op) # Unit cleared by default
-        with np.errstate(invalid='ignore'): # Manage 0**neg, neg**frac warnings
-            if isinstance(other, (Number, np.ndarray)): # Case 1: M ** k
-                n = np.asarray(other)
-                a, sa = self.value, self.error
-                # Check for domain issues that yield complex numbers or NaN/Inf
-                # Negative base with fractional exponent -> complex
-                if np.any((a < 0) & (n % 1 != 0)):
-                     warnings.warn(f"Power M**k: Base Measurement has negative values with non-integer exponent {n}. "
-                                   "Result may be complex or NaN. Error propagation assumes real result.", RuntimeWarning)
-                # 0 ** negative -> inf
-                if np.any((np.isclose(a, 0.0)) & (n < 0)):
-                     warnings.warn(f"Power M**k: Operation 0**negative encountered.", RuntimeWarning)
+        res_name, res_unit = self._propagate_metadata(other, op)
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
 
-                # Calculate value: a^n
-                new_value = a ** n
+        a, sa, b, sb = operands
 
-                # Calculate error: σ_f ≈ | ∂f/∂a * σ_a | = | n * a^(n-1) * σ_a |
-                deriv = n * (a ** (n - 1))
-                new_error = np.abs(deriv * sa)
+        with np.errstate(invalid='ignore'): # Manage 0**neg, neg**frac warnings etc.
+             # Check for domain issues that yield complex numbers or NaN/Inf
+             if np.any((a < 0) & (b % 1 != 0)):
+                  warnings.warn(f"Power M**k or M1**M2: Base has negative values with non-integer exponent. "
+                                "Result may be complex or NaN. Error propagation assumes real result.", RuntimeWarning)
+             if np.any((np.isclose(a, 0.0)) & (b < 0)):
+                  warnings.warn(f"Power: Operation 0**negative encountered.", RuntimeWarning)
+             # Check if M2 involved (sb != 0) and base a<=0 for log(a) issue
+             if np.any(sb != 0) and np.any(a <= 0):
+                  warnings.warn(f"Power M1**M2: Logarithm of non-positive base M1 ({a}) required for error propagation "
+                                "due to M2 uncertainty. Error contribution from M2 may be NaN.", RuntimeWarning)
 
-                # Refine error for special cases where derivative might be NaN/Inf or rule simple
-                # If deriv is NaN (e.g., from 0**-1), error should be NaN or Inf
-                new_error = np.where(np.isnan(deriv) | np.isinf(deriv), deriv, new_error)
-                # If exponent n=0, result is 1 exactly, error is 0
-                new_error = np.where(np.isclose(n, 0.0), 0.0, new_error)
-                # If base a=0 and n>0, result is 0 exactly, error is 0
-                new_error = np.where(np.isclose(a, 0.0) & (n > 0), 0.0, new_error)
-                # If base a=0 and n=1, result 0, error is |1*0^0*sa| - handle 0^0 as 1? No, use limit -> error is sa
-                new_error = np.where(np.isclose(a, 0.0) & np.isclose(n, 1.0), sa, new_error)
+             # Calculate value
+             new_value = a ** b
 
+             # Calculate error contributions
+             # Term 1: (∂f/∂a * sa) = (b * a**(b-1) * sa)
+             df_da = b * (a ** (b - 1))
+             term_a = df_da * sa
 
-            elif isinstance(other, Measurement): # Case 2: M1 ** M2
-                # f(a, b) = a^b
-                # ∂f/∂a = b * a^(b-1)
-                # ∂f/∂b = a^b * ln(a) = f * ln(a)
-                # σ_f² ≈ ( (b * a^(b-1)) * σ_a )² + ( (a^b * ln(a)) * σ_b )²
-                a, sa = self.value, self.error
-                b, sb = other.value, other.error
-
-                # Domain warnings for M1**M2 are more complex
-                if np.any(a < 0):
-                     warnings.warn(f"Power M1**M2: Base M1 has negative values ({a}). "
-                                   "Result or error propagation may involve complex numbers or NaN.", RuntimeWarning)
-                if np.any((np.isclose(a, 0.0)) & (b <= 0)):
-                     warnings.warn(f"Power M1**M2: Operation 0 ** (M2 <= 0) encountered.", RuntimeWarning)
-                # ln(a) is needed for error propagation, requires a > 0
-                if np.any(a <= 0):
-                     warnings.warn(f"Power M1**M2: Logarithm of non-positive base M1 ({a}) required for error propagation. "
-                                   "Error contribution from M2 uncertainty (σ_b) may be NaN.", RuntimeWarning)
-
-                # Calculate value
-                new_value = a ** b
-
-                # Calculate partial derivatives and error terms
-                df_da = b * (a ** (b - 1))
-                # Use np.log for potential array input, handle log(<=0) -> nan/inf
-                with np.errstate(divide='ignore', invalid='ignore'): # Suppress log(0) warning
+             # Term 2: (∂f/∂b * sb) = (a**b * ln(a) * sb) = (new_value * ln(a) * sb)
+             # Only calculate if sb is non-zero
+             term_b = np.zeros_like(new_value, dtype=float)
+             has_sb_error = np.any(sb != 0.0)
+             if has_sb_error:
+                 with np.errstate(divide='ignore', invalid='ignore'): # Suppress log(0) warning
                      log_a = np.log(a)
-                df_db = new_value * log_a # This will be nan if a <= 0
+                 df_db = new_value * log_a # Will be nan if a <= 0
+                 term_b = df_db * sb
 
-                term_a = df_da * sa
-                term_b = df_db * sb
+             # Handle NaNs/Infs arising from derivatives or inputs
+             # If derivative is NaN/Inf, term is NaN/Inf (unless error is 0)
+             term_a = np.where((np.isnan(df_da) | np.isinf(df_da)) & ~np.isclose(sa, 0.0), df_da, term_a)
+             term_b = np.where((np.isnan(df_db) | np.isinf(df_db)) & ~np.isclose(sb, 0.0), df_db, term_b)
+             # If error is zero, term is zero
+             term_a = np.where(np.isclose(sa, 0.0), 0.0, term_a)
+             term_b = np.where(np.isclose(sb, 0.0), 0.0, term_b)
+             # If base a=0:
+             # If b>1, a**(b-1)=0 -> df_da=0 -> term_a=0. If b=1, a**0=1 -> df_da=1 -> term_a=sa. If 0<b<1, a**(b-1)=inf. If b=0, a**-1=inf. If b<0, a**(b-1)=inf.
+             # If base a=0: ln(a)=-inf -> df_db=-inf (if new_value=0). term_b = -inf * sb.
 
-                # Handle NaNs arising from derivatives or inputs
-                # If derivative is NaN, term is NaN (unless error is 0)
-                term_a = np.where(np.isnan(df_da) & ~np.isclose(sa, 0.0), np.nan, term_a)
-                term_b = np.where(np.isnan(df_db) & ~np.isclose(sb, 0.0), np.nan, term_b)
-                # If error is zero, term is zero
-                term_a = np.where(np.isclose(sa, 0.0), 0.0, term_a)
-                term_b = np.where(np.isclose(sb, 0.0), 0.0, term_b)
+             # More robust handling for a=0:
+             # Case: a=0, b>0 => new_value=0. Error requires care.
+             # If b > 1: df_da=0, term_a=0. log(a)=-inf, df_db=-inf, term_b=-inf*sb. Error is inf if sb!=0.
+             # If b = 1: new_value=0. df_da=1*0^0=1 (convention?), term_a=sa. log(a)=-inf, df_db=0*(-inf)=nan?, term_b=nan. Error is sa.
+             # If 0 < b < 1: new_value=0. df_da=inf, term_a=inf*sa. df_db=-inf, term_b=-inf*sb. Error is inf if sa!=0 or sb!=0.
+             # If b=0: new_value=1. df_da=0*0^-1=inf, term_a=inf*sa. df_db=1*log(0)=-inf, term_b=-inf*sb. Error is inf if sa!=0 or sb!=0.
+             # If b < 0: new_value=inf.
 
-                # Combine in quadrature
-                new_error = np.hypot(term_a, term_b)
-            else:
-                return NotImplemented
+             # Combine in quadrature - hypot handles inf correctly (sqrt(inf^2 + x^2) = inf)
+             new_error = np.hypot(term_a, term_b)
+
+             # Specific overrides based on simpler logic where possible
+             # If exponent b=0, result is 1, error is 0 (overrides inf calculations above if a=0)
+             new_error = np.where(np.isclose(b, 0.0), 0.0, new_error)
+             new_value = np.where(np.isclose(b, 0.0), 1.0, new_value)
+             # If exponent b=1, result is a, error is sa
+             new_error = np.where(np.isclose(b, 1.0), sa, new_error)
+             new_value = np.where(np.isclose(b, 1.0), a, new_value)
+             # If base a=0 and b>0 and sb=0, result is 0, error is 0 (unless b=1, handled above)
+             is_a0_bpos_sb0 = np.isclose(a, 0.0) & (b > 0) & np.isclose(sb, 0.0) & ~np.isclose(b, 1.0)
+             new_error = np.where(is_a0_bpos_sb0, 0.0, new_error)
+
 
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
 
+
     def __rpow__(self, other: Any) -> 'Measurement':
-        # k ** M
+        # k ** (a ± sa)
         op = "rpow"
-        res_name, res_unit = self._propagate_metadata(other, op) # Unit cleared
-        if isinstance(other, (Number, np.ndarray)):
-            with np.errstate(invalid='ignore', divide='ignore'):
-                k = np.asarray(other) # Base
-                a, sa = self.value, self.error # Exponent M = a ± sa
-                # f(a) = k^a => ∂f/∂a = k^a * ln(k)
-                # σ_f ≈ | (k^a * ln(k)) * σ_a |
+        res_name, res_unit = self._propagate_metadata(other, op)
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
 
-                 # Domain warnings
-                if np.any(k < 0):
-                     warnings.warn(f"Power k**M: Base k={k} is negative. Result may be complex or NaN.", RuntimeWarning)
-                if np.any((np.isclose(k, 0.0)) & (a <= 0)):
-                     warnings.warn(f"Power k**M: Operation 0 ** (M <= 0) encountered.", RuntimeWarning)
-                # ln(k) requires k > 0 for real result
-                if np.any(k <= 0):
-                     warnings.warn(f"Power k**M: Logarithm of non-positive base k ({k}) required for error propagation. "
-                                   "Error may be NaN.", RuntimeWarning)
+        k, _, a, sa = operands # other_err (sk) is 0
 
-                # Calculate value
-                new_value = k ** a
+        with np.errstate(invalid='ignore', divide='ignore'):
+            # Domain warnings
+            if np.any(k < 0):
+                 warnings.warn(f"Power k**M: Base k={k} is negative. Result may be complex or NaN.", RuntimeWarning)
+            if np.any((np.isclose(k, 0.0)) & (a <= 0)):
+                 warnings.warn(f"Power k**M: Operation 0 ** (M <= 0) encountered.", RuntimeWarning)
+            if np.any(k <= 0):
+                 warnings.warn(f"Power k**M: Logarithm of non-positive base k ({k}) required for error propagation. "
+                               "Error may be NaN.", RuntimeWarning)
 
-                # Calculate derivative and error
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    log_k = np.log(k) # Will be nan/inf for k<=0
-                deriv = new_value * log_k
-                new_error = np.abs(deriv * sa)
+            # Calculate value
+            new_value = k ** a
 
-                # Refine error for special cases
-                # If ln(k) was NaN/Inf, error is NaN/Inf (unless sa=0)
-                new_error = np.where((np.isnan(log_k) | np.isinf(log_k)) & ~np.isclose(sa, 0.0), np.nan, new_error)
-                new_error = np.where(np.isclose(sa, 0.0), 0.0, new_error) # If exponent error is zero, result error is zero
-                # If base k=1, result is 1 exactly, error is 0
-                new_error = np.where(np.isclose(k, 1.0), 0.0, new_error)
-                # If base k=0 and exponent a > 0, result is 0 exactly, error is 0
-                new_error = np.where(np.isclose(k, 0.0) & (a > 0), 0.0, new_error)
-        else:
-            return NotImplemented
+            # Calculate error: σ_f ≈ | ∂f/∂a * σ_a | = | (k^a * ln(k)) * σ_a | = | new_value * ln(k) * sa |
+            with np.errstate(divide='ignore', invalid='ignore'):
+                log_k = np.log(k) # Will be nan/inf for k<=0
+            deriv = new_value * log_k
+            new_error = np.abs(deriv * sa)
+
+            # Refine error for special cases
+            # If ln(k) was NaN/Inf, error is NaN/Inf (unless sa=0)
+            new_error = np.where((np.isnan(log_k) | np.isinf(log_k)) & ~np.isclose(sa, 0.0), np.nan, new_error)
+            # If exponent error sa=0, result error is 0 (unless base/exponent invalid -> NaN/Inf)
+            new_error = np.where(np.isclose(sa, 0.0) & np.isfinite(new_value), 0.0, new_error)
+            # If base k=1, result is 1 exactly, error is 0
+            new_error = np.where(np.isclose(k, 1.0), 0.0, new_error)
+            new_value = np.where(np.isclose(k, 1.0), 1.0, new_value)
+            # If base k=0 and exponent a > 0, result is 0 exactly, error is 0
+            is_k0_apos = np.isclose(k, 0.0) & (a > 0)
+            new_error = np.where(is_k0_apos, 0.0, new_error)
+            new_value = np.where(is_k0_apos, 0.0, new_value)
+
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)
         return result
@@ -910,8 +951,7 @@ class Measurement:
         # Check if the interval [x - n*σx, x + n*σx] (e.g., n=3 for ~3 sigma) includes zero.
         # If it does, the simple error propagation σ_abs ≈ σx might be poor.
         # The distribution of abs(X) is non-Gaussian near zero.
-        # A more sophisticated treatment might be needed for high-accuracy cases near zero.
-        if np.any(np.abs(self.value) < 3 * np.asarray(self.error)): # Check if |value| < 3*error
+        if np.any(np.abs(np.asarray(self.value)) < 3 * np.asarray(self.error)): # Check if |value| < 3*error
              warnings.warn("Taking absolute value of a Measurement whose uncertainty interval "
                            "likely includes zero (|value| < 3*error). Standard error propagation "
                            "(σ_abs ≈ σ_orig) is used but might be inaccurate in this region.", UserWarning)
@@ -993,276 +1033,200 @@ class Measurement:
             warnings.warn("The 'out' keyword argument is not supported for ufuncs involving "
                           "Measurement objects. A new Measurement object will always be returned.",
                           UserWarning)
-            # We could try to remove 'out' and proceed, but safer to return NotImplemented
-            # if the user explicitly tried to use it. Alternatively, modify kwargs:
-            # kwargs = {k: v for k, v in kwargs.items() if k != 'out'} # Proceed without 'out'
             return NotImplemented # Be strict: if user specified 'out', don't handle it.
 
 
-        # Convert inputs for processing: extract value, error, metadata
-        input_values = []
-        input_errors = []
-        input_units = []
-        input_names = []
-        input_is_measurement = [] # Track which inputs are Measurements
+        # Convert inputs for processing: extract value, error, metadata, handle broadcasting implicitly later
+        processed_inputs = [] # Store tuples of (value, error, unit, name, is_measurement)
+        has_measurement = False
+        input_shapes = []
 
         for x in inputs:
             if isinstance(x, Measurement):
-                input_values.append(x.value)
-                input_errors.append(x.error)
-                input_units.append(x.unit)
-                input_names.append(x.name)
-                input_is_measurement.append(True)
+                val = np.asarray(x.value)
+                err = np.asarray(x.error)
+                processed_inputs.append((val, err, x.unit, x.name, True))
+                has_measurement = True
+                input_shapes.append(val.shape)
             elif isinstance(x, (Number, np.ndarray)):
-                # Treat NumPy arrays or scalars as having zero error
                 val = np.asarray(x)
-                input_values.append(val)
-                input_errors.append(np.zeros_like(val, dtype=float)) # Zero error
-                input_units.append("") # No unit
-                input_names.append("") # No name
-                input_is_measurement.append(False)
+                err = np.zeros_like(val, dtype=float) # Zero error
+                processed_inputs.append((val, err, "", "", False))
+                input_shapes.append(val.shape)
             else:
-                # If any input is not a Measurement, number, or array, cannot handle it
-                return NotImplemented
+                return NotImplemented # Unsupported input type
 
-        # If no Measurement objects were involved, this method shouldn't have been called
-        # due to __array_priority__, but as a safeguard:
-        if not any(input_is_measurement):
-             return NotImplemented
+        if not has_measurement:
+             return NotImplemented # Should not happen if __array_priority__ is set
+
+        # Determine common broadcast shape
+        try:
+            bcast_shape = np.broadcast(*(inp[0] for inp in processed_inputs)).shape
+        except ValueError:
+             # Shape mismatch even before ufunc call
+             shapes = [inp[0].shape for inp in processed_inputs]
+             raise ValueError(f"Input shapes {shapes} for ufunc '{ufunc.__name__}' cannot be broadcast together.")
+
+        # Broadcast all input values and errors
+        broadcast_inputs = []
+        for val, err, unit, name, is_meas in processed_inputs:
+            b_val = np.broadcast_to(val, bcast_shape)
+            b_err = np.broadcast_to(err, bcast_shape)
+            broadcast_inputs.append((b_val, b_err, unit, name, is_meas))
+
+        input_values = [inp[0] for inp in broadcast_inputs]
+        input_errors = [inp[1] for inp in broadcast_inputs]
+        input_units = [inp[2] for inp in broadcast_inputs]
+        input_names = [inp[3] for inp in broadcast_inputs]
+        input_is_measurement = [inp[4] for inp in broadcast_inputs]
+
 
         # --- Value Calculation ---
-        # Calculate the nominal value of the result using the ufunc
         try:
-            # Use errstate to avoid warnings from numpy during intermediate calculations
-            # (e.g., log(0), sqrt(-1)) - these should result in nan/inf appropriately.
             with np.errstate(all='ignore'):
                  result_value = ufunc(*input_values, **kwargs)
         except Exception as e:
-            # If the ufunc itself fails on the values (e.g., type mismatch not caught earlier)
             warnings.warn(f"Error during ufunc '{ufunc.__name__}' value calculation: {e}. "
                           "Result value calculation failed.", RuntimeWarning)
-            # Attempt to determine expected output shape for returning NaNs
-            try:
-                 broadcast_shape = np.broadcast(*input_values).shape
-                 result_value = np.full(broadcast_shape, np.nan)
-            except ValueError:
-                 # If even broadcasting fails, cannot proceed
-                 return NotImplemented
+            result_value = np.full(bcast_shape, np.nan)
 
 
         # --- Metadata Propagation (Result Unit and Name) ---
-        # Default to dimensionless, generate generic name
         res_unit = ""
         operand_names = [name if name else f"op{i+1}" for i, name in enumerate(input_names)]
         res_name = f"{ufunc.__name__}({', '.join(operand_names)})"
 
-        # Simple unit rules based on ufunc type
+        # Simple unit rules (as before)
         if ufunc.nin == 1 and input_is_measurement[0]:
-             # Unary functions
              if ufunc in [np.negative, np.positive, np.conjugate, np.absolute]:
-                 res_unit = input_units[0] # Preserve unit
-             # Most others (trig, exp, log, sqrt, square) likely change or clear unit -> default "" is okay
-             # np.sqrt('m^2') -> 'm', np.square('m') -> 'm^2' - requires parsing, not done.
-
+                 res_unit = input_units[0]
         elif ufunc.nin == 2:
-             # Binary functions
              unit1 = input_units[0]
              unit2 = input_units[1]
              if ufunc in [np.add, np.subtract, np.hypot]:
-                 # Addition-like: require compatible units
-                 if unit1 and unit1 == unit2:
-                      res_unit = unit1
-                 elif unit1 and not unit2 and not input_is_measurement[1]: # M + const
-                      res_unit = unit1
-                 elif unit2 and not unit1 and not input_is_measurement[0]: # const + M
-                      res_unit = unit2
+                 if unit1 and unit1 == unit2: res_unit = unit1
+                 elif unit1 and not unit2 and not input_is_measurement[1]: res_unit = unit1
+                 elif unit2 and not unit1 and not input_is_measurement[0]: res_unit = unit2
                  elif unit1 and unit2 and unit1 != unit2:
                       warnings.warn(f"Ufunc '{ufunc.__name__}' on Measurements with incompatible units: "
                                     f"'{unit1}' and '{unit2}'. Result unit cleared.", UserWarning)
-                      res_unit = "" # Clear unit if incompatible and both were Measurements
-             # Most others (multiply, divide, power, etc.) -> unit logic complex, default ""
+                      res_unit = ""
 
         # --- Error Propagation using SymPy ---
-        result_error: Union[float, np.ndarray] = np.nan # Default to NaN
+        result_error: Union[float, np.ndarray] = np.nan
 
         try:
-            # Create SymPy symbols for the inputs that are Measurements
-            sympy_vars = sp.symbols(f'x:{ufunc.nin}') # Max arity symbols needed
-            sympy_inputs_map = {} # Map index to symbol
-            measurement_indices = [i for i, is_meas in enumerate(input_is_measurement) if is_meas]
-
-            # Build the SymPy expression corresponding to the ufunc
-            # Map NumPy ufuncs to their SymPy equivalents where possible
-            # This mapping needs to be extended for more ufunc support
+            sympy_vars = sp.symbols(f'x:{ufunc.nin}')
             sympy_func_map = {
-                np.add: lambda x, y: x + y,
-                np.subtract: lambda x, y: x - y,
-                np.multiply: lambda x, y: x * y,
-                np.true_divide: lambda x, y: x / y,
-                np.power: lambda x, y: x**y,
-                np.negative: lambda x: -x,
-                np.positive: lambda x: +x,
-                np.exp: sp.exp,
-                np.log: sp.log,
-                np.log10: lambda x: sp.log(x, 10),
-                np.sqrt: sp.sqrt,
-                np.sin: sp.sin,
-                np.cos: sp.cos,
-                np.tan: sp.tan,
-                np.arcsin: sp.asin,
-                np.arccos: sp.acos,
-                np.arctan: sp.atan,
-                np.absolute: sp.Abs, # Sympy Abs
-                np.conjugate: sp.conjugate,
+                np.add: lambda x, y: x + y, np.subtract: lambda x, y: x - y,
+                np.multiply: lambda x, y: x * y, np.true_divide: lambda x, y: x / y,
+                np.power: lambda x, y: x**y, np.negative: lambda x: -x,
+                np.positive: lambda x: +x, np.exp: sp.exp, np.log: sp.log,
+                np.log10: lambda x: sp.log(x, 10), np.sqrt: sp.sqrt,
+                np.sin: sp.sin, np.cos: sp.cos, np.tan: sp.tan,
+                np.arcsin: sp.asin, np.arccos: sp.acos, np.arctan: sp.atan,
+                np.absolute: sp.Abs, np.conjugate: sp.conjugate,
                 np.hypot: lambda x, y: sp.sqrt(x**2 + y**2),
-                # Add more mappings as needed...
-                # np.square: lambda x: x**2, # Covered by power?
+                np.square: lambda x: x**2,
+                # Add more...
             }
 
             sympy_f = sympy_func_map.get(ufunc)
             if not sympy_f:
-                 raise NotImplementedError(f"SymPy mapping for ufunc '{ufunc.__name__}' is not implemented.")
+                 raise NotImplementedError(f"SymPy mapping for ufunc '{ufunc.__name__}'")
 
-            # Create the symbolic expression using the first 'nin' symbols
             symbolic_expr = sympy_f(*sympy_vars[:ufunc.nin])
-
-            # Calculate sum of squared error contributions: Σ (∂f/∂xi * σi)²
             variance_sq_sum = np.zeros_like(np.asarray(result_value), dtype=float)
-            numeric_values_for_eval = input_values[:ufunc.nin] # Values needed for derivative evaluation
+            numeric_values_for_eval = input_values[:ufunc.nin] # Use broadcasted values
 
-            for i in measurement_indices:
-                 if i >= ufunc.nin: continue # Skip if index out of ufunc arity
+            for i in range(ufunc.nin):
+                 sigma_i = input_errors[i] # Use broadcasted errors
+                 if not input_is_measurement[i] or np.all(np.isclose(sigma_i, 0.0)):
+                     continue # Skip if not a measurement or has zero error
 
-                 # Get the corresponding symbol and error
                  var_sym = sympy_vars[i]
-                 sigma_i = np.asarray(input_errors[i]) # Ensure error is array
-
-                 # Skip calculation if error is zero for this input
-                 if np.all(np.isclose(sigma_i, 0.0)):
-                     continue
-
-                 # Calculate the partial derivative symbolically
                  deriv_sym = sp.diff(symbolic_expr, var_sym)
-
-                 # Lambdify the derivative for numerical evaluation using NumPy functions
-                 # Pass all necessary symbols for the original function's arity
-                 # Use 'numpy' module for numerical functions (sin, cos, etc.)
-                 # Add specific mappings if needed (e.g., Abs -> np.abs)
                  modules = ['numpy', {'Abs': np.abs, 'conjugate': np.conjugate}]
                  deriv_func = sp.lambdify(sympy_vars[:ufunc.nin], deriv_sym, modules=modules)
 
-                 # Evaluate the derivative numerically at the input values
-                 with np.errstate(all='ignore'): # Ignore potential numerical issues during derivative eval
+                 with np.errstate(all='ignore'):
                       deriv_val = deriv_func(*numeric_values_for_eval)
 
-                 # Calculate the variance contribution: (∂f/∂xi * σi)²
                  var_term = np.square(deriv_val * sigma_i)
-
-                 # Add to the sum, handling NaNs carefully
-                 # If term is NaN, the sum becomes NaN. If sum is already NaN, it stays NaN.
                  current_sum_is_nan = np.isnan(variance_sq_sum)
                  term_is_nan = np.isnan(var_term)
-                 variance_sq_sum = np.add(variance_sq_sum, np.nan_to_num(var_term)) # Add non-NaN part
-                 # Re-apply NaN status
+                 variance_sq_sum = np.add(variance_sq_sum, np.nan_to_num(var_term))
                  variance_sq_sum = np.where(current_sum_is_nan | term_is_nan, np.nan, variance_sq_sum)
 
-
-            # Final error is the square root of the summed variances
-            with np.errstate(invalid='ignore'): # Ignore sqrt(negative) warnings -> NaN
+            with np.errstate(invalid='ignore'):
                  result_error = np.sqrt(variance_sq_sum)
 
         except NotImplementedError as e:
-            warnings.warn(f"Cannot propagate error for ufunc '{ufunc.__name__}': {e}. "
-                          "Resulting error will be NaN.", RuntimeWarning)
-            # Ensure error shape matches value shape, filled with NaN
+            warnings.warn(f"Cannot propagate error for ufunc '{ufunc.__name__}': {e}. Error -> NaN.", RuntimeWarning)
             result_error = np.full_like(np.asarray(result_value), np.nan)
         except Exception as e_sympy:
-            warnings.warn(f"Unexpected error during SymPy error propagation for '{ufunc.__name__}': {e_sympy}. "
-                          "Resulting error will be NaN.", RuntimeWarning)
+            warnings.warn(f"SymPy error propagation failed for '{ufunc.__name__}': {e_sympy}. Error -> NaN.", RuntimeWarning)
             result_error = np.full_like(np.asarray(result_value), np.nan)
 
 
         # --- Final Result Construction ---
-        # Post-process error: Ensure NaN/Inf consistency with value, ensure non-negative
         value_arr = np.asarray(result_value)
         error_arr = np.asarray(result_error)
-
-        # Where value is NaN or Inf, error should also be NaN or Inf respectively
         error_arr = np.where(np.isnan(value_arr), np.nan, error_arr)
         error_arr = np.where(np.isinf(value_arr), np.inf, error_arr)
-
-        # If error calculation resulted in complex numbers (e.g., sqrt(-ve variance)), warn and take magnitude
         if np.iscomplexobj(error_arr):
-             warnings.warn(f"Complex error encountered during propagation for '{ufunc.__name__}'. "
-                           "Taking the magnitude (absolute value) of the error.", RuntimeWarning)
+             warnings.warn(f"Complex error for '{ufunc.__name__}'. Taking magnitude.", RuntimeWarning)
              error_arr = np.abs(error_arr)
-
-        # Ensure error is non-negative (abs) and convert remaining NaNs from calculation if value is finite
-        # (nan_to_num converts nan to 0, but we want to keep them if value is also nan)
         error_arr = np.abs(error_arr)
-        error_arr = np.where(np.isnan(value_arr) | np.isinf(value_arr), error_arr, # Keep NaN/Inf if value has them
-                             np.nan_to_num(error_arr, nan=np.nan, posinf=np.inf, neginf=np.nan)) # Convert others if needed
+        error_arr = np.where(np.isnan(value_arr) | np.isinf(value_arr), error_arr,
+                             np.nan_to_num(error_arr, nan=np.nan, posinf=np.inf, neginf=np.nan))
 
 
-        # Create the final Measurement object
         final_result = Measurement(result_value, error_arr, unit=res_unit, name=res_name)
-
-        # Perform final check for NaN/Inf issues in the result
         self._check_nan_inf(final_result.value, final_result.error, f"ufunc '{ufunc.__name__}'")
 
         # --- Match Return Type (Scalar/Array) ---
-        # Try to return a scalar Measurement if the operation naturally resulted in a scalar
-        # Heuristic: Check if all *Measurement* inputs were scalar-like (0-dim) AND output value is 0-dim
-        all_meas_inputs_scalar = all(np.ndim(inputs[i].value) == 0
-                                      for i in measurement_indices)
+        # Return scalar if all measurement inputs were scalar AND output is scalar
+        all_meas_inputs_scalar = all(inp[0].ndim == 0 for inp in broadcast_inputs if inp[4])
         output_is_scalar = (final_result.ndim == 0)
 
         if all_meas_inputs_scalar and output_is_scalar:
-             # Return a scalar Measurement (access .value, .error directly which handle scalar/0-dim array)
-              return Measurement(final_result.value, final_result.error, unit=final_result.unit, name=final_result.name)
+             # Ensure value/error are python floats before creating new Measurement
+             return Measurement(final_result.value.item(), final_result.error.item(),
+                                unit=final_result.unit, name=final_result.name)
         else:
-             # Return the potentially array-based Measurement
              return final_result
 
 
     # --- Comparison Methods ---
-    # Comparisons operate on nominal values ONLY. Uncertainty, name, unit are ignored.
-    # This follows the behavior of libraries like `uncertainties`.
-    # Returns boolean or boolean arrays, consistent with NumPy comparison behavior.
+    # Comparisons operate on nominal values ONLY.
 
     def _compare(self, other: Any, comparison_operator: Callable) -> Union[bool, np.ndarray]:
         """Internal helper for comparison operations."""
-        # Extract nominal value of other operand if it's a Measurement
-        other_val = other.value if isinstance(other, Measurement) else other
+        operands = self._get_broadcasted_operands(other)
+        if operands is None: return NotImplemented
+        a, _, b, _ = operands # Don't need errors for comparison
         try:
-            # Perform comparison on nominal values
-            return comparison_operator(self.value, other_val)
+            return comparison_operator(a, b)
         except (TypeError, ValueError):
-            # If comparison fails (e.g., incompatible types), return NotImplemented
             return NotImplemented
 
     def __eq__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Equality comparison (==) based on nominal values."""
         return self._compare(other, np.equal)
 
     def __ne__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Inequality comparison (!=) based on nominal values."""
         return self._compare(other, np.not_equal)
 
     def __lt__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Less than comparison (<) based on nominal values."""
         return self._compare(other, np.less)
 
     def __le__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Less than or equal comparison (<=) based on nominal values."""
         return self._compare(other, np.less_equal)
 
     def __gt__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Greater than comparison (>) based on nominal values."""
         return self._compare(other, np.greater)
 
     def __ge__(self, other: Any) -> Union[bool, np.ndarray]:
-        """Greater than or equal comparison (>=) based on nominal values."""
         return self._compare(other, np.greater_equal)
 
 # --- END OF FILE measurement.py ---
