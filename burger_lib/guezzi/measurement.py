@@ -17,28 +17,8 @@ from numbers import Number
 import math
 
 # Import formatting utilities (crucial for correct output)
-try:
-    from .utils import _format_value_error_eng, round_to_significant_figures, SI_PREFIXES, get_si_prefix
-except ImportError:
-    # Fallback stubs if running standalone (less useful without utils)
-    warnings.warn("Could not import from .utils. Using basic formatting stubs.", ImportWarning)
-    # Provide *very* basic placeholders if utils not found
-    def round_to_significant_figures(value, sig_figs): return round(value, sig_figs if sig_figs > 0 else 1)
-    def _format_value_error_eng(value, error, unit_symbol, sig_figs_error):
-        err_fmt = f".{max(0, sig_figs_error-1)}g" if error != 0 else ".1f"
-        val_fmt = ".3g" # Basic value format
-        try:
-            if error != 0:
-                order_err = math.floor(math.log10(abs(round_to_significant_figures(error, sig_figs_error))))
-                dp = max(0, -int(order_err - (sig_figs_error - 1)))
-                val_fmt = f".{dp}f"
-                err_fmt = f".{dp}f"
-            return f"{value:{val_fmt}} ± {error:{err_fmt}} {unit_symbol}".strip()
-        except: # Catch formatting errors
-             return f"{value:.3g} ± {error:.1g} {unit_symbol}".strip()
-    SI_PREFIXES = {0: ''}
-    def get_si_prefix(exponent): return '', 0
 
+from .utils import _format_value_error_eng, round_to_significant_figures, SI_PREFIXES, get_si_prefix
 
 # ---------------------------- Measurement Class -----------------------------
 
@@ -334,80 +314,75 @@ class Measurement:
         standard rounding based on error (`round_to_error`) with 1 significant figure.
         Handles both scalar and array Measurements.
         """
-        # Check if the Measurement holds scalar or array data
         is_scalar = (self.ndim == 0)
+        sig_figs = 1 # Default sig figs for __str__
 
-        # Choose formatting based on whether a unit is specified
         if self.unit:
-            # Use engineering notation if unit exists
             formatter_func = lambda v, e, u, sf: _format_value_error_eng(v, e, u, sf)
-            sig_figs = 1 # Default sig figs for __str__
         else:
-            # Use standard rounding if no unit
             formatter_func = lambda v, e, u, sf: self._round_single_to_error_std(v, e, sf)
-            sig_figs = 1 # Default sig figs for __str__
 
-        # Vectorize the chosen formatter to handle arrays
-        # We exclude unit and sig_figs as they are constant for the call
-        vectorized_formatter = np.vectorize(formatter_func, excluded=['u', 'sf'], otypes=[str])
-
-        # Apply formatting
-        formatted_array = vectorized_formatter(v=self.value, e=self.error, u=self.unit, sf=sig_figs)
-
-        # Return scalar string or formatted array string
         if is_scalar:
-            # Ensure scalar output even if internal storage was temporarily array
-            return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
+            # --- Direct call for scalar ---
+            try:
+                # Note: _round_single_to_error_std doesn't take unit, formatter_func adapts
+                if self.unit:
+                    return formatter_func(v=self.value, e=self.error, u=self.unit, sf=sig_figs)
+                else:
+                    # Need to call the correct underlying function directly
+                    return self._round_single_to_error_std(value=self.value, error=self.error, n_sig_figs=sig_figs)
+            except Exception as e:
+                warnings.warn(f"Error during scalar formatting in __str__: {e}", RuntimeWarning)
+                # Fallback for scalar failure
+                return f"{self.value} +/- {self.error}" + (f" {self.unit}" if self.unit else "")
         else:
-             # Use numpy's array2string for clean array output, prevent truncation
-             with np.printoptions(threshold=np.inf):
-                 # Use 'all' formatter to apply the identity function (string is already formatted)
-                 return np.array2string(formatted_array, separator=', ',
-                                        formatter={'all': lambda x: x})
+            # --- Use vectorize for arrays ---
+            vectorized_formatter = np.vectorize(formatter_func, excluded=['u', 'sf'], otypes=[str])
+            try:
+                formatted_array = vectorized_formatter(v=self.value, e=self.error, u=self.unit, sf=sig_figs)
+                with np.printoptions(threshold=np.inf):
+                    return np.array2string(formatted_array, separator=', ',
+                                           formatter={'all': lambda x: x})
+            except Exception as e:
+                 warnings.warn(f"Error during array formatting in __str__: {e}", RuntimeWarning)
+                 # Fallback for array failure
+                 return f"Measurement Array (value={np.shape(self.value)}, error={np.shape(self.error)}) Format Error"
+
 
     def to_eng_string(self, sig_figs_error: int = 1, **kwargs) -> str:
         """
         Formats the measurement(s) using engineering notation with SI prefixes.
-
-        This method provides a standardized way to display measurements,
-        especially common in physics and engineering, where values span many
-        orders of magnitude. The error is rounded to the specified number of
-        significant figures, and the value is rounded to the corresponding
-        decimal place. An appropriate SI prefix (like k, m, µ, n) is chosen
-        based on the value's magnitude.
-
-        Args:
-            sig_figs_error: The number of significant figures to use for displaying
-                            the error part. Typically 1 or 2. (Default 1).
-            **kwargs: Internal use for vectorization. Do not provide.
-
-        Returns:
-            str: A formatted string (for scalar) or a string representation of the
-                 formatted array (for array Measurement). Example: "1.23 ± 0.05 mV".
-
-        Raises:
-            ValueError: If `sig_figs_error` is not positive.
+        (Handles scalar/array directly)
         """
         if sig_figs_error <= 0:
             raise ValueError("Number of significant figures for error must be positive.")
 
-        # Extract value, error, unit - handle internal call from vectorization
+        # Extract value, error, unit - handle potential internal call from vectorization if needed (though we bypass it for scalar)
         value = kwargs.get('value', self.value)
         error = kwargs.get('error', self.error)
         unit = kwargs.get('unit', self.unit)
-        is_scalar = (np.ndim(value) == 0)
-
-        # Core formatting logic is in the utility function
-        formatter = np.vectorize(_format_value_error_eng, excluded=['unit_symbol', 'sig_figs_error'], otypes=[str])
-        formatted_array = formatter(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
+        is_scalar = (np.ndim(value) == 0) # Check dimension of potentially overridden value
 
         if is_scalar:
-            return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
+            # --- Direct call for scalar ---
+            try:
+                return _format_value_error_eng(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
+            except Exception as e:
+                warnings.warn(f"Error during scalar formatting in to_eng_string: {e}", RuntimeWarning)
+                # Fallback for scalar failure
+                return f"{value} +/- {error}" + (f" {unit}" if unit else "")
         else:
-             # Format array output cleanly
-             with np.printoptions(threshold=np.inf):
-                 return np.array2string(formatted_array, separator=', ',
-                                        formatter={'all': lambda x: x})
+            # --- Use vectorize for arrays ---
+            formatter = np.vectorize(_format_value_error_eng, excluded=['unit_symbol', 'sig_figs_error'], otypes=[str])
+            try:
+                formatted_array = formatter(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
+                with np.printoptions(threshold=np.inf):
+                    return np.array2string(formatted_array, separator=', ',
+                                           formatter={'all': lambda x: x})
+            except Exception as e:
+                 warnings.warn(f"Error during array formatting in to_eng_string: {e}", RuntimeWarning)
+                 # Fallback for array failure
+                 return f"Measurement Eng Array (value={np.shape(value)}, error={np.shape(error)}) Format Error"
 
     def round_to_error(self, n_sig_figs: int = 1) -> str:
         """

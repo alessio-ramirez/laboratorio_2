@@ -8,7 +8,9 @@ primarily used by other modules within the library (Measurement, tables, plottin
 
 import numpy as np
 import math
-from typing import Tuple
+from typing import Tuple, Optional
+import warnings
+import decimal # Use decimal for more precise rounding control if needed, though float arithmetic is usually sufficient here
 
 # Dictionary mapping exponents (powers of 10) to SI prefixes
 # Covers standard prefixes from Yotta (10^24) to yocto (10^-24)
@@ -18,7 +20,7 @@ SI_PREFIXES = {
     -3: 'm', -6: 'µ', -9: 'n', -12: 'p', -15: 'f', -18: 'a', -21: 'z', -24: 'y'
 }
 # Sorted list of exponents for easier lookup
-_SI_EXPONENTS = sorted(SI_PREFIXES.keys(), reverse=True)
+_SI_EXPONENTS = sorted(SI_PREFIXES.keys(), reverse=True) # Reverse is set to true since sorted() will put smallest as first
 
 def get_si_prefix(value: float) -> Tuple[str, int, float]:
     """
@@ -28,7 +30,7 @@ def get_si_prefix(value: float) -> Tuple[str, int, float]:
     (typically 1 to 1000, but adjusted for standard prefixes).
 
     Args:
-        value (float): The numerical value for which to find the prefix.
+        value (float): The numerical value for which to find the prefix. Can be zero.
 
     Returns:
         Tuple[str, int, float]: A tuple containing:
@@ -37,16 +39,18 @@ def get_si_prefix(value: float) -> Tuple[str, int, float]:
             - scale_factor (float): The factor needed to scale the original value
                                     (value / scale_factor = scaled_value). (10**exponent).
     """
-    if np.isclose(value, 0.0) or np.isnan(value) or np.isinf(value):
-        return '', 0, 1.0 # No prefix for zero, nan, inf
-
-    exponent = math.floor(math.log10(abs(value)))
+    if np.isnan(value) or np.isinf(value) or value==0:
+        return '', 0, 1.0 # No prefix for nan's and inf's
+    
+    # Use Decimal for potentially higher precision in edge cases
+    d_value = decimal.Decimal(value)
+    exponent = d_value.log10().to_integral_value(rounding=decimal.ROUND_FLOOR) # Floor(log_10(value))
 
     # Find the largest SI exponent less than or equal to the value's exponent
     best_exponent = 0 # Default to base unit
     for si_exponent in _SI_EXPONENTS:
         if exponent >= si_exponent:
-            best_exponent = si_exponent
+            best_exponent = si_exponent # Could be an issue for VERY LARGE numbers
             break
         # If value is smaller than the smallest prefix, use the smallest prefix
         best_exponent = _SI_EXPONENTS[-1]
@@ -55,153 +59,201 @@ def get_si_prefix(value: float) -> Tuple[str, int, float]:
     scale_factor = 10.0**best_exponent
 
     return prefix, best_exponent, scale_factor
-
-
+        
 def round_to_significant_figures(value: float, sig_figs: int) -> float:
     """
     Rounds a floating-point number to a specified number of significant figures.
-
     Handles positive, negative, and zero values correctly.
-
     Args:
         value (float): The number to round.
         sig_figs (int): The desired number of significant figures (must be > 0).
-
     Returns:
         float: The value rounded to the specified significant figures.
-
     Raises:
         ValueError: If sig_figs is not a positive integer.
-        TypeError: If value cannot be converted to float.
+        TypeError: If value cannot be converted to float or during log calculation.
+        RuntimeError: For other unexpected errors.
     """
-    if not isinstance(sig_figs, int) or sig_figs <= 0:
+
+    if not isinstance(sig_figs, int) or sig_figs <= 0: # Check for meaningless sig figs
         raise ValueError("Number of significant figures must be a positive integer.")
-    if value == 0 or np.isnan(value) or np.isinf(value):
-        return float(value) # Return 0, nan, inf as is
 
     try:
-        # Determine the order of magnitude of the most significant digit
-        # Use log10, handle potential errors for non-positive values (already checked for 0)
-        order = math.floor(math.log10(abs(value)))
+        # Using Decimal(value) directly takes the binary float's actual value,
+        # which might already have slight inaccuracies (e.g., float 0.1 is not exactly 0.1).
+        # For ultimate precision from user input strings, Decimal(str(value)) is better.
+        d_value = decimal.Decimal(str(value))
+    except decimal.InvalidOperation:
+        if np.isnan(value) or np.isinf(value) or value == 0.0: # Standard float NaN and Inf often can be converted to Decimal NaN/Inf.
+            return float(value) # Return edge cases as they are
+        raise TypeError(f"Cannot convert value '{value}' to Decimal for rounding.") from None
 
-        # Calculate the decimal place to round to.
-        # Example: value=12345, sig_figs=3. order=4. place = -(4 - (3-1)) = -2. Round to 10^2 = 100s place.
-        # Example: value=0.01234, sig_figs=2. order=-2. place = -(-2 - (2-1)) = 3. Round to 10^-3 = 0.001 place.
+    if d_value.is_zero() or d_value.is_nan() or d_value.is_infinite(): # Decimal has its own representations for Zero, NaN, and Infinity.
+        return float(d_value)
+
+    try:
+        # d_value.adjusted() returns the exponent of the leftmost digit.
+        # It's like floor(log10(abs(value))) but works directly on the Decimal representation.
+        # Examples:
+        #   Decimal('123.45').adjusted() -> 2 (since 123.45 = 1.2345 * 10^2)
+        #   Decimal('0.0123').adjusted() -> -2 (since 0.0123 = 1.23 * 10^-2)
+        #   Decimal('-567').adjusted() -> 2 (since -567 = -5.67 * 10^2)
+        order = d_value.adjusted()
+
+        # Example (value=12345, sig_figs=3):
+        #   order = 4 (from 10^4 place)
+        #   We want to keep 3 digits (1, 2, 3). The last one (3) is at the 10^2 place.
+        #   decimal_place_exponent = 4 - (3 - 1) = 4 - 2 = 2.
+        # Example (value=0.01234, sig_figs=2):
+        #   order = -2 (from 10^-2 place)
+        #   We want to keep 2 digits (1, 2). The last one (2) is at the 10^-3 place.
+        #   decimal_place_exponent = -2 - (2 - 1) = -2 - 1 = -3.
         decimal_place_exponent = order - (sig_figs - 1)
-        scale = 10.0**(-decimal_place_exponent)
 
-        # Round the scaled value to the nearest integer, then scale back
-        rounded_value = round(value * scale) / scale
-        return rounded_value
-    except ValueError as e: # Catch potential math domain errors if not caught earlier
-         raise TypeError(f"Cannot round value '{value}'. Ensure it's a valid number. Error: {e}")
-    except Exception as e: # Catch other potential issues
-         raise RuntimeError(f"Unexpected error during rounding of {value} to {sig_figs} sf: {e}")
+        # Example (decimal_place_exponent = 2):
+        #   rounding_exponent = Decimal('1e2') which is Decimal('100')
+        # Example (decimal_place_exponent = -3):
+        #   rounding_exponent = Decimal('1e-3') which is Decimal('0.001')
+        rounding_exponent = decimal.Decimal('1e' + str(decimal_place_exponent))
 
+        # Example (d_value=Decimal('123.45'), rounding_exponent=Decimal('1e0') i.e. 1):
+        #   quantize(Decimal('1')) rounds to the nearest integer -> Decimal('123')
+        # Example (d_value=Decimal('123.45'), rounding_exponent=Decimal('1e-1') i.e. 0.1):
+        #   quantize(Decimal('0.1')) rounds to the nearest tenth -> Decimal('123.5')
+        # rounding=decimal.ROUND_HALF_UP: Specifies the rounding rule.
+        #   ROUND_HALF_UP means round 5s away from zero (e.g., 2.5 -> 3, -2.5 -> -3).
+        #   Other options exist like ROUND_HALF_EVEN (Python 3 default, rounds 5s to nearest *even* digit).
+        rounded_d_value = d_value.quantize(rounding_exponent, rounding=decimal.ROUND_HALF_UP)
+
+        # The function is defined to return a float, so convert the precisely
+        # rounded Decimal value back into a standard Python float.
+        # Note: This final conversion can potentially reintroduce tiny binary
+        # representation inaccuracies if the rounded number isn't exactly
+        # representable as a binary float, but the rounding itself was performed
+        # with Decimal precision based on the significant figure rule.
+        return float(rounded_d_value)
+
+    except ValueError as e:
+        raise TypeError(f"Cannot round value '{value}'. Ensure it's a valid number. Error: {e}") from e
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error during rounding of {value} to {sig_figs} sf: {e}") from e
 
 def _format_value_error_eng(value: float, error: float, unit_symbol: str = "", sig_figs_error: int = 1) -> str:
     """
-    Formats a value-error pair using engineering notation with SI prefixes (Revised Logic).
+    Formats a value-error pair using engineering notation with SI prefixes,
+    rounding the value based on the error's significant figures.
 
-    This function aims to produce a standard representation like "1.23 ± 0.05 mV".
-    1. The error is rounded to `sig_figs_error` significant figures.
-    2. An appropriate SI prefix is chosen based on the *value*.
-    3. Both the value and the rounded error are scaled using this SI prefix.
-    4. The scaled value is rounded to the same decimal place as the least significant
-       digit of the *scaled rounded error*.
-    5. The final string is constructed.
+    The error is rounded to `sig_figs_error` significant figures. The decimal
+    place of the least significant digit of this rounded error then determines
+    the decimal place to which the value is rounded. Both are presented with
+    the SI prefix determined by the original value's magnitude.
 
     Args:
-        value (float): Nominal value.
-        error (float): Uncertainty (standard deviation).
-        unit_symbol (str): The base unit symbol (e.g., "V", "m"). (Default "").
-        sig_figs_error (int): Number of significant figures for the error (typically 1 or 2).
-                              (Default 1).
+        value (float): The central value.
+        error (float): The uncertainty (error) associated with the value.
+        unit_symbol (str, optional): The unit symbol to append (e.g., "V", "Ω"). Defaults to "".
+        sig_figs_error (int, optional): The number of significant figures to use
+                                        for rounding the error. Defaults to 1. Must be > 0.
 
     Returns:
-        str: Formatted string like "1.23 ± 0.05 mV".
+        str: A formatted string like "12.3 ± 0.2 kΩ" or "50.0 ± 0.0 mV".
 
     Raises:
-        ValueError: If sig_figs_error is not positive.
+        ValueError: If sig_figs_error is not a positive integer.
+
+    Examples:
+        >>> format_value_error_eng(12345, 567, "Hz", 1)
+        '12.3 ± 0.6 kHz'
+        >>> format_value_error_eng(12345, 567, "Hz", 2)
+        '12.35 ± 0.57 kHz'
+        >>> format_value_error_eng(0.0123, 0.00052, "V", 1)
+        '12.3 ± 0.5 mV'
+        >>> format_value_error_eng(0.0123, 0.00052, "V", 2)
+        '12.30 ± 0.52 mV'
+        >>> format_value_error_eng(50.0, 0.0, "mV")
+        '50.0 ± 0.0 mV'
+        >>> format_value_error_eng(100, 0.5, "m", 1)
+        '100.0 ± 0.5 m'
+        >>> format_value_error_eng(100, 7, "m", 1)
+        '100 ± 7 m'
+        >>> format_value_error_eng(100, 70, "m", 1) # Error rounded to 1sf is 70. Last digit place is 10^1.
+        '100 ± 70 m' # Value rounded to 10^1 place is 100.
+        >>> format_value_error_eng(99, 7, "m", 1) # Error rounded to 1sf is 7. Last digit place is 10^0.
+        '99 ± 7 m' # Value rounded to 10^0 place is 99.
+        >>> format_value_error_eng(1.2e-7, 3.4e-9, "A", 1) # Error 3e-9 -> 1sf = 3e-9. Place=10^-9.
+        '120 ± 3 nA' # Value 1.2e-7 = 120e-9. Rounded to 10^-9 place = 120.
+         >>> format_value_error_eng(1.2e-7, 3.4e-9, "A", 2) # Error 3.4e-9 -> 2sf = 3.4e-9. Place=10^-10.
+        '120.0 ± 3.4 nA' # Value 1.2e-7 = 120.0e-9. Rounded to 10^-10 place = 120.0.
     """
+    # --- Checks ---
     if not isinstance(sig_figs_error, int) or sig_figs_error <= 0:
         raise ValueError("Number of significant figures for error must be positive.")
 
-    # --- Handle Special Cases ---
-    if np.isnan(value) or np.isnan(error): return "NaN ± NaN" + (f" {unit_symbol}" if unit_symbol else "")
-    if np.isinf(value): return f"{value} ± {error}" + (f" {unit_symbol}" if unit_symbol else "") # Let inf value dominate
-    if np.isinf(error): return f"{value} ± {error}" + (f" {unit_symbol}" if unit_symbol else "") # Error is infinite
-    if error < 0: error = abs(error) # Ensure error is non-negative
+    if np.isnan(value) or np.isnan(error) or np.isinf(value) or np.isinf(error): # Edge cases returned as they are
+        return f"{value} ± {error} {unit_symbol}".strip() # Strip useful when unit_symbol is ""
 
-    # --- Case 1: Error is Zero (or effectively zero) ---
-    if np.isclose(error, 0.0):
-        prefix, _, scale_factor = get_si_prefix(value)
+    error = abs(error) # Ensure error is non-negative
+
+    ref_value_for_prefix = value if value != 0.0 else (error if error != 0.0 else 1.0) # If value is zero we want to use the error, otherwise 1.0
+    prefix, _, scale_factor = get_si_prefix(ref_value_for_prefix)
+
+    # --- Scale Value and Error ---
+    try:
         scaled_value = value / scale_factor
-        # Format zero error value with reasonable precision (~6 sig figs default)
-        if np.isclose(scaled_value, 0.0):
-             val_str = "0" # Simply "0" if value is also zero
-             err_str = "0"
-             # Determine decimal places needed based on a small number if value isn't exactly 0? No, keep simple.
-             final_decimal_places = 0
-             if not np.isclose(value, 0.0): # If value was non-zero but scaled to ~0
-                  # Try formatting with general precision
-                   temp_fmt = f"{scaled_value:.6g}"
-                   if '.' in temp_fmt: final_decimal_places = len(temp_fmt.split('.')[-1])
-                   else: final_decimal_places = 0 # Treat as integer if no decimal part
-             val_str = f"{scaled_value:.{final_decimal_places}f}"
-             err_str = f"{0.0:.{final_decimal_places}f}" # Match value's decimals
+        scaled_error = error / scale_factor
+    except OverflowError:
+        warnings.warn("Overflow during value/error scaling. Using unscaled values.", RuntimeWarning)
+        scaled_value = value
+        scaled_error = error
+        prefix = ""
+        scale_factor = 1.0
+
+    # --- Handle Zero Error Case ---
+    if error == 0.0:
+        temp_val_str = f"{scaled_value:.15g}"
+        if '.' in temp_val_str:
+            decimal_places = len(temp_val_str.split('.')[-1].split('e')[0]) # Handle potential sci notation from g format
         else:
-             # Heuristic: Show ~6 sig figs for non-zero value with zero error
-             order_scaled = math.floor(math.log10(abs(scaled_value)))
-             final_decimal_places = max(0, 5 - int(order_scaled)) # Aim for ~6 digits total
-             val_str = f"{scaled_value:.{final_decimal_places}f}"
-             err_str = f"{0.0:.{final_decimal_places}f}"
+            decimal_places = 0
+
+        val_str = f"{scaled_value:.{decimal_places}f}" # Format value and error to the determined decimal places
+        err_str = f"{0.0:.{decimal_places}f}" # Ensure error has same number of zeros
 
         return f"{val_str} ± {err_str} {prefix}{unit_symbol}".strip()
 
-
-    # --- Case 2: Error is Non-Zero ---
-    # 1. Choose SI prefix based on the *value*'s magnitude
-    prefix, eng_exponent, scale_factor = get_si_prefix(value)
-
-    # 2. Scale value and error by this factor
-    scaled_value = value / scale_factor
-    scaled_error = error / scale_factor
-
-    # 3. Round the *scaled error* to `sig_figs_error` significant figures
+    # --- Handle Non-Zero Error Case ---
     scaled_rounded_error = round_to_significant_figures(scaled_error, sig_figs_error)
 
-    # Check if scaled error rounded to zero (can happen if error was very small)
-    if np.isclose(scaled_rounded_error, 0.0):
-        # Treat as zero-error case, but use the chosen prefix
-        # Format scaled value reasonably, error is 0
-        if np.isclose(scaled_value, 0.0):
-            val_str = "0"
-            err_str = "0"
-            dp = 0
-        else:
-            order_scaled = math.floor(math.log10(abs(scaled_value)))
-            dp = max(0, 5 - int(order_scaled)) # Aim for ~6 digits total
-            val_str = f"{scaled_value:.{dp}f}"
-            err_str = f"{0.0:.{dp}f}"
-        return f"{val_str} ± {err_str} {prefix}{unit_symbol}".strip()
+    # Check if error rounded to zero (can happen if error is very small)
+    if np.isclose(scaled_rounded_error, 0.0, atol=1e-18): # atol=1e-18 => RELATIVE error of 1/10^18
+            # If error rounds to zero, treat similarly to the exact zero case,
+            # but base the precision on the original unrounded scaled error's magnitude
+            order_original_err = math.floor(math.log10(abs(scaled_error)))
+            decimal_place_exponent = order_original_err - (sig_figs_error - 1)
+            final_decimal_places = max(0, -decimal_place_exponent)
 
+            # Round value to these decimal places
+            scale_val_round = 10.0**final_decimal_places
+            scaled_rounded_value = round(scaled_value * scale_val_round) / scale_val_round
 
-    # 4. Determine the decimal place of the least significant digit of the *scaled rounded error*
-    order_scaled_rounded_err = math.floor(math.log10(abs(scaled_rounded_error)))
-    # This is the number of digits to keep *after* the decimal point
-    final_decimal_places = max(0, -int(order_scaled_rounded_err - (sig_figs_error - 1)))
+            val_str = f"{scaled_rounded_value:.{final_decimal_places}f}"
+            err_str = f"{0.0:.{final_decimal_places}f}" # Error is effectively zero at this precision
 
-    # 5. Round the *scaled value* to this same decimal place
-    scale_value_round = 10.0**final_decimal_places
-    scaled_rounded_value = round(scaled_value * scale_value_round) / scale_value_round
+            return f"{val_str} ± {err_str} {prefix}{unit_symbol}".strip()
 
-    # 6. Format the scaled rounded value and scaled rounded error to these decimal places
-    val_str = f"{scaled_rounded_value:.{final_decimal_places}f}"
+    d_scaled_rounded_error = decimal.Decimal(str(scaled_rounded_error))
+    order_rounded_err = d_scaled_rounded_error.adjusted() # Determine the decimal place of the least significant digit of the rounded error
+    decimal_place_exponent = order_rounded_err - (sig_figs_error - 1) # The exponent corresponding to the place value of the last significant digit
+    final_decimal_places = max(0, -decimal_place_exponent) # The number of decimal places needed is the negative of this exponent (if exponent is negative)
+    scale_val_round = 10.0**final_decimal_places
+    d_scaled_value = decimal.Decimal(str(scaled_value))
+    rounding_exp_val = decimal.Decimal('1e' + str(-final_decimal_places))
+    d_scaled_rounded_value = d_scaled_value.quantize(rounding_exp_val, rounding=decimal.ROUND_HALF_UP)
+    scaled_rounded_value = float(d_scaled_rounded_value)
+
+    val_str = f"{scaled_rounded_value:.{final_decimal_places}f}" # Format both using the calculated number of decimal places
     err_str = f"{scaled_rounded_error:.{final_decimal_places}f}"
 
-    # 7. Construct the final string
     return f"{val_str} ± {err_str} {prefix}{unit_symbol}".strip()
-
 
 # --- END OF FILE utils.py ---

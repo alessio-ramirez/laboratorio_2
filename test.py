@@ -1,68 +1,15 @@
-#from guezzi import *
+import sys
 import numpy as np
+sys.path.append("../")
 from burger_lib.guezzi import *
-import matplotlib.pyplot as plt
 
-R_nota = Measurement(500, 1, unit='Ohm', name='resistenza nota')
-err_tensione = 2 #millivolt
-R_osc = Measurement(1, magnitude=6, unit='Ohm', name='resistenza oscilloscopio')
-R_eq = (R_nota * R_osc)/(R_nota + R_osc)
+t_sotto = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320,340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800, 820, 840, 860, 880, 900, 920, 940, 960, 980, 1000, 1020, 1040, 1060, 1080, 1100, 1120, 1140, 1160, 1180, 1200, 1220, 1240, 1260, 1280, 1300, 1320, 1340, 1360, 1380, 1400, 1420, 1440, 1460, 1480, 1500, 1520, 1540, 1560, 1580, 1600, 1620, 1640, 1660, 1680, 1700, 1720, 1740, 1760, 1780, 1800, 1820, 1840, 1860, 1880, 1900, 1920, 1940, 1960, 1980, 2000] # micro s (10^(-6))
+t_sotto = Measurement(t_sotto, 1, magnitude=-6, unit='s', name='Tempo')                                                                                                                                                                                                    #aggiunta dopo
+tensione_sotto = [2.8, 12.0, 20.8, 29.2, 36.8, 44.0, 50.4, 55.6, 60.0, 64.0, 67.2, 69.6, 71.2, 71.6, 71.2, 68.0, 61.0, 53.2, 42.4, 30.4, 17.6, 4.8, -8.0, -19.6, -29.6, -37.6, -44.0, -47.2, -48.0, -47.2, -44.0, -39.2, -32.0,    -24.0,     -16.0, -6.4, 2.4, 10.4, 17.2, 24.0, 29.2, 32.8, 34.0, 33.6, 32.8, 29.6, 25.6, 20.0, 14.4, 8.0, 1.6, -4.0, -9.6, -14.4, -18.4, -20.8, -22.4, -23.2, -22.4, -20.8, -18.4, -14.8, -10.8, -6.4, -2.0, 2.0, 6.0, 9.6, 12.0, 14.4, 16.0, 16.8, 16.9, 15.2, 13.6, 11.6, 8.8, 6.4, 3.2, 0.0, -2.4, -5.2, -7.2, -8.8, -10.4, -10.8, -10.8, -10.4, -9.2, -8.0, -6.4, -4.0, -2.0, 0.0, 2.0, 4.0, 5.2, 6.4, 7.2, 8.0, 8.0, 8.0, 7.2, 6.4, 5.2, 4.0, 2.4, 0.8] #milli V
+err_tensione_sotto = [0.4, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.4, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.4, 0.1, 0.4, 0.4, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.4, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1, 0.1, 0.1] #milli V
+tensione_sotto = Measurement(tensione_sotto, err_tensione_sotto, magnitude=-3, unit='V', name='Tensione')
 
-#############################################################################################################################################################################################################################à
-
-#INDUTTORE
-def V_l(x, k, tau, c):
-    return k * np.exp(-x/tau) + c
-
-scarica_tempi_induttore = [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 92, 100, 108, 116, 132, 148, 160, 180, 192, 208, 224, 236, 252, 264, 280, 304, 324, 364, 412, 448, 488, 516, 556, 604] #microsecondi
-scarica_tensione_induttore = [-248, -224, -196, -172, -148, -128, -108, -88, -68, -52, -12, 0, 16, 28, 52, 72, 88, 108, 120, 132, 144, 152, 164, 168, 176, 188, 196, 208, 220, 224, 228, 232, 236, 240] #millivolt
-scarica_tempi = Measurement(scarica_tempi_induttore, 1, magnitude=-6, unit='s', name='scarica: tempo')
-scarica_tensione = Measurement(scarica_tensione_induttore, 2, magnitude=-3, unit='V', name='scarica: tensione')
-statistica = perform_fit(scarica_tempi, scarica_tensione, V_l, [0.500, 0.0010, -1], ['k', 'tau', 'c'])
-#plot_fit(statistica, plot_residuals=True, n_fit_points=10000, xlabel='tempi', show_stats=True, show_plot=True, show_params=True)
-#latex_table_fit(statistica, orientation='v')
-latex_table_data(scarica_tempi, scarica_tensione, orientation='v', caption='Circuito RL - Scarica')
-print(statistica.parameters['tau']*R_eq)
-"""
-tau = create_dataset(parametri['value'][1], parametri['error'][1])
-L = error_prop(lambda x, y : x*y, tau, R_eq)
-tau = 0.00014075
-tau_err = 5.01117404 * 10 ** -7
-L = 0.07033969
-L_err = 0.00028721
-chi_quadro = 6.063
-chi_quadro_ridotto = 0.1956
-gdl = 31
-
-##############################################################################################################################################################################
-carica_tempi_induttore = [3.05, 3.07, 3.09, 3.11, 3.13 , 3.16, 3.18, 3.21, 3.22, 3.24, 3.29, 3.32, 3.36, 3.40, 3.44, 3.49, 3.54, 3.59, 3.62, 3.77] #millisecondi
-carica_tensione_induttore = [248, 212, 152, 96, 48, -8, -40, -80, -92, -112, -152, -172, -192, -208, -216, -228, -232, -240, -240, -248] #millivolt
-carica_tensione_induttore = carica_tensione_induttore + np.full_like(carica_tensione_induttore, 248)
-carica_tempi_induttore = carica_tempi_induttore - np.full_like(carica_tempi_induttore, 3.05)
-carica_tempi = create_dataset(carica_tempi_induttore, 0.01, magnitude=-3)
-carica_tensione = create_dataset(carica_tensione_induttore, 2, magnitude=-3)
-#create_best_fit_line(carica_tempi, carica_tensione, func=V_l, show_chi_squared=True, show_fit_params=True, p0=[[-0.500, 0.00010, 1]])
-parametri = perform_fit(carica_tempi, carica_tensione, func=V_l, p0=[0.500, 0.00010, 1])['parameters']
-
-#############################################################################################################################################################################
-
-
-#RESISTENZA
-def V_r(x, V_g, tau, c):
-    return V_g * (1 - 2 * np.exp(-x/tau)) + c
-
-scarica_tempi_resistenza = [0, 40, 60, 80, 100, 140, 180, 200, 240, 280, 320, 360, 400, 440, 480, 500, 540, 580, 600, 700] #microsecondi
-scarica_tensione_resistenza = [552, 424, 368, 324, 284, 220, 172, 152, 120, 100, 80, 68, 56, 48, 44, 40, 36, 36, 32, 28] #millivolt
-scarica_tempi = create_dataset(scarica_tempi_resistenza, 1, magnitude=-6)
-scarica_tensione = create_dataset(scarica_tensione_resistenza, 2, magnitude=-3)
-#create_best_fit_line(scarica_tempi, scarica_tensione, func=V_r, show_chi_squared=True, show_fit_params=True, p0=[[0.300, 0.00010, 0.300]])
-
-####################################################################################################################################################################################################
-carica_tempi_resistenza = [3.06, 3.08, 3.10, 3.12, 3.14, 3.16, 3.18, 3.20, 3.22, 3.24, 3.26, 3.30, 3.33, 3.36, 3.39, 3.44, 3.47, 3.50, 3.54, 3.59, 3.64, 3.66, 3.67, 3.80] #millisecondi
-carica_tensione_resistenza = [-572, -500, -436, -380, -336, -296, -260, -228, -200, -176, -160, -124, -108, -92, -80, -64, -56, -52, -44, -40, -36, -36, -32, -28] #millivolt
-carica_tensione_resistenza = carica_tensione_resistenza+ np.full_like(carica_tensione_resistenza, 572)
-carica_tempi_resistenza = carica_tempi_resistenza - np.full_like(carica_tempi_resistenza, 3.06)
-carica_tempi = create_dataset(carica_tempi_resistenza, 0.02, magnitude=-3)
-carica_tensione = create_dataset(carica_tensione_resistenza, 2, magnitude=-3)
-create_best_fit_line(carica_tempi, carica_tensione, func=V_r, show_chi_squared=True, show_fit_params=True, p0=[[0.300, 0.00010, 0.003]])
-"""
+def tensiore_sotto_(t, V_0, gamma, omega):
+    return V_0 * np.exp(-gamma * t) * np.sin(t * np.sqrt((omega**2) - (gamma**2)))
+fit = perform_fit(t_sotto, tensione_sotto, func=tensiore_sotto_, p0=[100, 600, 3000], parameter_names=['V_0', 'gamma', 'omega'], method='minuit')
+plot_fit(fit, plot_residuals=True, n_fit_points=10000, title='Circuito RLC - Regime Sottosmorzato', show_plot=True, show_params=True, show_stats=True)
