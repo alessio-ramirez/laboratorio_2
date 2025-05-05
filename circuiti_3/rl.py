@@ -62,11 +62,11 @@ def fase_Hl (omega, L, k) :
 ampiezza_Hl = amp_Vl_pp / amp_Vg
 ampiezza_Hr = amp_Vr / amp_Vg
 mask = ampiezza_Hr.error > 0.015
-fit_Hr = perform_fit(pulsazione, ampiezza_Hr, fit_func_RL_lowpass, p0=[L_guess], method='minuit', minuit_limits={'L': (1e-5, 1e-1)}, mask=mask)
-plot_fit(fit_Hr, plot_residuals=True, title='Circuito RL - $H_r$', save_path='./grafici/rl_passa_basso.png', show_params=True, show_stats=True)
+fit_Hr = perform_fit(pulsazione, ampiezza_Hr, fit_func_RL_lowpass, p0=[L_guess], method='minuit', minuit_limits={'L': (1e-5, 1)}, mask=mask)
+plot_fit(fit_Hr, plot_residuals=True, title='Circuito RL - $H_r$', save_path='./grafici/rl_hr.png', show_params=True, show_stats=True)
 
 fit_Hl = perform_fit(pulsazione, ampiezza_Hl, fit_func_RL_highpass, p0=[L_guess], method='minuit', minuit_limits={'L': (1e-5, None)}, mask=mask)
-plot_fit(fit_Hl, plot_residuals=True, title='Circuito RL - $H_l$', save_path='./grafici/rl_passa_alto.png', show_params=True, show_stats=True)
+plot_fit(fit_Hl, plot_residuals=True, title='Circuito RL - $H_l$', save_path='./grafici/rl_hl.png', show_params=True, show_stats=True)
 
 fit_fase_Hl = perform_fit(pulsazione, fase_Vl, func = fase_Hl, p0=[L_guess, np.pi/2], method='minuit', minuit_limits={'L': (-1,1), 'k':(-10, 10)})
 plot_fit(fit_fase_Hl, plot_residuals=True, show_params=True, show_stats=True, title='Circuito RL - $\\arg(H_L(\\omega))$', save_path='./grafici/rl_fase_hl.png')
