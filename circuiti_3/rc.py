@@ -25,13 +25,13 @@ amp_Vr_pp_errors = [0.4, 0.4, 0.4, 0.8, 2, 2, 2, 4, 2, 2, 2, 30, 40, 40, 40, 40,
 amp_Vr = Measurement(amp_Vr_pp_values, amp_Vr_pp_errors, magnitude=-3, unit='V', name='V_pp resistenza')
 # Fase Vc misurata dall'oscilloscopio (automaticamente)
 fase_Vc_values = [178, 176, 179, 177, 177, 180, 175, 177, 174, 172, 170, 164, 157, 149, 139, 128, 120, 115, 108, 103, 102, 94] #gradi
-fase_Vc_errors = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] #gradi error
-fase_Vc = Measurement(fase_Vc_values, 2)
+fase_Vc_errors = [2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] #gradi error
+fase_Vc = Measurement(fase_Vc_values, fase_Vc_errors)
 fase_Vc = fase_Vc / 180 * np.pi
 # Fase Vr misurata dall'oscilloscopio (automaticamente)
 fase_Vr_values = [92.1, 89.6, 88.9, 90.4, 88.2, 88.6, 88.0, 87.0, 84.9, 84.2, 79.6, 74.5, 67.6, 59.3, 47.9, 38.8, 31.1, 25.9, 19.4, 13.5, 10.1, 6.49] #gradi
 fase_Vr_errors = [2, 1, 0.4, 0.2, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.05] #gradi error
-fase_Vr = Measurement(fase_Vr_values, 2)
+fase_Vr = Measurement(fase_Vr_values, np.array(fase_Vr_errors)*3)
 fase_Vr = fase_Vr / 180 * np.pi
 
 #funzioni

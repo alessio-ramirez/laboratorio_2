@@ -44,7 +44,7 @@ def get_si_prefix(value: float) -> Tuple[str, int, float]:
     
     # Use Decimal for potentially higher precision in edge cases
     d_value = decimal.Decimal(value)
-    exponent = d_value.log10().to_integral_value(rounding=decimal.ROUND_FLOOR) # Floor(log_10(value))
+    exponent = d_value.adjusted()
 
     # Find the largest SI exponent less than or equal to the value's exponent
     best_exponent = 0 # Default to base unit
