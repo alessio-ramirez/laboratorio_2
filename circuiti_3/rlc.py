@@ -49,14 +49,14 @@ fase_Vr = Measurement(fase_Vr, fase_Vr_err) * np.pi / 180
 
 fit_Hr = perform_fit(pulsazione, amp_Hr, Hr, [L_guess, C_nota.value], method='minuit', minuit_limits={'L':(-1,1), 'C':(-1,1)})
 plot_fit(fit_Hr, plot_residuals=True, show_params=True, show_stats=True,
-         data_label='dati', xlabel='$\\omega$', ylabel='$H_R$', title='Circuito RLC - $H_R(\\omega)$', save_path='./grafici/rlc_hr.png')
+         data_label='dati', xlabel='$\\omega$', ylabel='$H_R$', title='Circuito RLC - $H_R(\\omega)$', save_path='./grafici/rlc_hr.pdf')
 fit_fase_Hr = perform_fit(pulsazione, fase_Vr, fase_Hr, [0.0, L_guess, C_nota.value], method='minuit', minuit_limits={'k':(-10,10), 'L':(-1,1), 'C':(-1,1)})
 plot_fit(fit_fase_Hr, plot_residuals=True, show_params=True, show_stats=True,
-         data_label='dati', xlabel='$\\omega$', ylabel='$\\arg(H_R)$', title='Circuito RLC - $\\arg(H_R(\\omega))$', save_path='./grafici/rlc_fase_hr.png')
+         data_label='dati', xlabel='$\\omega$', ylabel='$\\arg(H_R)$', title='Circuito RLC - $\\arg(H_R(\\omega))$', save_path='./grafici/rlc_fase_hr.pdf')
 #una sonda ai capi del generatore e una sonda tra L e C (ai capi di C + R)
 #poi differenza tra 2 segnali delle 2 sonde per trovare segnale ai capi di L
 frequenza = [0.5, 1, 2, 5, 8, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150, 200, 250, 300, 350] #kilo hertz
-pulsazione= Measurement(frequenza) * 2 * np.pi
+pulsazione= Measurement(frequenza, magnitude=3) * 2 * np.pi
 amp_Vg = [4.12, 4.16, 4.12, 4.12, 4.16, 4.32, 4.32, 4.32, 4.32, 4.32, 4.32, 4.32, 4.32, 4.32, 4.36, 4.36, 4.36, 4.36, 4.36, 4.36, 4.36] #volt
 amp_Vg_err = 0.04 #volt
 amp_Vg = Measurement(amp_Vg, amp_Vg_err)
@@ -68,7 +68,7 @@ amp_Hl = amp_Vl / amp_Vg
 
 fit_Hl = perform_fit(pulsazione, amp_Hl, Hl, [L_guess, C_nota.value], method='minuit', minuit_limits={'L':(-1,1), 'C':(-1,1)})
 plot_fit(fit_Hl, plot_residuals=True, show_params=True, show_stats=True,
-         data_label='dati', xlabel='$\\omega$', ylabel='$H_L$', title='Circuito RLC - $H_L(\\omega)$', save_path='./grafici/rlc_hl.png')
+         data_label='dati', xlabel='$\\omega$', ylabel='$H_L$', title='Circuito RLC - $H_L(\\omega)$', save_path='./grafici/rlc_hl.pdf')
 # NOI TUTTI CI ABBIAMO PROVATO, MICHELE PIù DEGLI ALTRI, MA LA FASE NON SI TROVA "POTA"
 
 #una sonda ai capi del generatore e una sonda tra L e C scambiate di posizione rispettoa prima (ai capi di L + R)
@@ -86,4 +86,4 @@ amp_Hc = amp_Vc / amp_Vg
 
 fit_Hc = perform_fit(pulsazione, amp_Hc, Hc, [L_guess, C_nota.value], method='minuit', minuit_limits={'L':(-1,1), 'C':(-1,1)})
 plot_fit(fit_Hc, plot_residuals=True, show_params=True, show_stats=True,
-         data_label='dati', xlabel='$\\omega$', ylabel='$H_C$', title='Circuito RLC - $H_C(\\omega)$', save_path='./grafici/rlc_hc.png')
+         data_label='dati', xlabel='$\\omega$', ylabel='$H_C$', title='Circuito RLC - $H_C(\\omega)$', save_path='./grafici/rlc_hc.pdf')

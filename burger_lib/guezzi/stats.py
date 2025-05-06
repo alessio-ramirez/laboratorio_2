@@ -131,7 +131,7 @@ def test_comp(m1: Union[Measurement, Tuple[float, float]],
     # --- Calculate Z-score and p-value (ensure results are float) ---
     z_score: float
     p_value: float
-    if np.isclose(diff_err, 0.0):
+    if np.isclose(diff_err, 0.0, atol=1e-30):
         # Handle zero error case
         is_identical = np.isclose(diff_val, 0.0)
         z_score = 0.0 if is_identical else np.inf
@@ -234,7 +234,7 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
         raise ValueError("Uncertainties must be non-negative.")
 
     # --- Handle measurements with zero error (infinite weight) ---
-    zero_error_indices = np.where(np.isclose(errors, 0.0))[0]
+    zero_error_indices = np.where(np.isclose(errors, 0.0, atol=1e-30))[0]
     if len(zero_error_indices) > 0:
         first_zero_idx = zero_error_indices[0]
         # Check if all zero-error values are consistent
@@ -254,14 +254,14 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
     # Calculate weights (1 / variance)
     variances = errors**2
     # Avoid division by zero in weights for safety (use small epsilon if variance is near zero)
-    variances = np.where(np.isclose(variances, 0.0), np.finfo(float).eps, variances)
+    variances = np.where(np.isclose(variances, 0.0, atol=1e-30), np.finfo(float).eps, variances)
     weights = 1.0 / variances
 
     # Calculate weighted mean value
     weighted_sum = np.sum(weights * values)
     sum_of_weights = np.sum(weights)
     # Ensure sum_of_weights is not zero before division
-    if np.isclose(sum_of_weights, 0.0):
+    if np.isclose(sum_of_weights, 0.0, atol=1e-30):
         # This should only happen if all weights are zero (e.g., all errors infinite)
         warnings.warn("Sum of weights is zero. Cannot compute weighted mean.", RuntimeWarning)
         mean_value = np.nan
