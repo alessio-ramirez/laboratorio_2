@@ -665,7 +665,7 @@ class Measurement:
 
         # Note: _get_broadcasted_operands returns (k, 0, a, sa)
         k, _, a, sa = operands # Error on k (other) is zero if it wasn't a Measurement
-        new_value = k - a
+        new_value = a - k 
         new_error = sa # Error is just the error from self
 
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
