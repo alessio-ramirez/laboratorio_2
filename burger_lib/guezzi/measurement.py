@@ -6,25 +6,25 @@ Measurement Class for Handling Quantities with Uncertainties.
 Defines the `Measurement` class, the core of the library for representing
 physical quantities with associated uncertainties (errors) and units.
 It automatically handles error propagation for standard arithmetic operations
-and many NumPy functions.
+and many NumPy universal functions (ufuncs).
 """
 
 import numpy as np
-import sympy as sp
+import sympy as sp # Will be used later in __array_ufunc__
 import warnings
 from typing import Union, List, Dict, Tuple, Any, Optional, Callable
-from numbers import Number
-import math
+from numbers import Number # Used for type checking scalar numbers
 
 # Import formatting utilities (crucial for correct output)
-
-from .utils import _format_value_error_eng, round_to_significant_figures, SI_PREFIXES, get_si_prefix
+# _format_value_error_eng is the primary formatter now.
+# round_to_significant_figures is used internally by _format_value_error_eng.
+from .utils import _format_value_error_eng, round_to_significant_figures
 
 # ---------------------------- Measurement Class -----------------------------
 
 class Measurement:
     """
-    Represents a physical quantity with a nominal value and standard uncertainty.
+    Represents a real-valued physical quantity with a nominal value and standard uncertainty.
 
     This class facilitates calculations involving measured quantities by automatically
     propagating uncertainties using first-order Taylor expansion (linear error
@@ -37,257 +37,215 @@ class Measurement:
             σ_f² ≈ (∂f/∂x * σ_x)² + (∂f/∂y * σ_y)² + ...
 
         This approximation is generally valid when the uncertainties are "small"
-        relative to the values, meaning higher-order terms in the Taylor expansion
-        are negligible. The class assumes uncertainties represent one standard deviation (1σ).
+        relative to the values. The class assumes uncertainties represent 1σ.
 
         Key Assumptions:
-        1.  **Linearity:** The function f is approximately linear over the range
-            defined by the uncertainties (e.g., x ± σ_x).
-        2.  **Independence:** Uncertainties in different `Measurement` operands are
-            assumed to be statistically independent unless specifically handled
-            otherwise (e.g., `m - m` correctly yields zero error, but `m1 - m2`
-            assumes independence between `m1` and `m2`). Correlations are not
-            tracked automatically between separate operations.
-        3.  **Gaussian Errors (Implied):** While not strictly required for the propagation
-            formula itself, interpreting the uncertainty as a standard deviation is
-            most meaningful if the underlying error distribution is approximately Normal.
-
-    Features:
-        - Automatic error propagation for +, -, *, /, **, and NumPy ufuncs.
-        - Support for scalar and array-based measurements, including operations
-          between scalars and arrays.
-        - Basic unit tracking (units propagated correctly for +/- if identical,
-          cleared otherwise; unit consistency is user's responsibility for * / **).
-        - String formatting methods (`__str__`, `to_eng_string`, `round_to_error`)
-          for clear presentation of results, including SI prefixes.
-        - Compatibility with NumPy functions (though casting to array loses uncertainty).
+        1.  **Real Values:** Input values/errors assumed real. Complex inputs trigger
+            a warning, and only the real part is used.
+        2.  **Linearity:** f is approximately linear over the uncertainty range.
+        3.  **Independence:** Uncertainties in different Measurement operands are
+            assumed independent unless handled otherwise (e.g., m - m).
+        4.  **Gaussian Errors (Implied):** Interpretation of uncertainty as 1σ
+            is most meaningful for approximately Normal error distributions.
 
     Attributes:
-        value (Union[float, np.ndarray]): The nominal value(s) of the quantity.
-        error (Union[float, np.ndarray]): The uncertainty (standard deviation, σ)
-                                         associated with the value. Must be non-negative
-                                         and broadcastable with `value`.
-        unit (str): A string representing the physical unit (e.g., "V", "m/s", "kg").
-                    Used primarily for display purposes in formatting methods.
-        name (str): An optional descriptive name for the quantity (e.g., "Voltage", "Length").
+        value (np.ndarray): The nominal value(s) of the quantity (at least 1D).
+        error (np.ndarray): The uncertainty (standard deviation, σ) associated
+                            with the value (at least 1D, non-negative, and
+                            broadcastable with `value`).
+        unit (str): Physical unit string (e.g., "V", "m/s").
+        name (str): Optional descriptive name (e.g., "Voltage").
     """
-    __array_priority__ = 1000 # Ensure Measurement ops override NumPy ops when mixed
+    __array_priority__ = 1000
+
+    @staticmethod
+    def _process_complex_input(data: Any, data_name: str) -> np.ndarray:
+        """
+        Processes input, handles complex numbers (warns, takes real part),
+        and converts to a NumPy float array.
+        """
+        if isinstance(data, np.ndarray) and np.iscomplexobj(data):
+            warnings.warn(
+                f"Input '{data_name}' contains complex numbers. "
+                "Using only the real part. Ensure this is intended.",
+                UserWarning
+            )
+            return np.real(data).astype(float)
+        elif isinstance(data, (list, tuple)):
+            try:
+                arr_data = np.asarray(data) # Convert first for robust complex check
+                if np.iscomplexobj(arr_data):
+                    warnings.warn(
+                        f"Input '{data_name}' (list/tuple) contains complex numbers. "
+                        "Using only the real part. Ensure this is intended.",
+                        UserWarning
+                    )
+                    return np.real(arr_data).astype(float)
+                return arr_data.astype(float)
+            except (TypeError, ValueError) as e:
+                 raise TypeError(f"Could not convert '{data_name}' to a numeric array: {e}")
+        elif isinstance(data, Number): # Handles float, int, complex scalars
+            if isinstance(data, complex):
+                warnings.warn(
+                    f"Input '{data_name}' is a complex scalar. "
+                    "Using only the real part. Ensure this is intended.",
+                    UserWarning
+                )
+                return np.array([np.real(data)], dtype=float) # Output as 1-element array
+            return np.array([data], dtype=float) # Output as 1-element array
+        
+        # Fallback for other types, attempt direct conversion
+        try:
+            return np.asarray(data, dtype=float)
+        except (TypeError, ValueError) as e:
+            raise TypeError(f"Input '{data_name}' could not be converted to a numeric array: {e}")
+
 
     def __init__(self,
-                 values: Union[float, complex, list, tuple, np.ndarray, dict, 'Measurement'],
+                 values: Union[float, list, tuple, np.ndarray, dict, 'Measurement'],
                  errors: Union[float, list, tuple, np.ndarray, None] = None,
                  magnitude: int = 0,
                  unit: str = "",
                  name: str = ""):
         """
-        Initializes a Measurement object.
+        Initializes a Measurement object. Must represent at least one value.
 
         Args:
-            values: Nominal value(s). Can be:
-                - Scalar (float, int, complex).
-                - Sequence (list, tuple, NumPy array).
-                - Dictionary `{value1: error1, value2: error2, ...}` (errors must be None).
-                - Another Measurement object (creates a copy, ignores other args).
-            errors: Uncertainty(ies) corresponding to values. Can be:
-                - Scalar (float, int). Applied to all values if values is array-like.
-                - Sequence (list, tuple, NumPy array). Must be broadcastable with values.
-                - None: If `values` is a dict, `errors` MUST be None. If `values` is not
-                  a dict, `errors`=None implies zero uncertainty.
-            magnitude: A power-of-10 scaling factor applied to both values and errors
-                       upon initialization. E.g., `magnitude=-3` with `values=5`
-                       creates a measurement of 5e-3. Useful for inputting data
-                       with common prefixes (e.g., measured in mV). (Default 0).
-            unit: Physical unit symbol string (e.g., "V", "kg", "m/s"). (Default "").
-            name: Descriptive name string for the quantity. (Default "").
+            values: Nominal value(s). Scalar, sequence, dict, or Measurement.
+                    Complex inputs: real part used with warning.
+            errors: Uncertainty(ies). Scalar, sequence, or None (implies zero error).
+                    Complex inputs: real part used with warning.
+            magnitude: Power-of-10 scaling factor (e.g., `magnitude=-3` for milli).
+            unit: Physical unit symbol string.
+            name: Descriptive name string.
 
         Raises:
-            ValueError: If `values` is a dict and `errors` is not None.
-            ValueError: If `values` and `errors` (when provided) cannot be broadcast
-                        to a compatible shape.
-            TypeError: If inputs cannot be converted to appropriate numeric types.
+            ValueError: If `values` is an empty dict, or if processed `values`/`errors`
+                        result in an empty array (size 0), or if shapes are incompatible,
+                        or `values` is dict and `errors` is not None.
+            TypeError: If inputs cannot be converted to numeric arrays.
         """
-        _values_in: Any = values # Keep track of original type for scalar handling
-        _errors_in: Any = errors
 
-        # --- Input Parsing ---
-        if isinstance(values, Measurement): # Handle initialization from another Measurement
-             # Create a copy, ignore other arguments
-             self.value = np.copy(values.value)
-             self.error = np.copy(values.error)
-             # Allow overriding unit/name, otherwise inherit
-             self.unit = unit if unit else values.unit
-             self.name = name if name else values.name
-             if errors is not None or magnitude != 0:
-                  warnings.warn("Ignoring 'errors' and 'magnitude' when initializing "
-                                "from an existing Measurement object.", UserWarning)
-        elif isinstance(values, dict):
-            # Initialize from {value: error} dictionary
+        if isinstance(values, Measurement):
+            self.value = np.copy(values.value)
+            self.error = np.copy(values.error)
+            self.unit = unit if unit else values.unit
+            self.name = name if name else values.name
+            if errors is not None or magnitude != 0:
+                 warnings.warn("Ignoring 'errors' and 'magnitude' when initializing "
+                               "from an existing Measurement object.", UserWarning)
+            # A Measurement copied from another is inherently valid (non-empty).
+            return
+
+        scale_factor = 10.0 ** magnitude
+
+        if isinstance(values, dict):
+            if not values:
+                raise ValueError("Cannot initialize Measurement from an empty dictionary.")
             if errors is not None:
                 raise ValueError("Argument 'errors' must be None when 'values' is a dictionary.")
-            if not values: # Handle empty dictionary
-                 _vals_arr = np.array([], dtype=float)
-                 _errs_arr = np.array([], dtype=float)
-            else:
-                # Extract keys (values) and values (errors)
-                val_list = list(values.keys())
-                err_list = list(values.values())
-                _vals_arr = np.asarray(val_list, dtype=float) # Force float for consistency
-                _errs_arr = np.asarray(err_list, dtype=float)
-                if _vals_arr.shape != _errs_arr.shape:
-                    # Should not happen if dict structure is correct, but check
-                    raise ValueError("Internal error: Dictionary keys and values "
-                                     "yielded incompatible shapes after conversion.")
-            # Apply magnitude scaling
-            scale_factor = 10.0 ** magnitude
-            self.value = _vals_arr * scale_factor
-            self.error = _errs_arr * scale_factor
-            self.unit = unit
-            self.name = name
+            
+            _vals_arr_raw = list(values.keys())
+            _errs_arr_raw = list(values.values())
+
+            _vals_arr_processed = self._process_complex_input(_vals_arr_raw, "values (from dict keys)")
+            _errs_arr_processed = self._process_complex_input(_errs_arr_raw, "errors (from dict values)")
+
+            self.value = np.atleast_1d(_vals_arr_processed * scale_factor)
+            self.error = np.atleast_1d(_errs_arr_processed * scale_factor)
         else:
-            # Handle scalar, list, tuple, or ndarray for values
-            # Use float as default internal type for consistency in calculations
-            _vals_arr = np.atleast_1d(np.asarray(values, dtype=float))
+            _vals_arr_processed = self._process_complex_input(values, "values")
 
-            # Process errors based on 'errors' argument
             if errors is None:
-                _errs_arr = np.zeros_like(_vals_arr, dtype=float) # Default to zero error
+                _errs_arr_processed = np.zeros_like(_vals_arr_processed, dtype=float)
             else:
-                 _errs_arr = np.atleast_1d(np.asarray(errors, dtype=float))
+                 _errs_arr_processed = self._process_complex_input(errors, "errors")
 
-            # Apply magnitude scaling *before* broadcasting check
-            scale_factor = 10.0 ** magnitude
-            _vals_arr_scaled = _vals_arr * scale_factor
-            _errs_arr_scaled = _errs_arr * scale_factor
+            self.value = np.atleast_1d(_vals_arr_processed * scale_factor)
+            self.error = np.atleast_1d(_errs_arr_processed * scale_factor)
 
-            # --- Broadcasting and Final Assignment ---
-            try:
-                 # Check shape compatibility and broadcast arrays if necessary
-                 # np.broadcast handles the check and determines the final shape
-                 bcast_shape = np.broadcast(_vals_arr_scaled, _errs_arr_scaled).shape
+        # Ensure non-empty after processing
+        if self.value.size == 0:
+            raise ValueError("Cannot initialize Measurement with empty values after processing. "
+                             "Input 'values' might have been an empty list/tuple or resulted in an empty array.")
 
-                 # Store internally, ensuring they have the common broadcast shape
-                 self.value = np.broadcast_to(_vals_arr_scaled, bcast_shape)
-                 self.error = np.broadcast_to(_errs_arr_scaled, bcast_shape)
+        # Broadcast values and errors to a common shape
+        try:
+             bcast_shape = np.broadcast(self.value, self.error).shape
+             self.value = np.broadcast_to(self.value, bcast_shape)
+             self.error = np.broadcast_to(self.error, bcast_shape)
+        except ValueError:
+              # This error should ideally be caught if self.value.size check is robust
+              raise ValueError(f"Shape mismatch: Processed values (shape: {self.value.shape}) "
+                               f"and errors (shape: {self.error.shape}) "
+                               "cannot be broadcast together.")
 
-                 # Optimization: If original input was scalar and resulted in a 0-dim array,
-                 # store as Python float internally for potential slight speedup in scalar ops.
-                 # Check original types, not just the arrays after atleast_1d.
-                 was_scalar_input = isinstance(_values_in, Number) and \
-                                    (errors is None or isinstance(_errors_in, Number))
+        self.unit = unit
+        self.name = name
 
-                 # Store value/error as scalar floats if input was scalar AND result is 0-dim
-                 if was_scalar_input and self.value.ndim == 0:
-                      self.value = self.value.item() # Convert 0-dim array to Python float
-                      self.error = self.error.item()
-
-            except ValueError:
-                  # Broadcasting failed - shapes are incompatible
-                  raise ValueError(f"Shape mismatch: Input values (shape={_vals_arr.shape}) "
-                                   f"and errors (shape={_errs_arr.shape}) "
-                                   "cannot be broadcast together.")
-
-            # Assign metadata
-            self.unit = unit
-            self.name = name
-
-        # --- Final Validation ---
-        # Ensure errors are non-negative (standard deviation cannot be negative)
-        if np.any(np.asarray(self.error) < 0): # Use asarray to handle scalar/array cases
+        if np.any(self.error < 0):
             warnings.warn("Initializing Measurement with negative error(s). "
-                          "Uncertainty (standard deviation) must be non-negative. "
-                          "Taking the absolute value.", UserWarning)
+                          "Uncertainty must be non-negative. Taking absolute value.", UserWarning)
             self.error = np.abs(self.error)
 
     # --- NumPy-like Properties ---
-    # These allow the Measurement object to mimic some behaviors of NumPy arrays
     @property
     def ndim(self) -> int:
         """Number of array dimensions of the value/error."""
-        # Return ndim of the value; error is guaranteed to be broadcastable
-        return np.ndim(self.value)
+        return self.value.ndim
 
     @property
     def shape(self) -> Tuple[int, ...]:
         """Tuple of array dimensions of the value/error."""
-        return np.shape(self.value)
+        return self.value.shape
 
     @property
     def size(self) -> int:
         """Total number of elements in the value/error array."""
-        return np.size(self.value)
+        return self.value.size # Always > 0 due to __init__ checks
 
     def __len__(self) -> int:
-        """Length of the first dimension (if array is not 0-dimensional)."""
-        s = self.shape
-        if not s: # Empty tuple for 0-dim array
-             # Mimics NumPy behavior for 0-d arrays
-             raise TypeError("len() of unsized object (0-dimensional Measurement)")
-        return s[0] # Return length of first dimension
+        """Length of the first dimension."""
+        return self.shape[0]
 
     def __getitem__(self, key: Any) -> 'Measurement':
         """
-        Allows indexing and slicing like a NumPy array.
-
-        Returns a *new* Measurement object representing the selected subset.
-        The name of the new object is appended with the index/slice key.
-        Units are preserved.
+        Allows indexing and slicing. Returns a *new* Measurement object.
+        If slicing results in an empty Measurement, a ValueError is raised by the constructor.
         """
-        if self.ndim == 0:
-             raise IndexError("Cannot index a 0-dimensional Measurement object.")
-
         try:
-            new_value = np.asarray(self.value)[key]
-            # Error needs careful handling: if error was scalar, it applies to all elements.
-            # If error was array, slice it the same way as value.
-            if np.ndim(self.error) == 0:
-                # If error is scalar, the sliced element still has the same scalar error
-                new_error = self.error
-            else:
-                # If error is an array, slice it correspondingly
-                new_error = np.asarray(self.error)[key]
+            new_value_array = self.value[key]
+            new_error_array = self.error[key]
 
-            # Determine if the result of indexing is a scalar or an array
-            is_result_scalar = (np.ndim(new_value) == 0)
-
-            # Create a descriptive name for the sliced Measurement
             try:
-                 # Attempt a clean string representation of the key
-                 key_str = str(key)
-                 # Basic sanitization for common problematic chars in names
-                 key_str = key_str.replace(':', '-').replace(' ', '').replace(',', '_')
+                 key_str = str(key).replace(':', '-').replace(' ', '').replace(',', '_')
             except:
-                 key_str = "slice" # Fallback
-            new_name = f"{self.name}[{key_str}]" if self.name else f"Measurement[{key_str}]"
+                 key_str = "slice"
 
-            # Return a new Measurement object
-            # Important: pass scalar values if result is scalar, else pass arrays
-            if is_result_scalar:
-                 # If result is scalar, store value/error as Python scalars
-                 val_item = new_value.item()
-                 err_item = new_error.item() if np.ndim(new_error) == 0 else new_error # Handle case where error was array but slice yields scalar
-                 return Measurement(val_item, err_item, unit=self.unit, name=new_name)
-            else:
-                 return Measurement(new_value, new_error, unit=self.unit, name=new_name)
+            new_name = f"{self.name}[{key_str}]" if self.name else f"Data[{key_str}]"
+            # Measurement constructor will raise ValueError if new_value_array.size is 0
+            return Measurement(new_value_array, new_error_array, unit=self.unit, name=new_name)
 
         except IndexError as e:
             raise IndexError(f"Error indexing Measurement: {e}")
-        except Exception as e: # Catch other potential slicing errors
+        except ValueError as e: # Propagate ValueError from Measurement constructor (e.g. empty slice)
+            raise ValueError(f"Slicing resulted in an invalid Measurement: {e}")
+        except Exception as e:
              raise TypeError(f"Invalid index or slice key for Measurement: {key}. Error: {e}")
-
 
     # --- Convenience Properties ---
     @property
-    def nominal_value(self) -> Union[float, np.ndarray]:
-        """Alias for `self.value` (the nominal value(s))."""
+    def nominal_value(self) -> np.ndarray:
+        """Alias for `self.value` (the nominal value(s) as np.ndarray)."""
         return self.value
 
     @property
-    def std_dev(self) -> Union[float, np.ndarray]:
-        """Alias for `self.error` (the uncertainty/standard deviation)."""
+    def std_dev(self) -> np.ndarray:
+        """Alias for `self.error` (the uncertainty/standard deviation as np.ndarray)."""
         return self.error
 
     @property
-    def variance(self) -> Union[float, np.ndarray]:
+    def variance(self) -> np.ndarray:
          """Returns the variance (square of the uncertainty `self.error`)."""
          return np.square(self.error)
 
@@ -295,195 +253,87 @@ class Measurement:
 
     def __repr__(self) -> str:
         """
-        Provides a detailed, unambiguous string representation of the object,
-        useful for debugging. Shows value, error, name, and unit.
+        Detailed, unambiguous string representation for debugging.
         """
         name_str = f", name='{self.name}'" if self.name else ""
         unit_str = f", unit='{self.unit}'" if self.unit else ""
-        # Use np.repr for array representation if needed, handle scalar case
-        val_repr = np.array_repr(np.asarray(self.value)) if isinstance(self.value, np.ndarray) else repr(self.value)
-        err_repr = np.array_repr(np.asarray(self.error)) if isinstance(self.error, np.ndarray) else repr(self.error)
+        val_repr = np.array_repr(self.value)
+        err_repr = np.array_repr(self.error)
         return f"Measurement(value={val_repr}, error={err_repr}{name_str}{unit_str})"
 
     def __str__(self) -> str:
         """
-        Provides a user-friendly string representation, suitable for printing.
-
-        Defaults to using engineering notation (`to_eng_string`) with 1 significant
-        figure for the error if a unit is present. If no unit is present, it uses
-        standard rounding based on error (`round_to_error`) with 1 significant figure.
-        Handles both scalar and array Measurements.
+        User-friendly string representation, using engineering notation.
+        Defaults to 1 significant figure for the error.
+        Returns a single string, even for array-like Measurements (uses np.array2string).
         """
-        is_scalar = (self.ndim == 0)
-        sig_figs = 1 # Default sig figs for __str__
+        sig_figs_error_default = 1
 
-        if self.unit:
-            formatter_func = lambda v, e, u, sf: _format_value_error_eng(v, e, u, sf)
-        else:
-            formatter_func = lambda v, e, u, sf: self._round_single_to_error_std(v, e, sf)
+        # Core scalar formatter
+        scalar_formatter_func = lambda v, e: _format_value_error_eng(
+            v, e, self.unit, sig_figs_error_default
+        )
 
-        if is_scalar:
-            # --- Direct call for scalar ---
+        if self.size == 1: # Handles Measurements with a single value/error pair
             try:
-                # Note: _round_single_to_error_std doesn't take unit, formatter_func adapts
-                if self.unit:
-                    return formatter_func(v=self.value, e=self.error, u=self.unit, sf=sig_figs)
-                else:
-                    # Need to call the correct underlying function directly
-                    return self._round_single_to_error_std(value=self.value, error=self.error, n_sig_figs=sig_figs)
+                return scalar_formatter_func(self.value.item(), self.error.item())
             except Exception as e:
                 warnings.warn(f"Error during scalar formatting in __str__: {e}", RuntimeWarning)
-                # Fallback for scalar failure
-                return f"{self.value} +/- {self.error}" + (f" {self.unit}" if self.unit else "")
-        else:
-            # --- Use vectorize for arrays ---
-            vectorized_formatter = np.vectorize(formatter_func, excluded=['u', 'sf'], otypes=[str])
+                val_item = self.value.item()
+                err_item = self.error.item()
+                return f"{val_item} \u00B1 {err_item}" + (f" {self.unit}" if self.unit else "")
+        else: # For Measurements with multiple elements
+            vectorized_formatter = np.vectorize(scalar_formatter_func, otypes=[str])
             try:
-                formatted_array = vectorized_formatter(v=self.value, e=self.error, u=self.unit, sf=sig_figs)
-                with np.printoptions(threshold=np.inf):
-                    return np.array2string(formatted_array, separator=', ',
-                                           formatter={'all': lambda x: x})
+                formatted_array = vectorized_formatter(self.value, self.error)
+                # np.array2string is appropriate here as __str__ should return a single string
+                return np.array2string(formatted_array, separator=', ',
+                                       formatter={'all': lambda x: x})
             except Exception as e:
                  warnings.warn(f"Error during array formatting in __str__: {e}", RuntimeWarning)
-                 # Fallback for array failure
-                 return f"Measurement Array (value={np.shape(self.value)}, error={np.shape(self.error)}) Format Error"
+                 return (f"Measurement Array (value_shape={self.shape}, error_shape={self.shape})"
+                         " - Formatting Error")
 
 
-    def to_eng_string(self, sig_figs_error: int = 1, **kwargs) -> str:
+    def to_eng_string(self, sig_figs_error: int = 1) -> np.ndarray:
         """
-        Formats the measurement(s) using engineering notation with SI prefixes.
-        (Handles scalar/array directly)
-        """
-        if sig_figs_error <= 0:
-            raise ValueError("Number of significant figures for error must be positive.")
-
-        # Extract value, error, unit - handle potential internal call from vectorization if needed (though we bypass it for scalar)
-        value = kwargs.get('value', self.value)
-        error = kwargs.get('error', self.error)
-        unit = kwargs.get('unit', self.unit)
-        is_scalar = (np.ndim(value) == 0) # Check dimension of potentially overridden value
-
-        if is_scalar:
-            # --- Direct call for scalar ---
-            try:
-                return _format_value_error_eng(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
-            except Exception as e:
-                warnings.warn(f"Error during scalar formatting in to_eng_string: {e}", RuntimeWarning)
-                # Fallback for scalar failure
-                return f"{value} +/- {error}" + (f" {unit}" if unit else "")
-        else:
-            # --- Use vectorize for arrays ---
-            formatter = np.vectorize(_format_value_error_eng, excluded=['unit_symbol', 'sig_figs_error'], otypes=[str])
-            try:
-                formatted_array = formatter(value=value, error=error, unit_symbol=unit, sig_figs_error=sig_figs_error)
-                with np.printoptions(threshold=np.inf):
-                    return np.array2string(formatted_array, separator=', ',
-                                           formatter={'all': lambda x: x})
-            except Exception as e:
-                 warnings.warn(f"Error during array formatting in to_eng_string: {e}", RuntimeWarning)
-                 # Fallback for array failure
-                 return f"Measurement Eng Array (value={np.shape(value)}, error={np.shape(error)}) Format Error"
-
-    def round_to_error(self, n_sig_figs: int = 1) -> str:
-        """
-        Formats the measurement(s) by rounding the value based on error significance.
-
-        This method uses standard decimal rounding without SI prefixes.
-        The error is rounded to `n_sig_figs` significant figures, and the value
-        is then rounded to the same decimal place as the least significant digit
-        of the rounded error. This is a common convention for displaying results
-        where engineering notation is not required or desired.
+        Formats the measurement(s) using engineering notation with SI prefixes,
+        returning a NumPy array of formatted strings.
+        The value is rounded based on the error's significant figures.
 
         Args:
-            n_sig_figs: Number of significant figures for the uncertainty (error).
-                        Typically 1 or 2. (Default 1).
+            sig_figs_error (int): Number of significant figures for the error. (Default 1).
 
         Returns:
-            str: Formatted string (for scalar) or array representation (for array).
-                 Example: "123.4 ± 1.2" or "0.0056 ± 0.0003".
-
-        Raises:
-            ValueError: If `n_sig_figs` is not positive.
+            np.ndarray: A NumPy array of formatted strings. The shape of this array
+                        matches the shape of `self.value`.
         """
-        if n_sig_figs <= 0:
-            raise ValueError("Number of significant figures must be positive.")
+        if not isinstance(sig_figs_error, int) or sig_figs_error <= 0:
+            raise ValueError("Number of significant figures for error must be positive.")
 
-        is_scalar = (self.ndim == 0)
+        # Vectorize the core formatting utility _format_value_error_eng.
+        # It will be applied element-wise to self.value and self.error.
+        # self.unit and sig_figs_error are passed as fixed arguments to each call.
+        vectorized_core_formatter = np.vectorize(
+            _format_value_error_eng,
+            excluded=['unit_symbol', 'sig_figs_error'], # These are fixed for all elements
+            otypes=[str] # Specify the output type of the vectorized function
+        )
 
-        # Vectorize the static helper method for standard rounding
-        formatter = np.vectorize(self._round_single_to_error_std, excluded=['n_sig_figs'], otypes=[str])
-        formatted_array = formatter(value=self.value, error=self.error, n_sig_figs=n_sig_figs)
-
-        if is_scalar:
-             return formatted_array.item() if hasattr(formatted_array, 'item') else str(formatted_array)
-        else:
-             with np.printoptions(threshold=np.inf):
-                 return np.array2string(formatted_array, separator=', ',
-                                        formatter={'all': lambda x: x})
-
-    @staticmethod
-    def _round_single_to_error_std(value: float, error: float, n_sig_figs: int) -> str:
-        """
-        Static helper method for formatting a single value-error pair using
-        standard rounding based on the error's significant figures.
-        (Internal use, called by `round_to_error`).
-        """
-        # Handle non-finite numbers gracefully
-        if np.isnan(value) or np.isnan(error): return "nan ± nan"
-        if np.isinf(value) or np.isinf(error): return f"{value} ± {error}" # Basic representation
-        if error < 0: error = abs(error) # Ensure error is non-negative
-
-        # --- Case 1: Error is effectively zero ---
-        if np.isclose(error, 0.0):
-            # Format value reasonably when error is zero. Avoid excessive digits.
-            # Use scientific notation for very large/small numbers.
-            if abs(value) > 1e-4 and abs(value) < 1e6 or np.isclose(value, 0.0):
-                 # Heuristic: ~6 significant digits for typical range
-                 return f"{value:.6g} ± 0"
-            else:
-                 # Scientific notation for large/small magnitudes
-                 return f"{value:.3e} ± 0"
-
-        # --- Case 2: Error is non-zero ---
         try:
-            # 1. Round the error to the specified significant figures
-            rounded_error = round_to_significant_figures(error, n_sig_figs)
-            if np.isclose(rounded_error, 0.0):
-                # If error rounds to zero (e.g., 0.0001 rounded to 1 sf), treat as zero case.
-                decimal_place = 0 # Default, but should fall back to zero error formatting ideally
-                # Re-call formatting for zero error case might be cleaner, but simple approach:
-                return Measurement._round_single_to_error_std(value, 0.0, n_sig_figs)
-
-            # 2. Determine the decimal place of the least significant digit of the *rounded error*
-            # This determines how many decimal places the value should be rounded to.
-            # Example: rounded_error = 123 (3 sf) -> last digit is units place (dp=0)
-            # Example: rounded_error = 120 (2 sf) -> last digit is tens place (dp=-1) -> round value to nearest 10
-            # Example: rounded_error = 0.12 (2 sf) -> last digit is hundredths place (dp=2) -> round value to 0.01
-            # Example: rounded_error = 0.012 (2 sf) -> last digit is thousandths place (dp=3) -> round value to 0.001
-            order_rounded_err = math.floor(math.log10(abs(rounded_error)))
-            # The decimal place relative to point '.' is -(order - (sig_figs - 1))
-            decimal_place = max(0, -int(order_rounded_err - (n_sig_figs - 1)))
-
-            # 3. Round the value to this decimal place
-            scale = 10.0**decimal_place
-            rounded_value = round(value * scale) / scale
-
-            # 4. Format both rounded value and rounded error to this decimal place
-            # The f-string format specifier ensures trailing zeros are kept if needed
-            val_str = f"{rounded_value:.{decimal_place}f}"
-            err_str = f"{rounded_error:.{decimal_place}f}"
-            return f"{val_str} ± {err_str}"
-
-        except OverflowError:
-             warnings.warn(f"Overflow encountered during standard formatting for value={value}, error={error}. "
-                           "Result may be inaccurate.", RuntimeWarning)
-             return f"{value:.3g} ± {error:.2g}" # Fallback to general format
+            # Apply the vectorized formatter
+            formatted_strings_array = vectorized_core_formatter(
+                value=self.value,         # Operate on self.value
+                error=self.error,         # Operate on self.error
+                unit_symbol=self.unit,    # Pass self.unit to each internal call
+                sig_figs_error=sig_figs_error # Pass sig_figs_error to each internal call
+            )
+            return formatted_strings_array
         except Exception as e:
-             # Catch other potential errors (e.g., log10(0)) although zero error handled above
-             warnings.warn(f"Error during standard formatting for value={value}, error={error}: {e}. "
-                           "Using basic representation.", RuntimeWarning)
-             return f"{value:.3g} ± {error:.2g}" # Fallback
-
+            warnings.warn(f"Error during array formatting in to_eng_string: {e}", RuntimeWarning)
+            # Fallback: return an array of strings indicating the error
+            error_indicator_str = "FormatError"
+            return np.full(self.shape, error_indicator_str, dtype=object)
 
     # --- Metadata Propagation Helper ---
     def _propagate_metadata(self, other: Any, operation: str) -> Tuple[str, str]:
@@ -665,8 +515,8 @@ class Measurement:
 
         # Note: _get_broadcasted_operands returns (k, 0, a, sa)
         k, _, a, sa = operands # Error on k (other) is zero if it wasn't a Measurement
-        new_value = a - k 
-        new_error = sa # Error is just the error from self
+        new_value = a - k
+        new_error = _ # Error is just the error from self
 
         result = Measurement(new_value, new_error, unit=res_unit, name=res_name)
         self._check_nan_inf(result.value, result.error, op)

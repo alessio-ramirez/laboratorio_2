@@ -559,7 +559,7 @@ def plot_fit(fit_result: FitResult,
               # Use Measurement's formatting (respects sig figs from utils fix)
               # Use 2 sig figs for error in annotations by default
               try:
-                   param_str = param.to_eng_string(sig_figs_error=2)
+                   param_str = param.to_eng_string(sig_figs_error=2)[0]
               except Exception as fmt_err:
                    warnings.warn(f"Could not format parameter {name} for annotation: {fmt_err}", RuntimeWarning)
                    param_str = f"{param.value:.3g} \u00B1 {param.error:.2g} (format err)" # Fallback

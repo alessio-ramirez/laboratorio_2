@@ -25,6 +25,7 @@ from .stats import test_comp, weighted_mean
 # Output generation
 from .tables import latex_table_data, latex_table_fit
 from .plotting import plot_fit, plot_measurements
+from .interactive_plot_generator import generate_interactive_report
 
 # Utilities (can be accessed via gz.utils if needed, e.g., gz.utils.SI_PREFIXES)
 from . import utils

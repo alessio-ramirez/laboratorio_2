@@ -18,7 +18,8 @@ except ImportError:
 
 from .measurement import Measurement
 from .fitting import FitResult # Import FitResult
-from .utils import _format_value_error_eng # Import the corrected formatter
+# Ensure this import path is correct based on your project structure
+from .utils import _format_value_error_eng 
 
 # Helper function for formatting non-Measurement stats
 def _format_stat(value: Any) -> str:
@@ -30,12 +31,15 @@ def _format_stat(value: Any) -> str:
     if isinstance(value, float):
         # Format floats reasonably, e.g., 3-4 significant figures or scientific notation
         if np.isclose(value, 0.0): return "0"
-        if 0.001 <= abs(value) < 10000:
-            # Use general format, trying to get ~3-4 digits
-            return f"{value:.3g}"
+        # General format for typical range, trying for about 3-4 sig figs visible
+        if 0.001 <= abs(value) < 10000: 
+            # Using .3g might not always show trailing zeros if they are significant.
+            # A more complex formatter might be needed for perfect sig fig control here.
+            # For now, .3g is a reasonable default.
+            return f"{value:.3g}" 
         else:
             # Use scientific notation for very large/small numbers
-            return f"{value:.3e}"
+            return f"{value:.2e}" # Usually 2-3 sig figs in sci notation is good
     return str(value) # Fallback for other types
 
 def latex_table_data(*measurements: Measurement,
@@ -51,7 +55,7 @@ def latex_table_data(*measurements: Measurement,
     This function takes one or more Measurement objects and arranges them into
     a LaTeX `tabular` environment, enclosed within a `table` float environment.
     Values and errors are formatted using engineering notation (SI prefixes)
-    via `Measurement.to_eng_string`, ensuring appropriate significant figures.
+    via the library's internal formatting utilities, ensuring appropriate significant figures.
 
     Args:
         *measurements: One or more Measurement objects to include. If measurements
@@ -101,28 +105,46 @@ def latex_table_data(*measurements: Measurement,
         raise ValueError("Orientation must be 'h' (horizontal) or 'v' (vertical).")
 
     # Determine common shape and number of entries per measurement
-    shapes = [m.shape for m in measurements]
+    # This uses the .value attribute of each measurement for shape determination.
+    shapes = [m.shape for m in measurements] # m.shape is from m.value.shape
     try:
         # Use broadcasting to find common shape and check compatibility
-        common_shape = np.broadcast(*[np.empty(s) for s in shapes]).shape
-        n_entries = int(np.prod(common_shape)) if common_shape else 1 # np.prod(()) is 1.0 -> int
-        is_scalar_like = (common_shape == ())
+        # Create dummy arrays with these shapes for broadcasting check
+        dummy_arrays = [np.empty(s) for s in shapes]
+        common_shape = np.broadcast(*dummy_arrays).shape
+        n_entries = int(np.prod(common_shape)) if common_shape else 1 
+        is_scalar_like_table = (n_entries == 1) # If the whole table effectively has one entry per measurement
     except ValueError:
         raise ValueError(f"Measurement shapes {shapes} are not compatible for table generation. "
                          "They must be broadcastable to a common shape.")
 
-    # Format all measurement data points using the engineering string method
-    formatted_data = []
+    # Format all measurement data points
+    formatted_data = [] # This will store 1D arrays of strings for each measurement
+    
+    # Define the vectorized formatter for _format_value_error_eng ONCE
+    # It applies _format_value_error_eng to each element of its input arrays.
+    vectorized_core_formatter = np.vectorize(
+        _format_value_error_eng,
+        excluded=['unit_symbol', 'sig_figs_error'], # These are fixed per call below
+        otypes=[str] # Output type is string
+    )
+            
     for m in measurements:
-        # Use the Measurement's built-in formatter which calls the util function
-        formatter = np.vectorize(lambda v, e, u: m.to_eng_string(sig_figs_error=sig_figs_error, value=v, error=e, unit=u),
-                                 excluded=['sig_figs_error', 'unit'], # vectorize over value and error
-                                 otypes=[str])
-        # Ensure value/error are broadcastable to common shape before formatting
+        # `m` is one of the input Measurement objects.
+        # Broadcast its value and error to the `common_shape` determined for the table.
         val_bcast = np.broadcast_to(m.value, common_shape)
         err_bcast = np.broadcast_to(m.error, common_shape)
-        formatted_array = formatter(v=val_bcast, e=err_bcast, u=m.unit)
-        formatted_data.append(formatted_array.flatten()) # Flatten for simple row/column access
+
+        # Apply the pre-defined vectorized formatter
+        formatted_array_for_m = vectorized_core_formatter(
+            value=val_bcast,
+            error=err_bcast,
+            unit_symbol=m.unit, # Use unit from the original measurement m
+            sig_figs_error=sig_figs_error # Use sig_figs_error from latex_table_data args
+        )
+        
+        # formatted_array_for_m will have `common_shape`. Flatten it for table construction.
+        formatted_data.append(formatted_array_for_m.flatten())
 
     # --- Generate LaTeX Code ---
     latex_lines = []
@@ -132,24 +154,29 @@ def latex_table_data(*measurements: Measurement,
     # Build the tabular environment
     if orientation == 'h':
         # Horizontal: Labels are row headers. Data entries form columns.
-        n_cols = n_entries # Number of columns is the number of data points per measurement
-        # Default table spec: left-aligned label column, centered data columns
+        # n_cols is the number of data points per measurement (after broadcasting and flattening)
+        actual_n_cols = n_entries 
         if table_spec is None:
-            col_spec = '|l|' + ('c' * n_cols) + '|' if n_cols > 0 else '|l|'
+            col_spec = '|l|' + ('c' * actual_n_cols) + '|' if actual_n_cols > 0 else '|l|'
         else:
             col_spec = table_spec
         latex_lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
         latex_lines.append("\\hline")
 
-        # Optional header row for multi-entry data
-        if n_entries > 1 and not is_scalar_like:
-             header_row = ["Index"] + [str(i+1) for i in range(n_entries)]
-             latex_lines.append(" & ".join(header_row) + " \\\\\\hline") # Double hline after header
+        # Optional header row for multi-entry data (if not a scalar-like table for each measurement)
+        if n_entries > 1: # If each measurement contributes more than one cell
+             header_row_entries = [str(i+1) for i in range(n_entries)]
+             # Check if all measurements were originally scalar and got broadcast
+             all_orig_scalar = all(meas.size == 1 for meas in measurements)
+             if not (is_scalar_like_table and all_orig_scalar) : # Avoid "Index 1" if only one broadcasted column
+                header_row = ["Label"] + header_row_entries # Changed "Index" to "Label" for clarity
+                latex_lines.append(" & ".join(header_row) + " \\\\\\hline\\hline") # Double hline after header
+
 
         # Data rows: One row per measurement
         for i, label in enumerate(labels):
-            # Escape LaTeX special characters in labels (simple version)
             safe_label = label.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&')
+            # formatted_data[i] is already a flat list/array of strings
             row_content = [safe_label] + list(formatted_data[i])
             latex_lines.append(" & ".join(row_content) + " \\\\\\hline")
 
@@ -157,10 +184,9 @@ def latex_table_data(*measurements: Measurement,
 
     elif orientation == 'v':
         # Vertical: Labels are column headers. Data entries form rows.
-        n_cols = n_meas # Number of columns is the number of measurements
-        # Default table spec: centered columns for each measurement
+        actual_n_cols = n_meas # Number of columns is the number of measurements
         if table_spec is None:
-             col_spec = '|' + ('c|' * n_cols) if n_cols > 0 else '|'
+             col_spec = '|' + ('c|' * actual_n_cols) if actual_n_cols > 0 else '|'
         else:
              col_spec = table_spec
         latex_lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
@@ -168,23 +194,23 @@ def latex_table_data(*measurements: Measurement,
 
         # Header row: Measurement labels
         safe_labels = [lbl.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&') for lbl in labels]
-        latex_lines.append(" & ".join(safe_labels) + " \\\\\\hline\\hline") # Double hline after header
+        latex_lines.append(" & ".join(safe_labels) + " \\\\\\hline\\hline") 
 
-        # Data rows: One row per data point index
+        # Data rows: One row per data point index (up to n_entries)
         for i in range(n_entries):
+            # Get the i-th formatted string from each measurement's flattened list
             row_content = [formatted_data[j][i] for j in range(n_meas)]
-            latex_lines.append(" & ".join(row_content) + " \\\\") # No hline between data rows typical here
-        latex_lines.append("\\hline") # Add hline at the end of data
+            latex_lines.append(" & ".join(row_content) + " \\\\") 
+        latex_lines.append("\\hline") 
         latex_lines.append("\\end{tabular}")
 
     # Add caption if provided
     if caption:
-        # Basic escaping for caption text
         safe_caption = caption.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&')
         latex_lines.append(f"\\caption{{{safe_caption}}}")
-        # Consider adding automatic \label{tab:...} here? Maybe too complex.
-        # Example: label_base = "".join(filter(str.isalnum, caption)).lower()[:10]
-        # latex_lines.append(f"\\label{{tab:{label_base}}}")
+        # Automatic label generation could be:
+        # label_base = "".join(filter(str.isalnum, caption)).lower()[:15].replace("__", "_")
+        # if label_base: latex_lines.append(f"\\label{{tab:{label_base}}}")
 
     latex_lines.append("\\end{table}")
 
@@ -195,7 +221,6 @@ def latex_table_data(*measurements: Measurement,
         try:
             pyperclip.copy(latex_string)
         except Exception as e:
-            # Provide a more specific warning if copy fails
             warnings.warn(f"Failed to copy table to clipboard. pyperclip might not be configured correctly "
                           f"or lack permissions. Error: {e}", RuntimeWarning)
     elif copy_to_clipboard and not _HAS_PYPERCLIP:
@@ -264,7 +289,7 @@ def latex_table_fit(*fit_results: FitResult,
         raise TypeError("All arguments must be FitResult objects.")
 
     if fit_labels is None:
-        fit_labels = [f"Fit {i+1}" for i in range(n_fits)]
+        fit_labels = [f"Fit {i+1} ({res.method})" if res.method else f"Fit {i+1}" for i, res in enumerate(fit_results)]
     elif len(fit_labels) != n_fits:
         raise ValueError(f"Number of fit_labels provided ({len(fit_labels)}) must match the "
                          f"number of FitResult objects ({n_fits}).")
@@ -274,125 +299,124 @@ def latex_table_fit(*fit_results: FitResult,
 
     # --- Data Collection and Formatting ---
 
-    # Gather all unique parameter names and requested stat keys across all fits
-    all_param_names = []
-    all_stat_keys = []
+    all_param_names_ordered = [] # Maintain order of first appearance
+    seen_param_names = set()
+    all_stat_keys_ordered = [] # Maintain order from include_stats
+    seen_stat_keys = set()
+
     for res in fit_results:
-        for name in res.parameter_names:
-            if name not in all_param_names:
-                all_param_names.append(name)
-        if include_stats:
-            for key in include_stats:
-                 # Check if stat exists, is requested, and is not None in this *specific* result
-                 stat_val = getattr(res, key, None)
-                 if key not in all_stat_keys and stat_val is not None:
-                     all_stat_keys.append(key) # Add if present in at least one fit
+        for name in res.parameter_names: # Use the defined order in FitResult
+            if name not in seen_param_names:
+                all_param_names_ordered.append(name)
+                seen_param_names.add(name)
+    
+    if include_stats:
+        for key in include_stats: # Keep user's preferred order for stats
+            # Check if this stat key is present (not None) in at least one fit result
+            # to decide if it should be a column/row in the table.
+            is_key_present_in_any_fit = any(getattr(res, key, None) is not None for res in fit_results)
+            if key not in seen_stat_keys and is_key_present_in_any_fit:
+                all_stat_keys_ordered.append(key)
+                seen_stat_keys.add(key)
 
-    # Create display labels, using provided dictionaries or defaults
-    # Use internal names as fallback if no label provided
-    param_display_map = {name: param_labels.get(name, name) for name in all_param_names} if param_labels else {name: name for name in all_param_names}
 
-    # Define default pretty labels for common stats
+    param_display_map = {name: param_labels.get(name, name.replace('_', '\\_')) for name in all_param_names_ordered} if param_labels else \
+                        {name: name.replace('_', '\\_') for name in all_param_names_ordered}
+
     default_stat_display = {'chi_square': '$\\chi^2$',
-                            'dof': 'DoF', # Degrees of Freedom
-                            'reduced_chi_square': '$\\chi^2/\\nu$'} # Reduced Chi-squared (nu = DoF)
-    stat_display_map = {key: stat_labels.get(key, default_stat_display.get(key, key)) for key in all_stat_keys} if stat_labels else {key: default_stat_display.get(key, key) for key in all_stat_keys}
+                            'dof': 'DoF', 
+                            'reduced_chi_square': '$\\chi^2/\\nu$'}
+    stat_display_map = {key: stat_labels.get(key, default_stat_display.get(key, key.replace('_', '\\_'))) for key in all_stat_keys_ordered} if stat_labels else \
+                       {key: default_stat_display.get(key, key.replace('_', '\\_')) for key in all_stat_keys_ordered}
 
 
-    # Prepare the data for the table: Dict[row_label, List[formatted_entry_for_each_fit]]
-    table_data: Dict[str, List[str]] = {}
+    table_data_rows: Dict[str, List[str]] = {} # Key: display_label, Value: list of entries for each fit
 
     # Format parameters
-    for param_name in all_param_names:
-        row_label = param_display_map[param_name]
+    for param_name in all_param_names_ordered:
+        display_label = param_display_map[param_name]
         row_entries = []
         for res in fit_results:
-            param_meas = res.parameters.get(param_name) # Get Measurement object
+            param_meas = res.parameters.get(param_name) 
             if param_meas is not None:
-                # Use Measurement's formatting method with specified sig figs
-                row_entries.append(param_meas.to_eng_string(sig_figs_error=sig_figs_error))
+                # param_meas.to_eng_string() returns an np.ndarray of strings.
+                # Since parameters are scalar Measurements (size 1), it will be a 1-element array.
+                # We need the string item itself.
+                formatted_str_array = param_meas.to_eng_string(sig_figs_error=sig_figs_error)
+                row_entries.append(formatted_str_array.item()) # Get the single string
             else:
-                row_entries.append("---") # Placeholder if parameter not in this fit
-        table_data[row_label] = row_entries
+                row_entries.append("---") 
+        table_data_rows[display_label] = row_entries
 
     # Format statistics
-    for stat_key in all_stat_keys:
-        row_label = stat_display_map[stat_key]
+    for stat_key in all_stat_keys_ordered:
+        display_label = stat_display_map[stat_key]
         row_entries = []
         for res in fit_results:
             stat_val = getattr(res, stat_key, None)
-            # Use the helper function for consistent formatting of stats
             row_entries.append(_format_stat(stat_val))
-        table_data[row_label] = row_entries
+        table_data_rows[display_label] = row_entries
+    
+    # Define the final order of rows for the table
+    ordered_display_row_labels = [param_display_map[p] for p in all_param_names_ordered] + \
+                                 [stat_display_map[s] for s in all_stat_keys_ordered]
+
 
     # --- Generate LaTeX Code ---
     latex_lines = []
     latex_lines.append("\\begin{table}[htbp]")
     latex_lines.append("\\centering")
 
-    # Define the order of rows (parameters first, then statistics)
-    # Use the display names (values of the maps) as the keys for ordering
-    ordered_row_labels = list(param_display_map.values()) + list(stat_display_map.values())
-    # Filter out any row labels that ended up having no data (e.g., a stat requested but None in all fits)
-    ordered_row_labels = [label for label in ordered_row_labels if label in table_data]
-
-
-    if orientation == 'h': # Parameters/Stats as rows, Fits as columns
-        n_cols = n_fits # Number of fits determines data columns
-        # Default spec: Left-aligned label column, centered fit columns
+    if orientation == 'h': 
+        n_data_cols = n_fits 
         if table_spec is None:
-            col_spec = '|l|' + ('c' * n_cols) + '|' if n_cols > 0 else '|l|'
+            col_spec = '|l|' + ('c' * n_data_cols) + '|' if n_data_cols > 0 else '|l|'
         else:
             col_spec = table_spec
         latex_lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
         latex_lines.append("\\hline")
 
-        # Header row: Fit labels (plus a header for the first column)
-        # Escape special characters in fit labels
-        safe_fit_labels = [lbl.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&') for lbl in fit_labels]
-        header = ["Parameter/Stat"] + safe_fit_labels
-        latex_lines.append(" & ".join(header) + " \\\\\\hline\\hline") # Double hline after header
+        safe_fit_labels_display = [lbl.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&') for lbl in fit_labels]
+        header = ["Property"] + safe_fit_labels_display # Changed from "Parameter/Stat"
+        latex_lines.append(" & ".join(header) + " \\\\\\hline\\hline") 
 
-        # Data rows
-        for row_label in ordered_row_labels:
-             row_content = [row_label] + table_data[row_label]
-             latex_lines.append(" & ".join(row_content) + " \\\\\\hline") # Hline after each row
+        for row_display_label in ordered_display_row_labels:
+             # Ensure row_display_label is properly escaped if it contains LaTeX special chars not handled by maps
+             safe_row_display_label = row_display_label # Assumes maps already handled this
+             row_content_for_fits = table_data_rows[row_display_label]
+             latex_lines.append(safe_row_display_label + " & " + " & ".join(row_content_for_fits) + " \\\\\\hline")
 
         latex_lines.append("\\end{tabular}")
 
-    elif orientation == 'v': # Fits as rows, Parameters/Stats as columns
-        n_cols = len(ordered_row_labels) # Number of params/stats determines data columns
-        # Default spec: Left-aligned fit label column, centered data columns
+    elif orientation == 'v': 
+        n_data_cols = len(ordered_display_row_labels)
         if table_spec is None:
-             col_spec = '|l|' + ('c' * n_cols) + '|' if n_cols > 0 else '|l|'
+             col_spec = '|l|' + ('c' * n_data_cols) + '|' if n_data_cols > 0 else '|l|'
         else:
              col_spec = table_spec
         latex_lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
         latex_lines.append("\\hline")
 
-        # Header row: Parameter/Stat labels (already display-ready)
-        header = ["Fit Label"] + ordered_row_labels
-        latex_lines.append(" & ".join(header) + " \\\\\\hline\\hline") # Double hline after header
+        # Header row: Parameter/Stat display labels (already prepared)
+        header = ["Fit"] + ordered_display_row_labels # Changed from "Fit Label"
+        latex_lines.append(" & ".join(header) + " \\\\\\hline\\hline") 
 
-        # Data rows: One row per fit
-        for i, fit_label in enumerate(fit_labels):
-             safe_fit_label = fit_label.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&')
-             # Get the i-th entry from each column's data list
-             row_entries = [table_data[row_label][i] for row_label in ordered_row_labels]
-             row_content = [safe_fit_label] + row_entries
-             latex_lines.append(" & ".join(row_content) + " \\\\\\hline") # Hline after each fit row
+        for i, fit_disp_label in enumerate(fit_labels):
+             safe_fit_disp_label = fit_disp_label.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&')
+             row_entries_for_this_fit = [table_data_rows[prop_disp_label][i] for prop_disp_label in ordered_display_row_labels]
+             latex_lines.append(safe_fit_disp_label + " & " + " & ".join(row_entries_for_this_fit) + " \\\\\\hline")
 
         latex_lines.append("\\end{tabular}")
 
-    # Add caption if provided
     if caption:
         safe_caption = caption.replace('_', '\\_').replace('%', '\\%').replace('&', '\\&')
         latex_lines.append(f"\\caption{{{safe_caption}}}")
-        # Consider adding \label here as well
+        # label_base = "".join(filter(str.isalnum, caption)).lower()[:15].replace("__", "_")
+        # if label_base: latex_lines.append(f"\\label{{tab:fit_{label_base}}}")
+
 
     latex_lines.append("\\end{table}")
 
-    # --- Final Output and Clipboard ---
     latex_string = "\n".join(latex_lines)
 
     if copy_to_clipboard and _HAS_PYPERCLIP:
