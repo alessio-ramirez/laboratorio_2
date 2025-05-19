@@ -6,18 +6,21 @@ import numpy as np
 
 d_i = 68 #cm preso dalla base senza considerare la posizione della sorgente
 #offset fisso, amplificazione 3x
-#angolo di rotazione del ricevitore rispetto al suo angolo
+#angolo di rotazione del ricevitore rispetto al suo asse
 angolo =   [0   , 5   , 10  , 15  , 20  , 25  , 30  , 35  , 40  , 45  , 50  , 55  , 60  , 65  , 70  , 75  , 80  , 85  , 90  , 95  , 100 , 105 , 110 , 115 , 120 , 125 , 130 , 135 , 140 , 145 , 150 , 155 , 160 , 165 , 170 , 175 , 180 ]
 angolo = Measurement(angolo, 4) * np.pi / 180 #errore corrispondente alla sensibilità
 tensione = [2.97, 2.95, 2.90, 2.79, 2.67, 2.51, 2.33, 2.11, 1.92, 1.67, 1.42, 1.13, 0.89, 0.58, 0.37, 0.19, 0.07, 0.02, 0.00, 0.03, 0.12, 0.27, 0.47, 0.72, 0.98, 1.26, 1.52, 1.75, 2.00, 2.24, 2.45, 2.65, 2.81, 2.89, 2.93, 2.96, 2.97]
 tens_err = [0.02, 0.02, 0.02, 0.01, 0.02, 0.02, 0.02, 0.01, 0.01, 0.02, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.02, 0.01, 0.02, 0.02, 0.02, 0.03, 0.02, 0.02]
 tensione = Measurement(tensione, tens_err)
+angolo.name, angolo.unit = ('$\\alpha$', 'rad')
+#latex_table_data (angolo, tensione, caption='Dati sperimentali Legge di Malus', orientation='v' )
 
 def fit_(angolo, a, b):
     return a + b * (np.cos(angolo))**2
 
 fit = perform_fit(angolo, tensione, fit_)
-plot_fit(fit, save_path='./grafici/test.png', show_params=True, show_stats=True, plot_residuals=True)
+latex_table_fit(fit, fit_labels=['Fit Malus'], orientation='v', param_labels={'a': 'k', 'b': '$V_0$'})
+#plot_fit(fit, save_path='./grafici/Malus.pdf', plot_residuals=True, xlabel= '$\\alpha$ (rad)', ylabel= 'V (volt)', title='Segnale misurato al variare di $\\alpha$')
 
 #segnale proporzionale all'intensità (E^2)
 
@@ -33,9 +36,9 @@ def fit1 (x, a, b) :
 def fit2 (x, a, b) :
     return b/(1+a*x**2)
 
-fit = perform_fit(angolo, tensione, fit1)
-plot_measurements(angolo, tensione, save_path='./grafici/gg.png')
-plot_fit(fit, save_path='./grafici/test.png', show_params=True, show_stats=True, plot_residuals=True)
+#fit = perform_fit(angolo, tensione, fit1)
+#plot_measurements(angolo, tensione, save_path='./grafici/gg.png')
+#plot_fit(fit, save_path='./grafici/test.png', show_params=True, show_stats=True, plot_residuals=True)
 
 #campionare il segnale al variare della distanza su intervallo piccolo (per vedere oscillazioni onde stazionarie)
 #considerare la distanza tra i due massimi per trovare lunghezza d'onda 
@@ -45,7 +48,7 @@ tensione = [0.63, 0.59, 0.62, 0.65, 0.67, 0.68, 0.67, 0.64, 0.71, 0.68, 0.63, 0.
 tens_err = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 distanze = 105 - Measurement (d, 0.1) #cm
 tensione = Measurement(tensione, tens_err)
-plot_measurements(distanze, tensione, save_path='./grafici/distanza.png')
+#plot_measurements(distanze, tensione, save_path='./grafici/distanza.png')
 
 #campionare il segnale nei massimi al variare della distanza 
 #VALUTARE ERRORE SU DISTANZE
@@ -56,4 +59,4 @@ distanze = -(Measurement (massimi, 0.2)-105) #cm
 print(Measurement(massimi))
 print(distanze)
 tensione = Measurement( tensione, tens_err)
-plot_measurements(distanze, tensione, save_path='./grafici/distanza2.png')
+#plot_measurements(distanze, tensione, save_path='./grafici/distanza2.png')
