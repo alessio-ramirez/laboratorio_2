@@ -45,7 +45,7 @@ dati_1 = latex_table_data(angolo, tensione, orientation='v', caption='Dati relaz
 #campionare il segnale al variare della distanza su intervallo piccolo (per vedere oscillazioni onde stazionarie)
 #considerare la distanza tra i due massimi per trovare lunghezza d'onda 
 #105 - d
-d =        [15,   15.2, 15.4, 15.6, 15.8, 16,   16.2, 16.4, 16.1, 15.9, 16.6, 16.8, 17,   16.9, 17.1, 17.3, 17.5, 17.4, 17.2, 17.7, 17.9] #cm
+d =        [15,   15.2, 15.4, 15.6, 15.8, 16.1, 16.2, 16.4, 16.0, 15.9, 16.6, 16.8, 17,   16.9, 17.1, 17.3, 17.5, 17.4, 17.2, 17.7, 17.9] #cm
 tensione = [0.63, 0.59, 0.62, 0.65, 0.67, 0.68, 0.67, 0.64, 0.71, 0.68, 0.63, 0.63, 0.66, 0.65, 0.69, 0.72, 0.70, 0.72, 0.71, 0.70, 0.66]
 tens_err = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 distanze = Measurement(105 - np.array(d), errors=0.1, magnitude=-2, unit='m', name='Distanza') #cm
@@ -63,7 +63,7 @@ distanze = Measurement(105 - np.array(massimi), errors=0.2, magnitude=-2, unit='
 def amp(x, A, C):
     return A/x + C
 fit = perform_fit(distanze, tensione, amp, method='odr')
-plot_fit(fit, show_params=True, show_stats=True, save_path='./grafici/distanza_massimi.pdf')
+plot_fit(fit, save_path='./grafici/distanza_massimi.pdf')
 dati_3 = latex_table_data(distanze, tensione, orientation='v', caption='Dati relazione segnale - distanza sui massimi')
 ris_fit = latex_table_fit(fit, orientation='v', caption='risultati fit 1/r')
 pyperclip.copy(dati_1 + dati_2 + dati_3 + ris_fit)
