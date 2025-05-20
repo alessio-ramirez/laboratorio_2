@@ -13,7 +13,7 @@
 \usepackage{ragged2e} % Per \Centering nelle minipage
 \usepackage{float} % Per [htbp]
 \usepackage{fullwidth}
-\usepackage{darkmode}
+%\usepackage{darkmode} % Disabilitato come nell'originale
 %\enabledarkmode
 \usepackage[margin=2cm]{geometry}
 
@@ -83,61 +83,61 @@ e si avrebbe quindi una legge della forma
 V = V_0|\cos(\alpha)|
 \label{eq:legge_modulo_coseno}
 \end{equation}
-Una volta raccolti i dati, ne abbiamo quindi valutato l'accordo con le relazioni~\eqref{eq:legge_di_Malus}~\eqref{eq:legge_modulo_coseno}.
+Una volta raccolti i dati, ne abbiamo quindi valutato l'accordo con le \cref{eq:legge_di_Malus,eq:legge_modulo_coseno}.
 
 \subsubsection{Dati}
 Abbiamo raccolto i valori di tensione misurati in seguito ad una rotazione del ricevitore attorno al proprio asse di un angolo $\alpha$ compreso tra $\ang{0}$ e $\ang{180}$, 
-ogni $\ang{5}$\footnote{Tutti gli angoli misurati in gradi sono stati poi convertiti in radianti.}. 
-Abbiamo considerato come errore sul valore di $\alpha$ la sensibilità del goniometro montato sul ricevitore, il quale indicava angoli in multipli di $5^\circ$, 
-dunque l'errore è stato assunto pari a $3^\circ$ gradi, mentre, per quanto riguarda l'incertezza sul segnale, abbiamo osservato le fluttuazioni del valore di tensione restituito dal voltmetro. 
+ogni $\ang{5}$\footnote{Tutti gli angoli misurati in gradi sono stati poi convertiti in radianti per le analisi, e sono riportati in radianti nelle tabelle.}.
+Abbiamo considerato come errore sul valore di $\alpha$ la sensibilità del goniometro montato sul ricevitore, il quale indicava angoli in multipli di $\ang{5}$,
+dunque l'errore è stato assunto pari a $\ang{3}$ (circa $\SI{50}{\milli\radian}$), mentre, per quanto riguarda l'incertezza sul segnale, abbiamo osservato le fluttuazioni del valore di tensione restituito dal voltmetro.
 Sono stati così stimati errori variabili, differenti da misura a misura, e corrispondenti a metà dell'intervallo entro cui oscillavano i valori di tensione.
 Quanto misurato è visibile nella \Cref{tab:dati_Malus}.
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-$\alpha$ & Tensione \\\hline\hline
-0 ± 50 mrad & 2.97 ± 0.02 V \\
-87 ± 50 mrad & 2.95 ± 0.02 V \\
-175 ± 50 mrad & 2.90 ± 0.02 V \\
-262 ± 50 mrad & 2.79 ± 0.01 V \\
-349 ± 50 mrad & 2.67 ± 0.02 V \\
-436 ± 50 mrad & 2.51 ± 0.02 V \\
-524 ± 50 mrad & 2.33 ± 0.02 V \\
-611 ± 50 mrad & 2.11 ± 0.01 V \\
-698 ± 50 mrad & 1.92 ± 0.01 V \\
-785 ± 50 mrad & 1.67 ± 0.02 V \\
-873 ± 50 mrad & 1.42 ± 0.02 V \\
-960 ± 50 mrad & 1.13 ± 0.01 V \\
-1.05 ± 0.05 rad & 890 ± 10 mV \\
-1.13 ± 0.05 rad & 580 ± 10 mV \\
-1.22 ± 0.05 rad & 370 ± 10 mV \\
-1.31 ± 0.05 rad & 190 ± 10 mV \\
-1.40 ± 0.05 rad & 70 ± 10 mV \\
-1.48 ± 0.05 rad & 20 ± 10 mV \\
-1.57 ± 0.05 rad & 0 ± 10 mV \\
-1.66 ± 0.05 rad & 30 ± 10 mV \\
-1.75 ± 0.05 rad & 120 ± 10 mV \\
-1.83 ± 0.05 rad & 270 ± 10 mV \\
-1.92 ± 0.05 rad & 470 ± 10 mV \\
-2.01 ± 0.05 rad & 720 ± 10 mV \\
-2.09 ± 0.05 rad & 980 ± 10 mV \\
-2.18 ± 0.05 rad & 1.26 ± 0.01 V \\
-2.27 ± 0.05 rad & 1.52 ± 0.02 V \\
-2.36 ± 0.05 rad & 1.75 ± 0.02 V \\
-2.44 ± 0.05 rad & 2.00 ± 0.02 V \\
-2.53 ± 0.05 rad & 2.24 ± 0.02 V \\
-2.62 ± 0.05 rad & 2.45 ± 0.01 V \\
-2.71 ± 0.05 rad & 2.65 ± 0.02 V \\
-2.79 ± 0.05 rad & 2.81 ± 0.02 V \\
-2.88 ± 0.05 rad & 2.89 ± 0.02 V \\
-2.97 ± 0.05 rad & 2.93 ± 0.03 V \\
-3.05 ± 0.05 rad & 2.96 ± 0.02 V \\
-3.14 ± 0.05 rad & 2.97 ± 0.02 V \\
-\hline
-\end{tabular}
 \caption{Dati sperimentali per la verifica della Legge di Malus.}
 \label{tab:dati_Malus}
+\begin{tabular}{|c|c|}
+\hline
+$\alpha$ [\si{\radian}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{0.000 \pm 0.050}{} & \SI{2.97 \pm 0.02}{} \\
+\SI{0.087 \pm 0.050}{} & \SI{2.95 \pm 0.02}{} \\
+\SI{0.175 \pm 0.050}{} & \SI{2.90 \pm 0.02}{} \\
+\SI{0.262 \pm 0.050}{} & \SI{2.79 \pm 0.01}{} \\
+\SI{0.349 \pm 0.050}{} & \SI{2.67 \pm 0.02}{} \\
+\SI{0.436 \pm 0.050}{} & \SI{2.51 \pm 0.02}{} \\
+\SI{0.524 \pm 0.050}{} & \SI{2.33 \pm 0.02}{} \\
+\SI{0.611 \pm 0.050}{} & \SI{2.11 \pm 0.01}{} \\
+\SI{0.698 \pm 0.050}{} & \SI{1.92 \pm 0.01}{} \\
+\SI{0.785 \pm 0.050}{} & \SI{1.67 \pm 0.02}{} \\
+\SI{0.873 \pm 0.050}{} & \SI{1.42 \pm 0.02}{} \\
+\SI{0.960 \pm 0.050}{} & \SI{1.13 \pm 0.01}{} \\
+\SI{1.050 \pm 0.050}{} & \SI{0.890 \pm 0.010}{} \\ % 890 mV
+\SI{1.130 \pm 0.050}{} & \SI{0.580 \pm 0.010}{} \\ % 580 mV
+\SI{1.222 \pm 0.050}{} & \SI{0.370 \pm 0.010}{} \\ % 370 mV
+\SI{1.310 \pm 0.050}{} & \SI{0.190 \pm 0.010}{} \\ % 190 mV
+\SI{1.400 \pm 0.050}{} & \SI{0.070 \pm 0.010}{} \\ % 70 mV
+\SI{1.484 \pm 0.050}{} & \SI{0.020 \pm 0.010}{} \\ % 20 mV
+\SI{1.571 \pm 0.050}{} & \SI{0.000 \pm 0.010}{} \\ % 0 mV
+\SI{1.660 \pm 0.050}{} & \SI{0.030 \pm 0.010}{} \\ % 30 mV
+\SI{1.750 \pm 0.050}{} & \SI{0.120 \pm 0.010}{} \\ % 120 mV
+\SI{1.833 \pm 0.050}{} & \SI{0.270 \pm 0.010}{} \\ % 270 mV
+\SI{1.920 \pm 0.050}{} & \SI{0.470 \pm 0.010}{} \\ % 470 mV
+\SI{2.010 \pm 0.050}{} & \SI{0.720 \pm 0.010}{} \\ % 720 mV
+\SI{2.094 \pm 0.050}{} & \SI{0.980 \pm 0.010}{} \\ % 980 mV
+\SI{2.182 \pm 0.050}{} & \SI{1.26 \pm 0.01}{} \\
+\SI{2.270 \pm 0.050}{} & \SI{1.52 \pm 0.02}{} \\
+\SI{2.360 \pm 0.050}{} & \SI{1.75 \pm 0.02}{} \\
+\SI{2.440 \pm 0.050}{} & \SI{2.00 \pm 0.02}{} \\
+\SI{2.531 \pm 0.050}{} & \SI{2.24 \pm 0.02}{} \\
+\SI{2.620 \pm 0.050}{} & \SI{2.45 \pm 0.01}{} \\
+\SI{2.710 \pm 0.050}{} & \SI{2.65 \pm 0.02}{} \\
+\SI{2.790 \pm 0.050}{} & \SI{2.81 \pm 0.02}{} \\
+\SI{2.880 \pm 0.050}{} & \SI{2.89 \pm 0.02}{} \\
+\SI{2.970 \pm 0.050}{} & \SI{2.93 \pm 0.03}{} \\
+\SI{3.050 \pm 0.050}{} & \SI{2.96 \pm 0.02}{} \\
+\SI{3.140 \pm 0.050}{} & \SI{2.97 \pm 0.02}{} \\
+\hline
+\end{tabular}
 \end{table}
 
 \subsubsection{Analisi dati}
@@ -151,7 +151,7 @@ $\alpha$ & Tensione \\\hline\hline
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.7\textwidth]{grafici/abs_cos.pdf}
-	\caption{Fit segnale al variare dell'inclinazione del filtro polarizzatore (|cos|).}
+	\caption{Fit segnale al variare dell'inclinazione del filtro polarizzatore ($|\cos \alpha|$).}
 	\label{fig:modulo_coseno}
 \end{figure}
 
@@ -162,21 +162,22 @@ Nel realizzare l'interpolazione abbiamo considerato anche la presenza di un offs
 ma anzi poteva essere traslata o amplificata utilizzando le apposite manopole. 
 L'offset orizzontale $\alpha_0$ è stato invece considerato ipotizzando la presenza di un errore sistematico nella misura dell'angolo $\alpha$,
 dal momento che le direzioni di polarizzazione di ricevitore ed emettitore potrebbero non essere perfettamente parallele, quando si misura $\alpha = 0$.
-I parametri dei fit ottenuti mediante interpolazione sono raccolti nella \Cref{tab:fit_Malus}; i loro andamenti sono visualizzabili nei grafici nelle \Cref{fig:Malus_grafico,fig:modulo_coseno}. Si noti inoltre che il ricevitore utilizzato non aveva una manopola per l'offset utilizzabile, e in assenza del segnale dell'emettitore prevaleva il rumore di fondo. Questo ci porta a introdurre un parametro di offset nelle interpolazione $k$, come già spiegato, che ci aspettiamo essere confrontabile con lo 0, ma senza un valore atteso realmente misurabile.
+I parametri dei fit ottenuti mediante interpolazione sono raccolti nella \Cref{tab:fit_Malus}; i loro andamenti sono visualizzabili nei grafici nelle \Cref{fig:Malus_grafico,fig:modulo_coseno}. Si noti inoltre che il ricevitore utilizzato non aveva una manopola per l'offset utilizzabile, e in assenza del segnale dell'emettitore prevaleva il rumore di fondo. Questo ci porta a introdurre un parametro di offset $k$ nelle interpolazioni, come già spiegato, che ci aspettiamo essere compatibile con zero, ma senza un valore atteso realmente misurabile.
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|cccccc|}
-\hline
-Fit & k & $V_0$ & $\alpha_0$ & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Fit Malus & 6.5 ± 8.8 m & 2.999 ± 0.018 & -25.4 ± 9.1 m & 34.3 & 34 & 1.01 \\\hline
-Fit $|\cos|$ & -746 ± 79 m & 3.710 ± 0.082 & -15 ± 11 m & 51.7 & 34 & 1.52 \\\hline
-\end{tabular}
 \caption{Risultati del fit per la Legge di Malus.}
 \label{tab:fit_Malus}
+\begin{tabular}{|l|ccccccc|}
+\hline
+Fit & $k$ [\si{\milli\volt}]& $V_0$ [\si{\volt}]& $\alpha_0$ [\si{\milli\radian}]& $\chi^2$ & DoF & $\chi^2/\nu$ & p-value \\\hline\hline
+Fit Malus & \SI{6.5 \pm 8.8}{} & \SI{2.999 \pm 0.018}{} & \SI{-25.4 \pm 9.1}{} & 34.3 & 34 & 1.01 & 0.45 \\\hline
+Fit $|\cos\alpha|$ & \SI{-746 \pm 79}{} & \SI{3.710 \pm 0.082}{} & \SI{-15 \pm 11}{} & 51.7 & 34 & 1.52 & 0.02 \\\hline
+\end{tabular}
 \end{table}
 
 \subsubsection{Conclusione}
-Come si può osservare nella \Cref{tab:fit_Malus}, risulta compatibile un'interpolazione quadratica nel coseno, con un offset compatibile con 0, un $\alpha_0$ ragionevolmente piccolo, mentre la miglior interpolazione con il modulo del coseno risulta incompatibile\footnote{ Abbiamo ottenuto un $\chi^2/\nu$ di 1.5, con 34 gradi di libertà, il quale risulta incompatibile con qualsiasi soglia ragionevole per il p-value.}. Inoltre la funzione di fit assume dei valori negativi che non sono coerenti con un fenomeno fisico reale. la Legge di Malus risulta verificata, così come l'ipotesi che il segnale misurato dipenda dall'intensità dell'onda, in quanto proporzionale a $\cos^2(\alpha)$.
+Come si può osservare nella \Cref{tab:fit_Malus}, risulta compatibile un'interpolazione quadratica nel coseno, con un offset $k$ compatibile con zero e un $\alpha_0$ ragionevolmente piccolo. Al contrario, la miglior interpolazione con il modulo del coseno risulta incompatibile (abbiamo ottenuto un $\chi^2/\nu = \num{1.52}$ per \num{34} gradi di libertà, il che corrisponde a un p-value di 0.02, incompatibile con soglie di significatività ragionevoli). Inoltre, la funzione di fit $V_0 |\cos(\alpha - \alpha_0)| + k$ con i parametri trovati assume valori negativi in alcune regioni, il che non è coerente con un fenomeno fisico reale per una tensione misurata.
+La Legge di Malus risulta quindi verificata, così come l'ipotesi che il segnale misurato dipenda dall'intensità dell'onda, in quanto proporzionale a $\cos^2(\alpha)$.
 
 \subsection{Ampiezza e geometria del fascio}
 \subsubsection{Obiettivo}
@@ -194,10 +195,8 @@ L'obiettivo di questa parte dell'esperimento è caratterizzare l'ampiezza e la g
 Per studiare la dipendenza del segnale dall'angolo $\theta$, abbiamo posizionato l'emettitore e il ricevitore a una distanza fissa. Il ricevitore è stato quindi ruotato utilizzando il braccio mobile, campionando il segnale a intervalli angolari regolari, misurati utilizzando il goniometro.
 Per studiare la dipendenza del segnale dalla distanza $r$, abbiamo mantenuto invece emettitore e ricevitore lungo la guida millimetrata. In questa fase abbiamo eseguito due serie di misure:
 \begin{enumerate}
-    \item \textbf{Studio locale (nell'intorno dei massimi)} Per osservare le oscillazioni dovute alle onde stazionarie, la distanza $r$ tra emettitore e ricevitore è stata variata con piccoli incrementi (circa $\SI{2}{\milli\metre}$) in un intervallo ristretto (circa $\SI{20}{\milli\metre}$), misurando il segnale ad ogni passo. L'incertezza sulla distanza è stata stimata in $\SI{1}{\milli\metre}$, sensibilità del metro presente sulla guida.
-    
+    \item \textbf{Studio locale (nell'intorno dei massimi):} Per osservare le oscillazioni dovute alle onde stazionarie, la distanza $r$ tra emettitore e ricevitore è stata variata con piccoli incrementi (circa $\SI{2}{\milli\metre}$) in un intervallo ristretto (circa $\SI{20}{\milli\metre}$), misurando il segnale ad ogni passo. L'incertezza sulla distanza è stata stimata in $\SI{1}{\milli\metre}$, sensibilità del metro presente sulla guida.
     \item \textbf{Studio dell'andamento generale (dei massimi):} Per analizzare come l'ampiezza del segnale varia su distanze maggiori, abbiamo mosso il ricevitore lentamente lungo la guida millimetrata. Le posizioni $r$ corrispondenti ai massimi locali di intensità sono state stimate osservando le variazioni di segnale misurato. L'incertezza sulla posizione di tali massimi è stata considerata pari a $\SI{2}{\milli\metre}$, data la difficoltà nella precisa localizzazione visiva dei massimi di intensità.
-    
 \end{enumerate}
 In entrambi i casi, il guadagno del ricevitore è stato mantenuto costante per permettere il confronto tra le misure. L'incertezza sul segnale di tensione è stata stimata osservando le fluttuazioni del valore sul multimetro.
 
@@ -208,93 +207,93 @@ Infine, i dati relativi ai massimi del segnale in funzione della distanza $r$ so
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-$\theta$ & Tensione \\\hline\hline
-0 ± 50 mrad & 3.79 ± 0.01 V \\
-87 ± 50 mrad & 3.50 ± 0.02 V \\
-175 ± 50 mrad & 2.86 ± 0.01 V \\
-262 ± 50 mrad & 1.84 ± 0.01 V \\
-349 ± 50 mrad & 1.09 ± 0.01 V \\
-436 ± 50 mrad & 750 ± 10 mV \\
-524 ± 50 mrad & 400 ± 10 mV \\
-611 ± 50 mrad & 180 ± 10 mV \\
-698 ± 50 mrad & 90 ± 10 mV \\
-785 ± 50 mrad & 30 ± 10 mV \\
-873 ± 50 mrad & 20 ± 10 mV \\
--87 ± 50 mrad & 3.41 ± 0.03 V \\
--175 ± 50 mrad & 2.55 ± 0.04 V \\
--262 ± 50 mrad & 1.60 ± 0.02 V \\
--349 ± 50 mrad & 950 ± 20 mV \\
--436 ± 50 mrad & 500 ± 20 mV \\
--524 ± 50 mrad & 350 ± 30 mV \\
--611 ± 50 mrad & 140 ± 20 mV \\
--698 ± 50 mrad & 70 ± 20 mV \\
--785 ± 50 mrad & 30 ± 20 mV \\
--873 ± 50 mrad & 20 ± 10 mV \\
-\hline
-\end{tabular}
 \caption{Dati della relazione tra segnale (tensione) e angolo $\theta$ tra emettitore e ricevitore.}
 \label{tab:dati_ampgeom_angolo}
+\begin{tabular}{|c|c|}
+\hline
+$\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{0.000 \pm 0.050}{} & \SI{3.79 \pm 0.01}{} \\
+\SI{0.087 \pm 0.050}{} & \SI{3.50 \pm 0.02}{} \\
+\SI{0.175 \pm 0.050}{} & \SI{2.86 \pm 0.01}{} \\
+\SI{0.262 \pm 0.050}{} & \SI{1.84 \pm 0.01}{} \\
+\SI{0.349 \pm 0.050}{} & \SI{1.09 \pm 0.01}{} \\
+\SI{0.436 \pm 0.050}{} & \SI{0.750 \pm 0.010}{} \\ % 750 mV
+\SI{0.524 \pm 0.050}{} & \SI{0.400 \pm 0.010}{} \\ % 400 mV
+\SI{0.611 \pm 0.050}{} & \SI{0.180 \pm 0.010}{} \\ % 180 mV
+\SI{0.698 \pm 0.050}{} & \SI{0.090 \pm 0.010}{} \\ % 90 mV
+\SI{0.785 \pm 0.050}{} & \SI{0.030 \pm 0.010}{} \\ % 30 mV
+\SI{0.873 \pm 0.050}{} & \SI{0.020 \pm 0.010}{} \\ % 20 mV
+\SI{-0.087 \pm 0.050}{} & \SI{3.41 \pm 0.03}{} \\
+\SI{-0.175 \pm 0.050}{} & \SI{2.55 \pm 0.04}{} \\
+\SI{-0.262 \pm 0.050}{} & \SI{1.60 \pm 0.02}{} \\
+\SI{-0.349 \pm 0.050}{} & \SI{0.950 \pm 0.020}{} \\ % 950 mV
+\SI{-0.436 \pm 0.050}{} & \SI{0.500 \pm 0.020}{} \\ % 500 mV
+\SI{-0.524 \pm 0.050}{} & \SI{0.350 \pm 0.030}{} \\ % 350 mV
+\SI{-0.611 \pm 0.050}{} & \SI{0.140 \pm 0.020}{} \\ % 140 mV
+\SI{-0.698 \pm 0.050}{} & \SI{0.070 \pm 0.020}{} \\ % 70 mV
+\SI{-0.785 \pm 0.050}{} & \SI{0.030 \pm 0.020}{} \\ % 30 mV
+\SI{-0.873 \pm 0.050}{} & \SI{0.020 \pm 0.010}{} \\ % 20 mV
+\hline
+\end{tabular}
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-Distanza & Tensione \\\hline\hline
-900 ± 1 mm & 630 ± 10 mV \\
-898 ± 1 mm & 590 ± 10 mV \\
-896 ± 1 mm & 620 ± 10 mV \\
-894 ± 1 mm & 650 ± 10 mV \\
-892 ± 1 mm & 670 ± 10 mV \\
-890 ± 1 mm & 680 ± 10 mV \\
-888 ± 1 mm & 670 ± 10 mV \\
-886 ± 1 mm & 640 ± 10 mV \\
-889 ± 1 mm & 710 ± 10 mV \\
-891 ± 1 mm & 680 ± 10 mV \\
-884 ± 1 mm & 630 ± 10 mV \\
-882 ± 1 mm & 630 ± 10 mV \\
-880 ± 1 mm & 660 ± 10 mV \\
-881 ± 1 mm & 650 ± 10 mV \\
-879 ± 1 mm & 690 ± 10 mV \\
-877 ± 1 mm & 720 ± 10 mV \\
-875 ± 1 mm & 700 ± 10 mV \\
-876 ± 1 mm & 720 ± 10 mV \\
-878 ± 1 mm & 710 ± 10 mV \\
-873 ± 1 mm & 700 ± 10 mV \\
-871 ± 1 mm & 660 ± 10 mV \\
-\hline
-\end{tabular}
 \caption{Dati per lo studio delle onde stazionarie: segnale (tensione) in funzione della distanza $r$ emettitore-ricevitore (studio locale).}
 \label{tab:dati_ampgeom_ondestazionarie}
+\begin{tabular}{|c|c|}
+\hline
+Distanza [\si{\milli\metre}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{900 \pm 1}{} & \SI{0.630 \pm 0.010}{} \\
+\SI{898 \pm 1}{} & \SI{0.590 \pm 0.010}{} \\
+\SI{896 \pm 1}{} & \SI{0.620 \pm 0.010}{} \\
+\SI{894 \pm 1}{} & \SI{0.650 \pm 0.010}{} \\
+\SI{892 \pm 1}{} & \SI{0.670 \pm 0.010}{} \\
+\SI{890 \pm 1}{} & \SI{0.680 \pm 0.010}{} \\
+\SI{888 \pm 1}{} & \SI{0.670 \pm 0.010}{} \\
+\SI{886 \pm 1}{} & \SI{0.640 \pm 0.010}{} \\
+\SI{889 \pm 1}{} & \SI{0.710 \pm 0.010}{} \\
+\SI{891 \pm 1}{} & \SI{0.680 \pm 0.010}{} \\
+\SI{884 \pm 1}{} & \SI{0.630 \pm 0.010}{} \\
+\SI{882 \pm 1}{} & \SI{0.630 \pm 0.010}{} \\
+\SI{880 \pm 1}{} & \SI{0.660 \pm 0.010}{} \\
+\SI{881 \pm 1}{} & \SI{0.650 \pm 0.010}{} \\
+\SI{879 \pm 1}{} & \SI{0.690 \pm 0.010}{} \\
+\SI{877 \pm 1}{} & \SI{0.720 \pm 0.010}{} \\
+\SI{875 \pm 1}{} & \SI{0.700 \pm 0.010}{} \\
+\SI{876 \pm 1}{} & \SI{0.720 \pm 0.010}{} \\
+\SI{878 \pm 1}{} & \SI{0.710 \pm 0.010}{} \\
+\SI{873 \pm 1}{} & \SI{0.700 \pm 0.010}{} \\
+\SI{871 \pm 1}{} & \SI{0.660 \pm 0.010}{} \\
+\hline
+\end{tabular}
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-Distanza & Tensione \\\hline\hline
-889 ± 2 mm & 710 ± 10 mV \\
-877 ± 2 mm & 720 ± 10 mV \\
-861 ± 2 mm & 760 ± 10 mV \\
-848 ± 2 mm & 840 ± 10 mV \\
-834 ± 2 mm & 880 ± 10 mV \\
-819 ± 2 mm & 930 ± 10 mV \\
-805 ± 2 mm & 960 ± 10 mV \\
-790 ± 2 mm & 970 ± 10 mV \\
-775 ± 2 mm & 990 ± 10 mV \\
-761 ± 2 mm & 1.01 ± 0.02 V \\
-747 ± 2 mm & 1.04 ± 0.01 V \\
-718 ± 2 mm & 1.15 ± 0.01 V \\
-690 ± 2 mm & 1.23 ± 0.01 V \\
-661 ± 2 mm & 1.33 ± 0.01 V \\
-632 ± 2 mm & 1.44 ± 0.01 V \\
-603 ± 2 mm & 1.55 ± 0.01 V \\
-\hline
-\end{tabular}
 \caption{Dati della relazione tra segnale (tensione misurata ai massimi delle onde stazionarie) e distanza $r$.}
 \label{tab:dati_ampgeom_massimi_distanza}
+\begin{tabular}{|c|c|}
+\hline
+Distanza [\si{\milli\metre}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{889 \pm 2}{} & \SI{0.710 \pm 0.010}{} \\
+\SI{877 \pm 2}{} & \SI{0.720 \pm 0.010}{} \\
+\SI{861 \pm 2}{} & \SI{0.760 \pm 0.010}{} \\
+\SI{848 \pm 2}{} & \SI{0.840 \pm 0.010}{} \\
+\SI{834 \pm 2}{} & \SI{0.880 \pm 0.010}{} \\
+\SI{819 \pm 2}{} & \SI{0.930 \pm 0.010}{} \\
+\SI{805 \pm 2}{} & \SI{0.960 \pm 0.010}{} \\
+\SI{790 \pm 2}{} & \SI{0.970 \pm 0.010}{} \\
+\SI{775 \pm 2}{} & \SI{0.990 \pm 0.010}{} \\
+\SI{761 \pm 2}{} & \SI{1.01 \pm 0.02}{} \\
+\SI{747 \pm 2}{} & \SI{1.04 \pm 0.01}{} \\
+\SI{718 \pm 2}{} & \SI{1.15 \pm 0.01}{} \\
+\SI{690 \pm 2}{} & \SI{1.23 \pm 0.01}{} \\
+\SI{661 \pm 2}{} & \SI{1.33 \pm 0.01}{} \\
+\SI{632 \pm 2}{} & \SI{1.44 \pm 0.01}{} \\
+\SI{603 \pm 2}{} & \SI{1.55 \pm 0.01}{} \\
+\hline
+\end{tabular}
 \end{table}
 
 \subsubsection{Analisi dati}
@@ -313,7 +312,7 @@ Distanza & Tensione \\\hline\hline
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.8\textwidth]{grafici/distanza_massimi.pdf}
-	\caption{Fit andamento globale al variare di $r$}
+	\caption{Fit andamento globale al variare di $r$.}
 	\label{fig:distanza_massimi}
 \end{figure}
 \textbf{Dipendenza del segnale dall'angolo $\theta$:}
@@ -321,34 +320,34 @@ I dati della \Cref{tab:dati_ampgeom_angolo}, riportati nel grafico in \Cref{fig:
 
 \textbf{Onde stazionarie e stima della lunghezza d'onda $\lambda$:}
 I dati in \Cref{tab:dati_ampgeom_ondestazionarie}, rappresentati nel grafico in \Cref{fig:onde_stazionarie} mostrano chiare oscillazioni del segnale al variare della distanza $r$ su piccola scala. Queste oscillazioni sono dovute all'interferenza tra l'onda emessa e quelle riflesse tra emettitore e ricevitore, la quale porta alla formazione di onde stazionarie. Note le condizioni che descrivono l'instaurarsi di onde stazionarie, possiamo dedurre che la distanza tra due massimi (o minimi) consecutivi della figura di interferenza è pari a mezza lunghezza d'onda ($\lambda/2$).
-Analizzando le posizioni dei massimi e dei minimi più evidenti, ad esempio considerando un massimo a $\SI{890 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{876.5 \pm 0.7}{\milli\metre}$, oppure un minimo a $\SI{898 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{883 \pm 0.7}{\milli\metre}$, si osserva una distanza tra massimi e minimi consecutivi di circa $\SI{13.5 \pm 1.2}{\milli\metre}$ e $\SI{15 \pm 1.2}{\milli\metre}$. Si stima $\lambda/2 = \SI{14.25 \pm 0.87}{\milli\metre}$.
+Analizzando le posizioni dei massimi e dei minimi più evidenti, ad esempio considerando un massimo a $\SI{890 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{876.5 \pm 0.7}{\milli\metre}$ (media pesata di 877 e 876), oppure un minimo a $\SI{898 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{883 \pm 0.7}{\milli\metre}$ (media pesata di 884, 882), si osserva una distanza tra massimi consecutivi di circa $\SI{13.5 \pm 1.2}{\milli\metre}$ e tra minimi consecutivi di circa $\SI{15 \pm 1.2}{\milli\metre}$. Una stima combinata per $\lambda/2$ è $\SI{14.25 \pm 0.85}{\milli\metre}$ (media pesata e propagazione dell'errore).
 Da ciò si ricava la lunghezza d'onda:
 $\lambda = 2 \times (\lambda/2) = 2 \times \SI{14.25 \pm 0.87}{\milli\metre} = \SI{28.5 \pm 1.7}{\milli\metre} = \SI{2.85 \pm 0.17}{\centi\metre}$.
 Questo valore è compatibile con la lunghezza d'onda attesa di circa $\SI{3}{\centi\metre}$.
 
 \textbf{Andamento generale dell'ampiezza con la distanza $r$ (studio dei massimi):}
 I dati in \Cref{tab:dati_ampgeom_massimi_distanza}, rappresentati nel grafico in \Cref{fig:distanza_massimi} mostrano che l'ampiezza del segnale, proporzionale alla tensione misurata nei massimi delle onde stazionarie, aumenta al diminuire della distanza $r$. Se il fascio di microonde prodotto fosse un'onda sferica ideale e il ricevitore misurasse un segnale proporzionale all'intensità del campo elettrico, ci si aspetterebbe una dipendenza $V(r) \propto 1/r^2$. Al contrario se il fronte d'onda del fascio di microonde fosse cilindrico si avrebbe $V(r) \propto 1/r$.
-È stato tentato un fit dei dati con un modello del tipo $V(r) = C + A/r$. I parametri ottenuti per $A$ e $C$ sono riportati nella \Cref{tab:risultati_fit_ampgeom_1_su_r}. Si noti che è stato tentato un fit con $1/r^2$ che è risultato totalmente incompatibile, come si può dedurre anche dal grafico, che non è stato riportato per non rendere troppo prolissa l'analisi dati.
+È stato tentato un fit dei dati con un modello del tipo $V(r) = C + A/r$. I parametri ottenuti per $A$ e $C$ sono riportati nella \Cref{tab:risultati_fit_ampgeom_1_su_r}. Si noti che è stato tentato un fit con $1/r^2$ che è risultato totalmente incompatibile, come si può dedurre anche dal grafico (non riportato con tale fit per brevità).
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|ccccc|}
-\hline
-Fit & A & C & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Fit 1 (odr) & 1.542 ± 0.046 V/m & -998 ± 60 mV & 80.4 & 14 & 5.74 \\\hline
-\end{tabular}
 \caption{Risultati del fit dei dati di \Cref{tab:dati_ampgeom_massimi_distanza} con il modello $V(r) = C + A/r$.}
 \label{tab:risultati_fit_ampgeom_1_su_r}
+\begin{tabular}{|l|cccccc|}
+\hline
+Fit & A [\si{\volt\cdot\metre}]& C [\si{\milli\volt}]& $\chi^2$ & DoF & $\chi^2/\nu$ & p-value \\\hline\hline
+Fit $A/r+C$ & \SI{1.542 \pm 0.046}{} & \SI{-998 \pm 60}{} & 80.4 & 14 & 5.74 & 0.0001 \\\hline
+\end{tabular}
 \end{table}
 
-Il valore del $\chi^2/\nu = \num{5.74}$ per 14 gradi di libertà indica una scarsa compatibilità del modello con i dati sperimentali (p-value molto basso), il che suggerisce che il modello $A/r + C$ non è adeguato, o che vi sono problemi nella procedura di fit o nell'interpretazione dei parametri riportati.
+Il valore del $\chi^2/\nu = \num{5.74}$ per 14 gradi di libertà indica una scarsa compatibilità del modello con i dati sperimentali (p-value \num{0.0001}), il che suggerisce che il modello $A/r + C$ non è adeguato, o che vi sono problemi nella procedura di fit o nell'interpretazione dei parametri riportati.
 Come indicato nel manuale di laboratorio, effetti al contorno, la natura non puntiforme della sorgente e del ricevitore (dovuta alla presenza degli horn), e possibili riflessioni ambientali possono influenzare l'andamento del segnale, rendendo i modelli più semplici, quali quello di fronte d'onda sferico o cilindrico, inadeguati per una descrizione precisa.
 
 \subsubsection{Conclusioni}
 L'analisi dell'ampiezza e della geometria del fascio ha permesso di:
 \begin{itemize}
     \item Confermare la natura direzionale del fascio di microonde, poiché il segnale misurato decade rapidamente allontanandosi dall'asse di emissione.
-    \item Osservare chiaramente il fenomeno delle onde stazionarie dovute alle riflessioni multiple tra emettitore e ricevitore. Dall'analisi delle posizioni dei massimi e minimi di queste onde, è stato possibile stimare la lunghezza d'onda delle microonde, risultata pari a $\lambda = \SI{2.55 \pm 0.28}{\centi\metre}$. Questo valore è compatibile con quello atteso di circa $\SI{3}{\centi\metre}$.
+    \item Osservare chiaramente il fenomeno delle onde stazionarie dovute alle riflessioni multiple tra emettitore e ricevitore. Dall'analisi delle posizioni dei massimi e minimi di queste onde, è stato possibile stimare la lunghezza d'onda delle microonde, risultata pari a $\lambda = \SI{2.85 \pm 0.17}{\centi\metre}$. Questo valore è compatibile con quello atteso di circa $\SI{3}{\centi\metre}$.
     \item Studiare l'andamento dell'ampiezza del segnale (ai massimi delle onde stazionarie) in funzione della distanza $r$. Si osserva un aumento del segnale al diminuire di $r$. Tuttavia, un modello semplice di dipendenza $V(r) = C+A/r$ non descrive adeguatamente i dati, come indicato dal valore elevato del $\chi^2/\nu$ del fit e dalla problematica interpretazione dei parametri. Questa discrepanza è probabilmente dovuta alla complessità del sistema reale, che include la direttività degli horn, la loro prossimità, e possibili effetti di interferenza e diffrazione non modellizzati.
 \end{itemize}
 
@@ -362,56 +361,56 @@ Poiché avevamo a disposizione una sorgente d'onda polarizzata, ne abbiamo innan
 Per osservare la variazione del segnale trasmesso correlata ad un diverso angolo di incidenza, abbiamo disposto sorgente e ricevitore frontalmente, a distanza fissa, e abbiamo ruotato gradualmente la lastra di polietilene posta tra i due. Ciò è stato possibile in quanto la lastra si poteva montare su di un goniometro che ne misurava quindi facilmente la rotazione. A tale rotazione corrispondeva una variazione dell'angolo di incidenza sia durante la rifrazione aria-polietilene (onda in entrata nella lastra) sia durante la rifrazione polietilene-aria (onda in uscita dalla lastra). L'informazione raccolta infatti dal ricevitore, e osservata sotto forma di tensione sul display del voltmetro, era correlata a un doppio fenomeno di rifrazione, tale per cui l'onda trasmessa ritornava in asse con l'onda incidente e quindi con la congiungente emettitore-ricevitore. 
 
 \subsection{Dati}
-Al fine di studiare l'intensità dell'onda trasmessa e la sua correlazione con l'angolo di incidenza, abbiamo misurato il segnale recepito dal ricevitore al variare dell'inclinazione della lastra di polietilene. Quest'ultima è stata ruotata di $\ang{5}$ alla volta. Il segnale osservato è stato misurato come tensione, quindi in volt. Gli angoli riportati corrispondono invece all'angolo formato dalla perpendicolare alla lastra con la direzione della radiazione incidente, diretta lungo l'asse emettitore-ricevitore. Per quanto riguarda la stima delle incertezze, abbiamo considerato fisso l'errore sull'angolo di incidenza, pari alla sensibilità del goniometro: $\delta_{\theta}=\ang{2}$. Per le tensioni, invece, abbiamo valutato come oscillava il segnale restituito dal voltmetro, ottenendo errori variabili, corrispondenti a metà dell'intervallo di oscillazione. Quanto misurato per ciascuna direzione di polarizzazione è riportato nelle \Cref{tab:brewster_par,tab:brewster_perp}.
+Al fine di studiare l'intensità dell'onda trasmessa e la sua correlazione con l'angolo di incidenza, abbiamo misurato il segnale recepito dal ricevitore al variare dell'inclinazione della lastra di polietilene. Quest'ultima è stata ruotata di $\ang{5}$ alla volta. Il segnale osservato è stato misurato come tensione, quindi in volt. Gli angoli riportati corrispondono invece all'angolo formato dalla perpendicolare alla lastra con la direzione della radiazione incidente, diretta lungo l'asse emettitore-ricevitore (convertiti in radianti per coerenza). Per quanto riguarda la stima delle incertezze, abbiamo considerato fisso l'errore sull'angolo di incidenza, pari alla sensibilità del goniometro: $\delta_{\theta}=\ang{2}$ (circa $\SI{30}{\milli\radian}$). Per le tensioni, invece, abbiamo valutato come oscillava il segnale restituito dal voltmetro, ottenendo errori variabili, corrispondenti a metà dell'intervallo di oscillazione. Quanto misurato per ciascuna direzione di polarizzazione è riportato nelle \Cref{tab:brewster_par,tab:brewster_perp}.
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-$\theta$ & tensione \\\hline\hline
-0 ± 30 mrad & 2.47 ± 0.01 V \\
-87 ± 30 mrad & 2.46 ± 0.01 V \\
-175 ± 30 mrad & 2.54 ± 0.01 V \\
-262 ± 30 mrad & 2.59 ± 0.01 V \\
-349 ± 30 mrad & 2.54 ± 0.01 V \\
-436 ± 30 mrad & 2.55 ± 0.02 V \\
-524 ± 30 mrad & 2.52 ± 0.01 V \\
-611 ± 30 mrad & 2.68 ± 0.01 V \\
-698 ± 30 mrad & 3.02 ± 0.01 V \\
-785 ± 30 mrad & 3.62 ± 0.01 V \\
-873 ± 30 mrad & 4.34 ± 0.01 V \\
-960 ± 30 mrad & 4.66 ± 0.01 V \\
-1.05 ± 0.03 rad & 4.45 ± 0.01 V \\
-1.13 ± 0.03 rad & 3.00 ± 0.01 V \\
-1.22 ± 0.03 rad & 1.58 ± 0.01 V \\
-\hline
-\end{tabular}
 \caption{Dati di trasmissione con polarizzazione parallela al piano di incidenza.}
 \label{tab:brewster_par}
+\begin{tabular}{|c|c|}
+\hline
+$\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{0.000 \pm 0.030}{} & \SI{2.47 \pm 0.01}{} \\
+\SI{0.087 \pm 0.030}{} & \SI{2.46 \pm 0.01}{} \\
+\SI{0.175 \pm 0.030}{} & \SI{2.54 \pm 0.01}{} \\
+\SI{0.262 \pm 0.030}{} & \SI{2.59 \pm 0.01}{} \\
+\SI{0.349 \pm 0.030}{} & \SI{2.54 \pm 0.01}{} \\
+\SI{0.436 \pm 0.030}{} & \SI{2.55 \pm 0.02}{} \\
+\SI{0.524 \pm 0.030}{} & \SI{2.52 \pm 0.01}{} \\
+\SI{0.611 \pm 0.030}{} & \SI{2.68 \pm 0.01}{} \\
+\SI{0.698 \pm 0.030}{} & \SI{3.02 \pm 0.01}{} \\
+\SI{0.785 \pm 0.030}{} & \SI{3.62 \pm 0.01}{} \\
+\SI{0.873 \pm 0.030}{} & \SI{4.34 \pm 0.01}{} \\
+\SI{0.960 \pm 0.030}{} & \SI{4.66 \pm 0.01}{} \\
+\SI{1.050 \pm 0.030}{} & \SI{4.45 \pm 0.01}{} \\
+\SI{1.130 \pm 0.030}{} & \SI{3.00 \pm 0.01}{} \\
+\SI{1.220 \pm 0.030}{} & \SI{1.58 \pm 0.01}{} \\
+\hline
+\end{tabular}
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-$\theta$ & tensione \\\hline\hline
-0 ± 30 mrad & 2.50 ± 0.01 V \\
-87 ± 30 mrad & 2.55 ± 0.01 V \\
-175 ± 30 mrad & 2.84 ± 0.01 V \\
-262 ± 30 mrad & 2.90 ± 0.01 V \\
-349 ± 30 mrad & 2.76 ± 0.01 V \\
-436 ± 30 mrad & 2.66 ± 0.01 V \\
-524 ± 30 mrad & 2.65 ± 0.01 V \\
-611 ± 30 mrad & 2.52 ± 0.01 V \\
-698 ± 30 mrad & 2.56 ± 0.01 V \\
-785 ± 30 mrad & 2.71 ± 0.02 V \\
-873 ± 30 mrad & 2.86 ± 0.02 V \\
-960 ± 30 mrad & 3.17 ± 0.02 V \\
-1.05 ± 0.03 rad & 2.64 ± 0.02 V \\
-\hline
-\end{tabular}
 \caption{Dati di trasmissione con polarizzazione perpendicolare al piano di incidenza.}
 \label{tab:brewster_perp}
+\begin{tabular}{|c|c|}
+\hline
+$\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{0.000 \pm 0.030}{} & \SI{2.50 \pm 0.01}{} \\
+\SI{0.087 \pm 0.030}{} & \SI{2.55 \pm 0.01}{} \\
+\SI{0.175 \pm 0.030}{} & \SI{2.84 \pm 0.01}{} \\
+\SI{0.262 \pm 0.030}{} & \SI{2.90 \pm 0.01}{} \\
+\SI{0.349 \pm 0.030}{} & \SI{2.76 \pm 0.01}{} \\
+\SI{0.436 \pm 0.030}{} & \SI{2.66 \pm 0.01}{} \\
+\SI{0.524 \pm 0.030}{} & \SI{2.65 \pm 0.01}{} \\
+\SI{0.611 \pm 0.030}{} & \SI{2.52 \pm 0.01}{} \\
+\SI{0.698 \pm 0.030}{} & \SI{2.56 \pm 0.01}{} \\
+\SI{0.785 \pm 0.030}{} & \SI{2.71 \pm 0.02}{} \\
+\SI{0.873 \pm 0.030}{} & \SI{2.86 \pm 0.02}{} \\
+\SI{0.960 \pm 0.030}{} & \SI{3.17 \pm 0.02}{} \\
+\SI{1.050 \pm 0.030}{} & \SI{2.64 \pm 0.02}{} \\
+\hline
+\end{tabular}
 \end{table}
 
 \subsection{Analisi dati}
@@ -428,21 +427,21 @@ $\theta$ & tensione \\\hline\hline
 	\label{fig:brewster_perp_grafico}
 \end{figure}
 
-L'andamento del segnale ricevuto al variare di $\theta$ con polarizzazione parallela al piano di incidenza è visualizzabile nel grafico in \Cref{fig:brewster_par_grafico}. Il massimo del segnale trasmesso si ha in corrispondenza dell'angolo di Brewster, il cui valore è stato ottenuto attuando un'interpolazione parabolica sui punti campionati in prossimità del massimo. Si è utilizzata una relazione del tipo $y = ax^2 + bx +c$, con $y=V$ (tensione) e $x=\theta$ (angolo di incidenza), da cui si sono ricavati i parametri $a, b, c$ e i relativi errori, poi utilizzati per determinare la posizione del massimo. Più precisamente:
+L'andamento del segnale ricevuto al variare di $\theta$ con polarizzazione parallela al piano di incidenza è visualizzabile nel grafico in \Cref{fig:brewster_par_grafico}. Il massimo del segnale trasmesso si ha in corrispondenza dell'angolo di Brewster, il cui valore è stato ottenuto attuando un'interpolazione parabolica sui punti campionati in prossimità del massimo. Si è utilizzata una relazione del tipo $y = ax^2 + bx +c$, con $y=V$ (tensione, in \si{\volt}) e $x=\theta$ (angolo di incidenza, in \si{\radian}), da cui si sono ricavati i parametri $a, b, c$ e i relativi errori, poi utilizzati per determinare la posizione del massimo. Più precisamente:
 \begin{align}
   \theta_{B} = -\dfrac{b}{2a} \qquad & \text{e}\qquad
   \delta_{\theta_{B}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}. \label{eq:angolo_brewster_calc}
 \end{align}
-Nella \Cref{tab:fit_brewster} sono raccolti i valori dei parametri di fit e la stima dell'angolo di Brewster.
+Nella \Cref{tab:fit_brewster} sono raccolti i valori dei parametri di fit e la stima dell'angolo di Brewster (convertito in gradi per confronto).
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|ccccccc|}
-\hline
-Risultati & a & b & c & $\chi^2$ & DoF & $\chi^2/\nu$ & $\theta_B$ [\si{\degree}]\\\hline\hline
-Fit Brewster & -42.9 ± 4.3 & 81.9 ± 8.4 & -34.4 ± 4.1 & 0.803 & 3 & 0.268 & 54.69 ± 7.84 \\\hline
-\end{tabular}
 \caption{Risultati del fit per la stima dell'angolo di Brewster.}
 \label{tab:fit_brewster}
+\begin{tabular}{|l|cccccccc|}
+\hline
+Risultati & $a$ [\si{\volt\per\radian\squared}]& $b$ [\si{\volt\per\radian}]& $c$ [\si{\volt}]& $\chi^2$ & DoF & $\chi^2/\nu$ & p-value & $\theta_B$ [\si{\degree}]\\\hline\hline
+Fit Brewster & \SI{-42.9 \pm 4.3}{} & \SI{81.9 \pm 8.4}{} & \SI{-34.4 \pm 4.1}{} & 0.803 & 3 & 0.268 & 0.85 & \SI{54.69 \pm 7.84}{} \\\hline
+\end{tabular}
 \end{table}
 Per quanto riguarda invece le misurazioni effettuate con polarizzazione perpendicolare al piano di incidenza, come è possibile osservare dal grafico in \Cref{fig:brewster_perp_grafico}, si è osservato un segnale oscillante al variare di $\theta$. Inoltre, ponendosi più volte in corrispondenza dello stesso angolo si potevano misurare valori di tensione differenti. Abbiamo quindi interpretato quanto misurato come segnale di fondo. Tale ipotesi deriva anche dal fatto che le tensioni misurate con polarizzazione perpendicolare al piano di incidenza assumevano valori compresi tra $\SI{2.5}{\volt}$ e $\SI{3}{\volt}$, compatibili con il plateau iniziale rilevato per polarizzazione parallela al piano di incidenza.
 
@@ -450,6 +449,8 @@ Per quanto riguarda invece le misurazioni effettuate con polarizzazione perpendi
 Il valore dell'angolo di Brewster ricavato sperimentalmente, $\theta_B^{\text{sper}}$, è stato infine confrontato con quello atteso, $\theta_B^{\text{att}}$. Se si ha passaggio di un'onda elettromagnetica da un mezzo con indice di rifrazione minore ad uno con indice di rifrazione maggiore, come avviene durante l'ingresso dell'onda nella lastra, l'angolo di Brewster risulta pari a $\theta_B^{\text{att}} = \arctan\left(\frac{n_2}{n_1}\right)$, dove $n_1 = 1$ indica l'indice di rifrazione dell'aria, mentre $n_2 \approx 1.5$ corrisponde all'indice di rifrazione del polietilene. Il confronto tra $\theta_B^{\text{sper}}$ e $\theta_B^{\text{att}}$ è stato realizzato mediante z-test, con $z = \dfrac{|\theta_B^{\text{sper}} - \theta_B^{\text{att}}|}{\delta_{\theta_B^{\text{sper}}}}$. I suoi risultati sono riportati nella \Cref{tab:brewster_compatibilita}. Sebbene sia presente accordo tra quanto misurato e quanto atteso, è importante sottolineare che il segnale studiato non corrispondeva esattamente al segnale trasmesso in seguito al passaggio aria-polietilene, ma alla somma del segnale trasmesso per onda in entrata e in uscita dalla lastra di polietilene.
 \begin{table}[htbp] 
 \centering
+\caption{Risultati del test di compatibilità tra $\theta_B^{\text{sper}}$ e $\theta_B^{\text{att}}$.}
+\label{tab:brewster_compatibilita}
 \begin{tabular}{|l|c|}
 \hline
 $\theta_{att}$ [\si{\degree}] & Probabilità entro z sigma \\
@@ -457,8 +458,6 @@ $\theta_{att}$ [\si{\degree}] & Probabilità entro z sigma \\
 56.31 & 0.58 \\
 \bottomrule
 \end{tabular}
-\caption{Risultati del test di compatibilità tra $\theta_B^{\text{sper}}$ e $\theta_B^{\text{att}}$.}
-\label{tab:brewster_compatibilita}
 \end{table}
 
 
@@ -466,98 +465,101 @@ $\theta_{att}$ [\si{\degree}] & Probabilità entro z sigma \\
 \subsection{Obiettivo}
 L'obiettivo di questa esperienza è ricostruire la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che attraversa una doppia fenditura ed incide su uno schermo.
 \subsection{Metodo}
-Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde nella posizione fissa $x=0cm$ ed il ricevitore ad una posizione fissa $x=110cm$ rispetto al riferimento montato sull'apparato. Il campionamento è stato effettuato mantenendo sorgente e ricevitore a distanza fissa e variando unicamente l'angolo del ricevitore. Sopra al supporto centrale abbiamo costruito una doppia fenditura composta da tre lamine metalliche fissate su alcuni supporti magnetici. Le fenditure hanno ampiezza $a=1,5cm$ e sono poste a una distanza $d=(7,5\pm0.1)cm$ fra di loro. Possiamo supporre che tali lamine riflerttano la quasi totalità del segnale elettromagnetico incidente ($R\approx0$ ; $T\approx1$), di conseguenza il segnale misurato dal ricevitore sarà influenzato unicamente dalla radiazione passante per le due fenditure. L'ampiezza delle fenditure è stata scelta in modo da essere simile alla lunghezza d'onda delle microonde, nel caso dell'emettitore presente in laboratorio si ha $\lambda=3cm$.
-Per l'esperienza abbaimo tenuto un'amplificazione del segnale del ricevitore di $1x$.
+Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde nella posizione fissa $x=\SI{0}{\centi\metre}$ ed il ricevitore ad una posizione fissa $x=\SI{110}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Il campionamento è stato effettuato mantenendo sorgente e ricevitore a distanza fissa e variando unicamente l'angolo del ricevitore. Sopra al supporto centrale abbiamo costruito una doppia fenditura composta da tre lamine metalliche fissate su alcuni supporti magnetici. Le fenditure hanno ampiezza $a=\SI{1.5}{\centi\metre}$ e sono poste a una distanza $d=\SI{7.5 \pm 0.1}{\centi\metre}$ fra di loro. Possiamo supporre che tali lamine riflettano la quasi totalità del segnale elettromagnetico incidente ($R\approx0$ ; $T\approx1$), di conseguenza il segnale misurato dal ricevitore sarà influenzato unicamente dalla radiazione passante per le due fenditure. L'ampiezza delle fenditure è stata scelta in modo da essere simile alla lunghezza d'onda delle microonde, nel caso dell'emettitore presente in laboratorio si ha $\lambda \approx \SI{3}{\centi\metre}$.
+Per l'esperienza abbiamo tenuto un'amplificazione del segnale del ricevitore di $1\times$.
 \subsection{Dati}
-Nella tabella \ref{tab: dati doppia fenditura} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore mediante un multimetro da banco in funzione dell'angolo di inclinazione del ricevitore stesso rispetto alle fenditure. 
+Nella \Cref{tab:dati_doppia_fenditura} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore mediante un multimetro da banco in funzione dell'angolo di inclinazione del ricevitore stesso rispetto alle fenditure.
 \begin{table}[H]
 \centering
+\caption{Tensioni in funzione degli angoli nella doppia fenditura.}
+\label{tab:dati_doppia_fenditura}
 \begin{tabular}{|c|c|}
 \hline
-$\theta\,(\text{rad})$ & Tensione \\
+$\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\
 \hline
-$0.000 \pm 0.035$ & $0.66 \pm 0.01\,\text{V}$ \\
-$0.087 \pm 0.035$ & $0.10 \pm 0.01\,\text{V}$ \\
-$0.052 \pm 0.035$ & $0.32 \pm 0.01\,\text{V}$ \\
-$0.122 \pm 0.035$ & $0.03 \pm 0.01\,\text{V}$ \\
-$0.175 \pm 0.035$ & $0.04 \pm 0.01\,\text{V}$ \\
-$0.227 \pm 0.035$ & $0.18 \pm 0.01\,\text{V}$ \\
-$0.262 \pm 0.035$ & $0.32 \pm 0.02\,\text{V}$ \\
-$0.297 \pm 0.035$ & $0.66 \pm 0.03\,\text{V}$ \\
-$0.349 \pm 0.035$ & $0.66 \pm 0.03\,\text{V}$ \\
-$0.401 \pm 0.035$ & $0.49 \pm 0.03\,\text{V}$ \\
-$0.436 \pm 0.035$ & $0.28 \pm 0.01\,\text{V}$ \\
-$0.488 \pm 0.035$ & $0.13 \pm 0.01\,\text{V}$ \\
-$0.524 \pm 0.035$ & $0.01 \pm 0.01\,\text{V}$ \\
-$0.560 \pm 0.035$ & $0.00 \pm 0.01\,\text{V}$ \\
-$0.611 \pm 0.035$ & $0.07 \pm 0.02\,\text{V}$ \\
-$0.646 \pm 0.035$ & $0.12 \pm 0.01\,\text{V}$ \\
-$0.698 \pm 0.035$ & $0.15 \pm 0.01\,\text{V}$ \\
-$0.733 \pm 0.035$ & $0.43 \pm 0.03\,\text{V}$ \\
-$0.785 \pm 0.035$ & $0.65 \pm 0.03\,\text{V}$ \\
+\SI{0.000 \pm 0.035}{} & \SI{0.66 \pm 0.01}{} \\
+\SI{0.087 \pm 0.035}{} & \SI{0.10 \pm 0.01}{} \\
+\SI{0.052 \pm 0.035}{} & \SI{0.32 \pm 0.01}{} \\
+\SI{0.122 \pm 0.035}{} & \SI{0.03 \pm 0.01}{} \\
+\SI{0.175 \pm 0.035}{} & \SI{0.04 \pm 0.01}{} \\
+\SI{0.227 \pm 0.035}{} & \SI{0.18 \pm 0.01}{} \\
+\SI{0.262 \pm 0.035}{} & \SI{0.32 \pm 0.02}{} \\
+\SI{0.297 \pm 0.035}{} & \SI{0.66 \pm 0.03}{} \\
+\SI{0.349 \pm 0.035}{} & \SI{0.66 \pm 0.03}{} \\
+\SI{0.401 \pm 0.035}{} & \SI{0.49 \pm 0.03}{} \\
+\SI{0.436 \pm 0.035}{} & \SI{0.28 \pm 0.01}{} \\
+\SI{0.488 \pm 0.035}{} & \SI{0.13 \pm 0.01}{} \\
+\SI{0.524 \pm 0.035}{} & \SI{0.01 \pm 0.01}{} \\
+\SI{0.560 \pm 0.035}{} & \SI{0.00 \pm 0.01}{} \\
+\SI{0.611 \pm 0.035}{} & \SI{0.07 \pm 0.02}{} \\
+\SI{0.646 \pm 0.035}{} & \SI{0.12 \pm 0.01}{} \\
+\SI{0.698 \pm 0.035}{} & \SI{0.15 \pm 0.01}{} \\
+\SI{0.733 \pm 0.035}{} & \SI{0.43 \pm 0.03}{} \\
+\SI{0.785 \pm 0.035}{} & \SI{0.65 \pm 0.03}{} \\
 \hline
 \end{tabular}
-\caption{Tensioni in funzione degli angoli nella doppia fenditura.}
-\label{tab: dati doppia fenditura}
 \end{table}
-Gli errori sugli angoli sono stati scelti valutando la sensibilità del goniometro montato sul supporto mentre gli errori sulle tensioni sono stati valutati considerando l'oscillazione dei valori misurati. Il campionamento è stato effettuato per angoli $\theta$ compresi tra $0^\circ$ e $45^\circ$. Questa scelta è stata fatta per limiti strutturali dell'apparato, per il quale abbiamo ritenuto inaffidabili i dati misurati oltre tale angolo. L'apparato avrebbe consentito la misurazione di angoli compresi fra $0^\circ$ e $-45^\circ$, tuttavia non è stato possibile effettuare tali misure per questioni tempistiche.
+Gli errori sugli angoli sono stati scelti valutando la sensibilità del goniometro montato sul supporto ($\ang{2}$ o $\SI{0.035}{\radian}$) mentre gli errori sulle tensioni sono stati valutati considerando l'oscillazione dei valori misurati. Il campionamento è stato effettuato per angoli $\theta$ compresi tra $\ang{0}$ e $\ang{45}$. Questa scelta è stata fatta per limiti strutturali dell'apparato, per il quale abbiamo ritenuto inaffidabili i dati misurati oltre tale angolo. L'apparato avrebbe consentito la misurazione di angoli compresi fra $\ang{0}$ e $\ang{-45}$, tuttavia non è stato possibile effettuare tali misure per questioni tempistiche.
 \subsection{Analisi dati}
-Studiando l'andamento della tensione indotta sul ricevitore in funzione dell'angolo ci aspettiamo di trovare una figura formata da massimi e minimni. In particolare ci aspettiamo di trovare una figura di diffrazione composta da massimi e minimi che si alternano a frequenza costante ma con ampiezza decrescente con l'aumento del modulo dell'angolo. 
+Studiando l'andamento della tensione indotta sul ricevitore in funzione dell'angolo ci aspettiamo di trovare una figura formata da massimi e minimi. In particolare ci aspettiamo di trovare una figura di interferenza composta da massimi e minimi che si alternano a frequenza costante ma con ampiezza decrescente con l'aumento del modulo dell'angolo.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{grafici/max_doppiafenditura.pdf}
-    \caption{Grafico doppia fenditura}
-    \label{fig:enter-label}
+    \caption{Grafico interferenza da doppia fenditura.}
+    \label{fig:grafico_doppia_fenditura}
 \end{figure}
 Per una figura di interferenza a doppia fenditura con radiazione che incide su schermo piano ci aspettiamo una legge di intensità in funzione dell'angolo del tipo: 
-\begin{center}
-    $I(\theta)=4I_0cos^2(\pi\frac{d sin(\theta)}{\lambda})$
-\end{center}
-I massimi si avranno quando $cos^2(\pi\frac{dsin\theta}{\lambda})=1$ ovvero quando $dsin(\theta)=k\lambda$. Nel nostro caso non possiamo considerare l'approssimazione di schermo piano per tutti i dati. Possiamo ritenere affidabile questa formula solo per il primo massimo. possiamo così ricavare la lunghezza d'onda del fascio incidente considerando un valore di $k=1$ e $\theta$ in corrispondenza del primo massimo.
-Non consideriamo il massimo in $\theta=0$ poichè i dati a nostra disposizione rappresentano solo metà del picco. Per ricavare l'angolo in corrispondenza del quale si trova il massimo, utilizziamo un'interpolazione parabolica del tipo $y=ax^2+bx+c$ grazie alla quale possiamo ricavare i parametri della parabola a,b,c e dunque l'angolo $\theta_{max}$ per il quale si ha il massimo. in particolare avremo:
+\begin{equation}
+    I(\theta)=4I_0\cos^2\left(\pi\frac{d \sin(\theta)}{\lambda}\right)
+    \label{eq:doppia_fenditura_intensita}
+\end{equation}
+I massimi si avranno quando $\cos^2\left(\pi\frac{d\sin\theta}{\lambda}\right)=1$ ovvero quando $d\sin(\theta)=k\lambda$, con $k \in \mathbb{Z}$. Nel nostro caso non possiamo considerare l'approssimazione di schermo piano per tutti i dati. Possiamo ritenere affidabile questa formula solo per il primo massimo ($k=1$). Possiamo così ricavare la lunghezza d'onda del fascio incidente considerando un valore di $k=1$ e $\theta$ in corrispondenza del primo massimo (diverso da zero).
+Non consideriamo il massimo in $\theta=0$ poiché i dati a nostra disposizione rappresentano solo metà del picco. Per ricavare l'angolo in corrispondenza del quale si trova il massimo successivo, utilizziamo un'interpolazione parabolica del tipo $y=ax^2+bx+c$ (con $x=\theta$ in radianti e $y=V$ in volt) grazie alla quale possiamo ricavare i parametri della parabola a,b,c e dunque l'angolo $\theta_{max}$ per il quale si ha il massimo. In particolare avremo:
 \begin{align}
-  \theta_{max} = -\dfrac{b}{2a} \qquad & \text{e}\qquad
-  \delta_{\theta_{max}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}. \label{eq:angolo_max}
+  \theta_{\text{max}} = -\dfrac{b}{2a} \qquad & \text{e}\qquad
+  \delta_{\theta_{\text{max}}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}. \label{eq:angolo_max_doppia_fenditura}
 \end{align}
-Dall'interpolazione parabolica otteniamo i seguenti risultati, visibili in tabella \ref{tab:fit.doppiafenditura}:
+Dall'interpolazione parabolica otteniamo i seguenti risultati, visibili nella \Cref{tab:fit_doppia_fenditura}:
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|ccccccc|}
+\caption{Risultati fit massimo di interferenza per $k=1$.}
+\label{tab:fit_doppia_fenditura}
+\begin{tabular}{|l|cccccccc|}
 \hline
-Fit & a & b & c & $\chi^2$ & DoF & $\chi^2/\nu$ & $\theta_{\textbf{max}}$ [\si{\degree}] \\\hline\hline
-Fit max di interferenza & -47.3 ± 8.8 & 31.7 ± 5.9 & -4.61 ± 0.97 & 0.476 & 3 & 0.159 & 19.20 ± 5.05\\\hline
+Fit & $a$ [\si{\volt\per\radian\squared}]& $b$ [\si{\volt\per\radian}]& $c$ [\si{\volt}]& $\chi^2$ & DoF & $\chi^2/\nu$ & p-value & $\theta_{\textbf{max}}$ [\si{\degree}] \\\hline\hline
+Fit max di interferenza & \SI{-47.3 \pm 8.8}{} & \SI{31.7 \pm 5.9}{} & \SI{-4.61 \pm 0.97}{} & 0.476 & 3 & 0.159 & 0.92 & \SI{19.20 \pm 5.05}{}\\\hline
 \end{tabular}
-\caption{Risultati fit massimo di interferenza per k=1}
-\label{tab:fit.doppiafenditura}
 \end{table}
 Dall'angolo massimo possiamo ricavare la lunghezza d'onda del fascio ed il relativo errore che saranno:
-\begin{center}
 \begin{minipage}{0.45\textwidth}
 \centering
-$\lambda = \frac{d \sin(\theta)}{k}$
+$\lambda = \frac{d \sin(\theta_{\text{max}})}{k}$
 \end{minipage}
 \hfill
 \begin{minipage}{0.45\textwidth}
 \centering
-$\delta_{\lambda} = \sqrt{ \delta_{\theta_{max}}^2 \left( \frac{d \cos(\theta_{max})}{k} \right)^2 + \delta_d^2 \left( \frac{\sin(\theta_{max})}{k} \right)^2 }$
+$\delta_{\lambda} = \sqrt{ \delta_{\theta_{\text{max}}}^2 \left( \frac{d \cos(\theta_{\text{max}})}{k} \right)^2 + \delta_d^2 \left( \frac{\sin(\theta_{\text{max}})}{k} \right)^2 }$
 \end{minipage}
-\end{center}
-Per il primo massimo avremo $k=1$ e dunque si avrà:
+\vspace{\baselineskip}
+
+Per il primo massimo ($k=1$) e convertendo $\theta_{\text{max}}$ in radianti per il calcolo, si avrà:
 \begin{table}[H]
 \centering
+\caption{Valore di $\lambda$ con errore.}
+\label{tab:valori_di_lambda}
 \begin{tabular}{|c|c|}
 \hline
-$\lambda\,(\text{cm})$ & $\text{err}\,\lambda\,(\text{cm})$ \\
+$\lambda$ [\si{\centi\metre}] & $\delta\lambda$ [\si{\centi\metre}] \\
 \hline
-$2.47$ & $0.62$ \\
+\num{2.47} & \num{0.62} \\
 \hline
 \end{tabular}
-\caption{Valore di $\lambda$ con errore.}
-\label{tab:valori di lambda}
 \end{table}
-La compatibilità fra $\lambda_{sper}$ e $\lambda_{att}$ è stata valutata mediante il $t$ test con $t=\frac{|\lambda_{att}-\lambda_{sper}|}{\delta_{\lambda}}$. i risultati sono riportati nella tabella \ref{tab:test compatibilità doppia fenditura}:
+La compatibilità fra $\lambda_{\text{sper}} = \SI{2.47 \pm 0.62}{\centi\metre}$ e $\lambda_{\text{att}} \approx \SI{3}{\centi\metre}$ è stata valutata mediante il test $t$ con $t=\frac{|\lambda_{\text{att}}-\lambda_{\text{sper}}|}{\delta_{\lambda}}$. I risultati sono riportati nella \Cref{tab:test_compatibilita_doppia_fenditura}:
 \begin{table}[H]
 \centering
+\caption{Test di compatibilità per $\lambda$ da doppia fenditura.}
+\label{tab:test_compatibilita_doppia_fenditura}
 \begin{tabular}{|c|c|}
 \hline
 $t$ & Probabilità entro t sigma \\
@@ -565,60 +567,58 @@ $t$ & Probabilità entro t sigma \\
 $0.85$ & $0.60$ \\
 \hline
 \end{tabular}
-\caption{t test doppia fenditura.}
-\label{tab:test compatibilità doppia fenditura}
 \end{table}
 
 
 \subsection{Conclusioni}
- Basandoci sui dati ottenuti dagli esperimenti e dai test di compatibilità possiamo affermare che il valore di $\lambda$ ricavato mediante la legge attesa nel limite di $\theta$ piccolo è compatibile con il valore di $\lambda$ atteso. In generale non abbiamo però una legge specifica su cui basarci, infatti il campionamento non è stato effettuato su uno schermo piano bensì su una semicirconferenza, inoltre l'emissione dell'onda non è ideale e gli effetti di bordo non sono trascurabili, nè per quanto riguarda l'emettitore nè per quanto riguarda il ricevitore. Dunque dobbiamo limitarci a fornire unicamente un'osservazione qualitativa globale del fenomeno. In particolare possiamo riconoscere 3 massimi e 2 minimi che si alternano ad intervalli angolari non regolari. Inoltre si ha tensione massima per un angolo di $0^\circ$. In cocnclusione possiamo affermare che esiste una relazione periodica fra l'angolo e l'intensità misurata, dunque si ha un effetto di diffrazione evidente.
+Basandoci sui dati ottenuti dagli esperimenti e dai test di compatibilità possiamo affermare che il valore di $\lambda$ ricavato mediante la legge attesa nel limite di $\theta$ piccolo è compatibile con il valore di $\lambda$ atteso ($\approx \SI{3}{\centi\metre}$). In generale non abbiamo però una legge specifica su cui basarci per l'intera figura, infatti il campionamento non è stato effettuato su uno schermo piano bensì su una semicirconferenza, inoltre l'emissione dell'onda non è ideale e gli effetti di bordo non sono trascurabili, né per quanto riguarda l'emettitore né per quanto riguarda il ricevitore. Dunque dobbiamo limitarci a fornire unicamente un'osservazione qualitativa globale del fenomeno. In particolare possiamo riconoscere 3 massimi e 2 minimi che si alternano ad intervalli angolari non regolari. Inoltre si ha tensione massima per un angolo di $\ang{0}$. In conclusione possiamo affermare che esiste una relazione periodica fra l'angolo e l'intensità misurata, dunque si ha un effetto di interferenza evidente.
 
 \section{Interferometro di Fabry-Perot}
 \subsection{Obiettivo}
-L'obiettivo di questa esperienza è studiare la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che attraversa una cavità di Fabry-Perot ed incide su uno schermo.
+L'obiettivo di questa esperienza è studiare la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che attraversa una cavità di Fabry-Perot.
 \subsection{Metodo}
-Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde ad una posizione fissa pari a $x=30cm$  ed il ricevitore ad una posizione fissa di $x=104cm$ rispetto al riferimento montato sull'apparato. Nel mezzo abbiamo creato una cavità di Fabry-Perot composta da due lamine semiriflettenti montate su supporti magnetici e poste ad una  distanza $d$ fra di loro. Lo schema della configurazione è rappresentato nell'immagine \ref{fig:Configurazione Fabry-Perot}. I supporti sono stati montati da parti opposte rispetto al supporto centrale in modo da poter campionare una distanza maggiore. Le lamine, l'emettitore ed il ricevitore sono stati posizionati in modo da essere allineati, ciò è stato possibile grazie al goniometro montato sull'apparato.
+Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde ad una posizione fissa pari a $x=\SI{30}{\centi\metre}$ ed il ricevitore ad una posizione fissa di $x=\SI{104}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Nel mezzo abbiamo creato una cavità di Fabry-Perot composta da due lamine semiriflettenti montate su supporti magnetici e poste ad una distanza $d$ fra di loro. Lo schema della configurazione è rappresentato nella \Cref{fig:Configurazione_Fabry_Perot}. I supporti sono stati montati da parti opposte rispetto al supporto centrale in modo da poter campionare una distanza maggiore. Le lamine, l'emettitore ed il ricevitore sono stati posizionati in modo da essere allineati, ciò è stato possibile grazie al goniometro montato sull'apparato.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{grafici/Fabry-Perot configurazione.png}
+    \includegraphics[width=0.7\linewidth]{grafici/Fabry-Perot_configurazione.png}
     \caption{Configurazione Fabry-Perot}
-    \label{fig:Configurazione Fabry-Perot}
+    \label{fig:Configurazione_Fabry_Perot}
 \end{figure}
 \subsection{Dati}
-Nella tabella \ref{tab: dati Fabry-Perot} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore in funzione della distanza reciproca fra le lamine $d$. 
+Nella \Cref{tab:dati_Fabry_Perot} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore in funzione della distanza reciproca $d$ fra le lamine.
 \begin{table}[H]
 \centering
+\caption{Dati della dimensione della cavità $d$ in funzione della tensione, Fabry-Perot.}
+\label{tab:dati_Fabry_Perot}
 \begin{tabular}{|c|c|}
-\hline $d$ & Tensione \\
+\hline $d$ [\si{\centi\metre}] & Tensione [\si{\volt}] \\
 \hline
-$56.0 \pm 0.2\,\text{cm}$ & $2.55 \pm 0.02\,\text{V}$ \\
-$55.5 \pm 0.2\,\text{cm}$ & $1.26 \pm 0.01\,\text{V}$ \\
-$55.0 \pm 0.2\,\text{cm}$ & $3.46 \pm 0.01\,\text{V}$ \\
-$54.5 \pm 0.2\,\text{cm}$ & $2.23 \pm 0.01\,\text{V}$ \\
-$54.0 \pm 0.2\,\text{cm}$ & $1.41 \pm 0.02\,\text{V}$ \\
-$53.5 \pm 0.2\,\text{cm}$ & $3.96 \pm 0.01\,\text{V}$ \\
-$53.0 \pm 0.2\,\text{cm}$ & $1.92 \pm 0.02\,\text{V}$ \\
-$52.5 \pm 0.2\,\text{cm}$ & $1.78 \pm 0.01\,\text{V}$ \\
-$52.0 \pm 0.2\,\text{cm}$ & $4.20 \pm 0.03\,\text{V}$ \\
-$51.5 \pm 0.2\,\text{cm}$ & $1.74 \pm 0.01\,\text{V}$ \\
-$51.0 \pm 0.2\,\text{cm}$ & $1.90 \pm 0.02\,\text{V}$ \\
-$50.5 \pm 0.2\,\text{cm}$ & $4.28 \pm 0.01\,\text{V}$ \\
-$50.0 \pm 0.2\,\text{cm}$ & $1.50 \pm 0.02\,\text{V}$ \\
-$49.5 \pm 0.2\,\text{cm}$ & $2.50 \pm 0.02\,\text{V}$ \\
-$49.6 \pm 0.2\,\text{cm}$ & $2.10 \pm 0.01\,\text{V}$ \\
+\SI{56.0 \pm 0.2}{} & \SI{2.55 \pm 0.02}{} \\
+\SI{55.5 \pm 0.2}{} & \SI{1.26 \pm 0.01}{} \\
+\SI{55.0 \pm 0.2}{} & \SI{3.46 \pm 0.01}{} \\
+\SI{54.5 \pm 0.2}{} & \SI{2.23 \pm 0.01}{} \\
+\SI{54.0 \pm 0.2}{} & \SI{1.41 \pm 0.02}{} \\
+\SI{53.5 \pm 0.2}{} & \SI{3.96 \pm 0.01}{} \\
+\SI{53.0 \pm 0.2}{} & \SI{1.92 \pm 0.02}{} \\
+\SI{52.5 \pm 0.2}{} & \SI{1.78 \pm 0.01}{} \\
+\SI{52.0 \pm 0.2}{} & \SI{4.20 \pm 0.03}{} \\
+\SI{51.5 \pm 0.2}{} & \SI{1.74 \pm 0.01}{} \\
+\SI{51.0 \pm 0.2}{} & \SI{1.90 \pm 0.02}{} \\
+\SI{50.5 \pm 0.2}{} & \SI{4.28 \pm 0.01}{} \\
+\SI{50.0 \pm 0.2}{} & \SI{1.50 \pm 0.02}{} \\
+\SI{49.5 \pm 0.2}{} & \SI{2.50 \pm 0.02}{} \\
+\SI{49.6 \pm 0.2}{} & \SI{2.10 \pm 0.01}{} \\
 \hline
 \end{tabular}
-\caption{Dati della dimensione della cavità in funzione della tensione, Fabry-Perot.}
-\label{tab: dati Fabry-Perot}
 \end{table}
-Gli errori sulle tensioni sono stati valutati considerando le oscillazioni sui valori misurati dallo strumento, per le distanze abbiamo invece deciso di utilizzare un errore fisso di $2mm$. Tale errore è stato scelto considerando la somma fra la sensibilità dello strumento, pari a $1mm$ e lo spessore delle lamine, pari a circa $1mm$. Tali fattori rendevano infatti difficile un preciso posizionamento delle lamine stesse sul supporto.
+Gli errori sulle tensioni sono stati valutati considerando le oscillazioni sui valori misurati dallo strumento, per le distanze abbiamo invece deciso di utilizzare un errore fisso di $\SI{2}{\milli\metre}$. Tale errore è stato scelto considerando la somma fra la sensibilità dello strumento, pari a $\SI{1}{\milli\metre}$ e lo spessore delle lamine, pari a circa $\SI{1}{\milli\metre}$. Tali fattori rendevano infatti difficile un preciso posizionamento delle lamine stesse sul supporto.
 \subsection{Analisi dati}
-A partire dai dati raccolti durante l'esperienza abbiamo creato un grafico della tensione misurata in funzione della dimensione della cavità. Ci aspettiamo che la radiazione riflessa sulla prima lamina semiriflettenti crei diffrazione con la radiazione riflessa dalla seconda lamina semiriflettente. I dati ottenuti sono stati graficati e sono rappresentati nel grafico \ref{fig:grafico Fabry-Perot}:
+A partire dai dati raccolti durante l'esperienza abbiamo creato un grafico della tensione misurata in funzione della dimensione della cavità $d$. Ci aspettiamo che la radiazione riflessa sulla prima lamina semiriflettente crei interferenza con la radiazione riflessa dalla seconda lamina semiriflettente. I dati ottenuti sono stati graficati e sono rappresentati nel \Cref{fig:grafico_Fabry_Perot}:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{grafici/fabriperot.pdf}
-    \caption{Grafico cavità di Fabry-Perot}
-    \label{fig:grafico Fabry-Perot}
+    \caption{Grafico interferenza da cavità di Fabry-Perot.}
+    \label{fig:grafico_Fabry_Perot}
 \end{figure}
 
 
@@ -634,7 +634,7 @@ Dall'osservazione dei dati ottenuti possiamo affermare che il valore dell'interv
 \subsection{Obiettivo}
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.5\textwidth]{grafici/schema.bragg.png}
+	\includegraphics[width=0.5\textwidth]{grafici/schema_bragg.png}
 	\caption{Schema del reticolo di Bragg.}
 	\label{fig:schema_bragg}
 \end{figure}
@@ -644,7 +644,7 @@ Verificare empiricamente la Legge di Bragg. Utilizzare un cubo realizzato in mat
 \subsection{Metodo}
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.4\textwidth]{grafici/disposizione.bragg.png}
+	\includegraphics[width=0.4\textwidth]{grafici/disposizione_bragg.png}
 	\caption{Disposizione dell'apparato sperimentale per la diffrazione di Bragg.}
 	\label{fig:disposizione_bragg}
 \end{figure}
@@ -652,34 +652,34 @@ Verificare empiricamente la Legge di Bragg. Utilizzare un cubo realizzato in mat
 Dopo aver posizionato il cubo di Bragg sul goniometro mediante l'utilizzo dell'apposito supporto, abbiamo disposto il ricevitore in modo tale che fosse possibile captare il segnale riflesso dal cubo. Per variare l'angolo di incidenza del fascio, abbiamo lasciato fisso l'emettitore e ruotato gradualmente il cubo. Ad ogni rotazione di un angolo $\alpha$ in senso orario del cubo seguiva una rotazione in senso orario di un angolo $2\alpha$ del ricevitore\footnote{Lo stesso ragionamento vale per rotazioni in senso antiorario.}, come si può osservare in \Cref{fig:disposizione_bragg}, in modo tale che il ricevitore puntasse nella direzione del raggio riflesso, dal momento che l'angolo di incidenza è uguale all'angolo di riflessione. Abbiamo quindi misurato il segnale acquisito dal ricevitore ad ogni rotazione. Tale procedura ci ha permesso però di osservare l'andamento del segnale soltanto parzialmente, in quanto siamo riusciti a campionare un numero limitato di angoli $\alpha$, poiché dovevamo mantenere una posizione reciproca tra ricevitore ed emettitore tale per cui il segnale prodotto non arrivasse direttamente al ricevitore senza prima incidere sul cubo.
 
 \subsection{Dati}
-Riportiamo nella \Cref{tab:dati_bragg} l'intensità del segnale misurato in corrispondenza degli angoli di rotazione considerati, definiti rispetto 
+Riportiamo nella \Cref{tab:dati_bragg} l'intensità del segnale misurato in corrispondenza degli angoli di rotazione $\theta$ considerati, definiti rispetto
 alla congiungente con l'emettitore.
-Abbiamo stimato l'incertezza sul segnale, misurato come tensione, valutando l'oscillazione di quest'ultimo, scegliendo cioè come errore metà dell'intervallo di valori restituiti dal voltmetro. Per quanto riguarda invece l'incertezza sull'angolo di rotazione, abbiamo fissato $\delta_{\theta}=\ang{2}$, corrispondente all'angolo intercettato dalla punta del goniometro e cioè alla sensibilità dello strumento.
+Abbiamo stimato l'incertezza sul segnale, misurato come tensione, valutando l'oscillazione di quest'ultimo, scegliendo cioè come errore metà dell'intervallo di valori restituiti dal voltmetro. Per quanto riguarda invece l'incertezza sull'angolo di rotazione, abbiamo fissato $\delta_{\theta}=\ang{2}$ (circa $\SI{30}{\milli\radian}$), corrispondente all'angolo intercettato dalla punta del goniometro e cioè alla sensibilità dello strumento.
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-$\theta$ & tensione \\\hline\hline
-349 ± 30 mrad & 30 ± 10 mV \\
-401 ± 30 mrad & 30 ± 10 mV \\
-436 ± 30 mrad & 30 ± 10 mV \\
-471 ± 30 mrad & 40 ± 20 mV \\
-524 ± 30 mrad & 90 ± 10 mV \\
-559 ± 30 mrad & 180 ± 20 mV \\
-611 ± 30 mrad & 210 ± 20 mV \\
-663 ± 30 mrad & 230 ± 10 mV \\
-698 ± 30 mrad & 280 ± 10 mV \\
-750 ± 30 mrad & 320 ± 10 mV \\
-785 ± 30 mrad & 300 ± 20 mV \\
-838 ± 30 mrad & 150 ± 10 mV \\
-873 ± 30 mrad & 140 ± 10 mV \\
-960 ± 30 mrad & 20 ± 10 mV \\
-1.05 ± 0.03 rad & 50 ± 10 mV \\
-\hline
-\end{tabular}
 \caption{Dati sperimentali per la diffrazione dal cubo di Bragg.}
 \label{tab:dati_bragg}
+\begin{tabular}{|c|c|}
+\hline
+$\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\\hline\hline
+\SI{0.349 \pm 0.030}{} & \SI{0.030 \pm 0.010}{} \\ % 30 mV
+\SI{0.401 \pm 0.030}{} & \SI{0.030 \pm 0.010}{} \\ % 30 mV
+\SI{0.436 \pm 0.030}{} & \SI{0.030 \pm 0.010}{} \\ % 30 mV
+\SI{0.471 \pm 0.030}{} & \SI{0.040 \pm 0.020}{} \\ % 40 mV
+\SI{0.524 \pm 0.030}{} & \SI{0.090 \pm 0.010}{} \\ % 90 mV
+\SI{0.559 \pm 0.030}{} & \SI{0.180 \pm 0.020}{} \\ % 180 mV
+\SI{0.611 \pm 0.030}{} & \SI{0.210 \pm 0.020}{} \\ % 210 mV
+\SI{0.663 \pm 0.030}{} & \SI{0.230 \pm 0.010}{} \\ % 230 mV
+\SI{0.698 \pm 0.030}{} & \SI{0.280 \pm 0.010}{} \\ % 280 mV
+\SI{0.750 \pm 0.030}{} & \SI{0.320 \pm 0.010}{} \\ % 320 mV
+\SI{0.785 \pm 0.030}{} & \SI{0.300 \pm 0.020}{} \\ % 300 mV
+\SI{0.838 \pm 0.030}{} & \SI{0.150 \pm 0.010}{} \\ % 150 mV
+\SI{0.873 \pm 0.030}{} & \SI{0.140 \pm 0.010}{} \\ % 140 mV
+\SI{0.960 \pm 0.030}{} & \SI{0.020 \pm 0.010}{} \\ % 20 mV
+\SI{1.050 \pm 0.030}{} & \SI{0.050 \pm 0.010}{} \\ % 50 mV
+\hline
+\end{tabular}
 \end{table}
 
 \subsection{Analisi dati}
@@ -694,8 +694,8 @@ La Legge di Bragg descrive la posizione dei massimi di interferenza, i quali si 
     n\lambda=2d \sin(\theta)
     \label{eq:legge_bragg} 
 \end{align}
-in cui $n$ indica l'ordine del massimo ed è quindi un numero intero, $\lambda$ è la lunghezza d'onda del raggio e $d$ corrisponde alla distanza tra due piani di sferette distinti. Nel caso in esame abbiamo misurato $d = \SI{3.8 +- 0.1}{\centi\metre}$.
-Valutando l'andamento del segnale misurato al variare dell'angolo, visualizzabile in \Cref{fig:grafico_bragg}, abbiamo stimato la posizione del massimo di interferenza. Tale stima è stata ricavata utilizzando un'interpolazione parabolica applicata ai punti centrali del grafico. Abbiamo quindi utilizzato una legge della forma $y = ax^2 + bx +c$, con $y=V$ (tensione) e $x=\theta$ (angolo), a partire dalla quale abbiamo stimato i valori dei parametri $a, b, c$ e i relativi errori, poi utilizzati per ricavare la posizione del vertice. Più precisamente, abbiamo ricavato l'angolo per cui il segnale è massimo dalla relazione $\theta_{\text{max}} = -\dfrac{b}{2a}$, con errore $\delta_{\theta_{\text{max}}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}$. Tale risultato ci ha permesso di ricavare la lunghezza d'onda della radiazione; invertendo la~\cref{eq:legge_bragg} e utilizzando la propagazione degli errori si ottiene\footnote{Si è ipotizzato di trovarsi in corrispondenza del primo massimo, cioè $n=1$.}:
+in cui $n$ indica l'ordine del massimo ed è quindi un numero intero, $\lambda$ è la lunghezza d'onda del raggio e $d$ corrisponde alla distanza tra due piani di sferette distinti. Nel caso in esame abbiamo misurato $d = \SI{3.8 \pm 0.1}{\centi\metre}$.
+Valutando l'andamento del segnale misurato al variare dell'angolo, visualizzabile in \Cref{fig:grafico_bragg}, abbiamo stimato la posizione del massimo di interferenza. Tale stima è stata ricavata utilizzando un'interpolazione parabolica applicata ai punti centrali del grafico. Abbiamo quindi utilizzato una legge della forma $y = ax^2 + bx +c$, con $y=V$ (tensione, in \si{\volt}) e $x=\theta$ (angolo, in \si{\radian}), a partire dalla quale abbiamo stimato i valori dei parametri $a, b, c$ e i relativi errori, poi utilizzati per ricavare la posizione del vertice. Più precisamente, abbiamo ricavato l'angolo per cui il segnale è massimo dalla relazione $\theta_{\text{max}} = -\dfrac{b}{2a}$, con errore $\delta_{\theta_{\text{max}}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}$. Tale risultato ci ha permesso di ricavare la lunghezza d'onda della radiazione; invertendo la~\cref{eq:legge_bragg} e utilizzando la propagazione degli errori si ottiene\footnote{Si è ipotizzato di trovarsi in corrispondenza del primo massimo, cioè $n=1$.}:
 \begin{align}
   \lambda_s = \dfrac{2d \sin(\theta_{\text{max}})}{n} \qquad & \text{e}\qquad
   \delta \lambda_s = \sqrt{\left( \dfrac{2d \cos(\theta_{\text{max}})}{n}\delta \theta_{\text{max}}\right)^2 + \left(\dfrac{2\sin(\theta_{\text{max}})}{n}\delta_d\right)^2}. \label{eq:lunghezza_bragg}
@@ -703,16 +703,16 @@ Valutando l'andamento del segnale misurato al variare dell'angolo, visualizzabil
 I risultati ricavati sono riportati nella \Cref{tab:fit_bragg}.
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|ccccccc|}
-\hline
-Risultati & a & b & c & $\chi^2$ & DoF & $\chi^2/\nu$ & $\lambda_s$ [\si{\meter}]  \\\hline\hline
-Fit massimo & -8.3 ± 2.0 & 12.1 ± 2.8 & -4.0 ± 1.0 & 5.78 & 6 & 0.963 & 0.051 ±0.014\\\hline
-\end{tabular}
 \caption{Risultati del fit per la determinazione della lunghezza d'onda tramite la Legge di Bragg.}
 \label{tab:fit_bragg}
+\begin{tabular}{|l|cccccccc|}
+\hline
+Risultati & $a$ [\si{\volt\per\radian\squared}]& $b$ [\si{\volt\per\radian}]& $c$ [\si{\volt}]& $\chi^2$ & DoF & $\chi^2/\nu$ & p-value & $\lambda_s$ [\si{\centi\metre}]  \\\hline\hline
+Fit massimo & \SI{-8.3 \pm 2.0}{} & \SI{12.1 \pm 2.8}{} & \SI{-4.0 \pm 1.0}{} & 5.78 & 6 & 0.963 & 0.45 & \SI{5.1 \pm 1.4}{}\\\hline
+\end{tabular}
 \end{table}
 
 \subsection{Conclusione}
-Vogliamo sottolineare come l'andamento del segnale al variare dell'angolo non sia regolare, come è possibile osservare dalle misure riportate in \Cref{fig:grafico_bragg}. Tale irregolarità è da imputarsi agli effetti di bordo dovuti alla struttura di ricevitore e trasmettitore, ma anche ai vari fattori di rumore esterno, quali la presenza di dispositivi elettronici nei pressi della strumentazione o l'attività degli apparati sperimentali circostanti. Nel corso dell'esperienza abbiamo infatti potuto osservare come il segnale misurato dal voltmetro oscillasse anche a causa di fattori esterni. Ne consegue che abbiamo ottenuto una misura di $\lambda_s$ molto poco accurata, dal momento che presenta un errore relativo $\approx \SI{27}{\percent}$.
+Vogliamo sottolineare come l'andamento del segnale al variare dell'angolo non sia regolare, come è possibile osservare dalle misure riportate in \Cref{fig:grafico_bragg}. Tale irregolarità è da imputarsi agli effetti di bordo dovuti alla struttura di ricevitore e trasmettitore, ma anche ai vari fattori di rumore esterno, quali la presenza di dispositivi elettronici nei pressi della strumentazione o l'attività degli apparati sperimentali circostanti. Nel corso dell'esperienza abbiamo infatti potuto osservare come il segnale misurato dal voltmetro oscillasse anche a causa di fattori esterni. Ne consegue che abbiamo ottenuto una misura di $\lambda_s = \SI{5.1 \pm 1.4}{\centi\metre}$ molto poco accurata, dal momento che presenta un errore relativo $\approx \SI{27}{\percent}$. Tale valore, inoltre, risulta poco compatibile con la lunghezza d'onda attesa di circa $\SI{3}{\centi\metre}$ (un test di compatibilità darebbe $z \approx \frac{|5.1-3.0|}{1.4} \approx 1.5$, che corrisponde a un p-value di circa $0.13$, indicando una compatibilità marginale).
 
 \end{document}
