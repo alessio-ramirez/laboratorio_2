@@ -1,4 +1,3 @@
-# --- START OF FILE tables.py ---
 """
 LaTeX Table Generation Utilities
 
@@ -428,5 +427,3 @@ def latex_table_fit(*fit_results: FitResult,
         warnings.warn("pyperclip not found. Cannot copy table to clipboard.", RuntimeWarning)
 
     return latex_string
-
-# --- END OF FILE tables.py ---

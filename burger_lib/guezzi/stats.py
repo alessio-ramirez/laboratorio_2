@@ -1,4 +1,3 @@
-# --- START OF FILE stats.py ---
 """
 Statistical Analysis Tools for Measurements
 
@@ -284,5 +283,3 @@ def weighted_mean(measurements: List[Measurement]) -> Measurement:
 
     # Return scalar Measurement
     return Measurement(float(mean_value), float(mean_error), unit=res_unit, name=res_name)
-
-# --- END OF FILE stats.py ---

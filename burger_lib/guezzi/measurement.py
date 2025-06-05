@@ -1,5 +1,3 @@
-# --- START OF FILE measurement.py ---
-
 """
 Measurement Class for Handling Quantities with Uncertainties.
 
@@ -610,5 +608,3 @@ class Measurement:
 
     def __ge__(self, other: Any) -> Union[bool, np.ndarray]:
         return self._compare(other, np.greater_equal)
-
-# --- END OF FILE measurement.py ---

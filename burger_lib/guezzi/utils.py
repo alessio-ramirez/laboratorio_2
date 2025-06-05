@@ -1,4 +1,3 @@
-# --- START OF FILE utils.py ---
 """
 Internal Utility Functions for Guezzi Library
 
@@ -255,5 +254,3 @@ def _format_value_error_eng(value: float, error: float, unit_symbol: str = "", s
     err_str = f"{scaled_rounded_error:.{final_decimal_places}f}"
 
     return f"{val_str} ± {err_str} {prefix}{unit_symbol}".strip()
-
-# --- END OF FILE utils.py ---

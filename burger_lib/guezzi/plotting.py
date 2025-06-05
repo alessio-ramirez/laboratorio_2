@@ -1,4 +1,3 @@
-# --- START OF FILE plotting.py ---
 """
 Plotting Utilities for Measurements and Fits
 
@@ -698,5 +697,3 @@ def plot_fit(fit_result: FitResult,
          return main_ax, res_ax
     else:
          return main_ax
-
-# --- END OF FILE plotting.py ---
