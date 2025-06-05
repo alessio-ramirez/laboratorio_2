@@ -7,8 +7,12 @@ import matplotlib.pyplot as plt
 
 #FIGURA INTERFERENZA
 def int_fabry (cos, A, d) :
-    lambd = 632.8 *10e-9 
+    lambd = 632.8e-9 
     return A + (2*d/lambd)*cos
+
+def test(cos, C, b):
+    lambd = 500e-9
+    return C + (2*b/lambd) + cos
 
 l = Measurement(128, 0.5, magnitude=-2)
 diam = [2.0, 3.6, 4.8, 5.7, 6.5]
@@ -17,7 +21,9 @@ diam = Measurement(diam, err_diam, magnitude=-2)
 cos= np.cos(np.arctan(diam/(2*l)))
 k = Measurement([5,4,3,2,1])
 fit = perform_fit(cos, k, int_fabry, method='odr')
-plot_fit(fit, show_plot=True, show_params=True, show_stats=True)
+fit1 = perform_fit(cos, k, test, method='odr')
+style = PlotStyle(colors=['orange', 'green'], marker='o', linestyle='-')
+plot_fit(fit, fit1, show_plot=True, show_params=True, show_stats=True, plot_residuals=True, style=style)
 
 #CALIBRAZIONE MICROMETRO 
 #nonio mosso sempre tra le stesse posizioni
