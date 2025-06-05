@@ -1,4 +1,3 @@
-# --- START OF FILE fitting.py ---
 """
 Curve Fitting Functionality
 
@@ -14,34 +13,9 @@ import inspect
 from typing import Callable, Optional, List, Dict, Any, Tuple, Union
 from dataclasses import dataclass, field
 import warnings
-import sys # For float max
-
-# Assuming measurement.py contains the Measurement class as before
-# If measurement.py is in the same directory, use:
-# from measurement import Measurement
-# If it's a sub-module of a package, use:
-try:
-    from .measurement import Measurement
-except ImportError:
-    # Fallback if running as a script or structure differs
-    print("Warning: Could not import Measurement using relative path '.measurement'. Trying direct import.")
-    try:
-        from measurement import Measurement
-    except ImportError:
-        raise ImportError("Could not find the Measurement class. Ensure measurement.py is accessible.")
-
-
-# Optional dependency: iminuit
-try:
-    from iminuit import Minuit
-    from iminuit.cost import LeastSquares # Import LeastSquares
-    _has_iminuit = True
-except ImportError:
-    _has_iminuit = False
-    # Define dummy classes/functions if iminuit is not available to avoid NameErrors later
-    # But the code will raise an ImportError if 'minuit' method is actually chosen.
-    class Minuit: pass
-    class LeastSquares: pass
+from .measurement import Measurement
+from iminuit import Minuit
+from iminuit.cost import LeastSquares
 
 
 @dataclass
@@ -125,17 +99,16 @@ class FitResult:
 
         lines.append("  Parameters:")
         if self.parameters:
-            param_sig_figs = 2 # Use consistent sig figs for summary print
-            for name in self.parameter_names: # Print in consistent order
+            param_sig_figs = 2
+            for name in self.parameter_names:
                 if name in self.parameters:
                      param = self.parameters[name]
-                     # Handle potential NaN values gracefully in output
                      if np.isnan(param.value) or np.isnan(param.error):
                          lines.append(f"    {name}: NaN ± NaN")
                      else:
                          lines.append(f"    {name}: {param.to_eng_string(sig_figs_error=param_sig_figs)}")
                 else:
-                     lines.append(f"    {name}: (Parameter not found in results?)") # Should not happen
+                     lines.append(f"    {name}: (Parameter not found in results?)")
         else:
             lines.append("    (No parameters fitted or available)")
 
@@ -152,26 +125,23 @@ class FitResult:
              lines.append(f"    Degrees of Freedom (DoF): {self.dof}")
              if self.reduced_chi_square is not None:
                   lines.append(f"    Reduced Chi² (χ²/DoF): {self.reduced_chi_square:.4g}")
-        elif self.chi_square is not None: # Case where DoF might be <= 0
+        elif self.chi_square is not None:
              lines.append("  Goodness of Fit:")
              lines.append(f"    Chi²: {self.chi_square:.4g}")
              lines.append(f"    Degrees of Freedom (DoF): {self.dof if self.dof is not None else 'N/A'} (Reduced Chi² not computed)")
-        # Check if fit_object is Minuit and show fval if chi2 wasn't calculated formally but fval exists
         elif self.method == 'minuit' and self.fit_object is not None and hasattr(self.fit_object, 'fval'):
             lines.append("  Goodness of Fit:")
-            lines.append(f"    Minuit FCN Value (χ²): {self.fit_object.fval:.4g}") # fval IS chi2 when using LeastSquares
+            lines.append(f"    Minuit FCN Value (χ²): {self.fit_object.fval:.4g}")
             lines.append(f"    Degrees of Freedom (DoF): {self.dof if self.dof is not None else 'N/A'}")
 
-
         if self.mask is not None:
-             points_used = np.sum(self.mask) # True=1, False=0
+             points_used = np.sum(self.mask)
              total_points = len(self.mask)
              lines.append(f"  Mask Applied: {points_used} / {total_points} data points used.")
         lines.append("--------------------------")
         return "\n".join(lines)
 
     def __repr__(self) -> str:
-        # More technical representation, useful for debugging
         params_repr = {name: f"({p.value:.3g} ± {p.error:.2g})" for name, p in self.parameters.items()}
         chi2_str = f"{self.chi_square:.4g}" if self.chi_square is not None else 'None'
         return (f"FitResult(method='{self.method}', success={self.success}, "
@@ -179,10 +149,356 @@ class FitResult:
                 f"dof={self.dof}, function={getattr(self.function,'__name__','?!')}, ...)")
 
 
+class _FitWarnings:
+    """Centralized warning management for fit operations."""
+    
+    def __init__(self):
+        self.warnings = []
+    
+    def add(self, message: str, category: str = 'general'):
+        """Add a warning message to be emitted later."""
+        self.warnings.append((category, message))
+    
+    def emit_all(self):
+        """Emit all collected warnings."""
+        for category, message in self.warnings:
+            warnings.warn(message, UserWarning if category == 'user' else RuntimeWarning)
+
+
+def _validate_and_prepare_data(x_data, y_data, mask=None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, int, Optional[np.ndarray]]:
+    """Validate inputs and prepare data arrays for fitting."""
+    # Convert to Measurement objects if needed
+    if not isinstance(x_data, Measurement):
+        x_data = Measurement(values=x_data, name=getattr(x_data, 'name', 'x'))
+    if not isinstance(y_data, Measurement):
+        y_data = Measurement(values=y_data, name=getattr(y_data, 'name', 'y'))
+    
+    # Check shape compatibility
+    try:
+        common_shape = np.broadcast(x_data.value, y_data.value).shape
+    except ValueError:
+        raise ValueError(f"Shape mismatch: x_data ({x_data.shape}) and y_data ({y_data.shape}) cannot be broadcast together.")
+    
+    # Extract and flatten arrays
+    x_vals = np.broadcast_to(x_data.value, common_shape).flatten()
+    y_vals = np.broadcast_to(y_data.value, common_shape).flatten()
+    x_errs = np.broadcast_to(x_data.error, common_shape).flatten()
+    y_errs = np.broadcast_to(y_data.error, common_shape).flatten()
+    
+    # Apply mask
+    if mask is not None:
+        mask_arr = np.asarray(mask, dtype=bool).flatten()
+        if mask_arr.size == 1:
+            active_mask = np.full_like(x_vals, mask_arr[0], dtype=bool)
+        elif mask_arr.shape == x_vals.shape:
+            active_mask = mask_arr
+        else:
+            raise ValueError(f"Mask shape {mask_arr.shape} incompatible with data shape {x_vals.shape}")
+        
+        x_vals, y_vals = x_vals[active_mask], y_vals[active_mask]
+        x_errs, y_errs = x_errs[active_mask], y_errs[active_mask]
+    else:
+        active_mask = None
+    
+    n_points = len(x_vals)
+    if n_points == 0:
+        raise ValueError("No data points available after masking.")
+    
+    return x_vals, y_vals, x_errs, y_errs, n_points, active_mask
+
+
+def _extract_parameter_info(func, parameter_names=None) -> Tuple[List[str], int]:
+    """Extract parameter names and count from function signature."""
+    try:
+        sig = inspect.signature(func)
+        func_params = list(sig.parameters.keys())[1:]  # Skip first parameter (x)
+        n_params = len(func_params)
+        
+        if n_params == 0:
+            raise ValueError("Function must have at least one parameter besides x.")
+        
+        if parameter_names is None:
+            return func_params, n_params
+        elif len(parameter_names) != n_params:
+            raise ValueError(f"Provided parameter_names count ({len(parameter_names)}) != function parameters ({n_params})")
+        else:
+            return parameter_names, n_params
+            
+    except Exception as e:
+        raise ValueError(f"Could not inspect function signature: {e}")
+
+
+def _determine_method(x_vals, y_vals, x_errs, y_errs, n_points, method='auto') -> Tuple[str, _FitWarnings]:
+    """Intelligent method selection based on data characteristics."""
+    warn_mgr = _FitWarnings()
+    
+    if method != 'auto':
+        return method, warn_mgr
+    
+    has_x_errors = np.any(x_errs > 0.005 * x_vals) # Error greater than 0.5%
+    has_y_errors = np.any(y_errs > 0)
+    
+    # Selection logic
+    if has_x_errors:
+        selected = 'odr'
+        warn_mgr.add("Method 'auto' selected 'odr' due to significant x-errors.", 'general')
+    elif not has_y_errors:
+        selected = 'curve_fit'
+        warn_mgr.add("Method 'auto' selected 'curve_fit' (no errors provided - unweighted fit).", 'general')
+    elif n_points < 20:  # For small datasets, use robust minuit
+        selected = 'minuit'
+        warn_mgr.add("Method 'auto' selected 'minuit' for robust fitting with small dataset.", 'general')
+    else:
+        selected = 'minuit'  # Default for well-behaved cases
+    
+    return selected, warn_mgr
+
+
+def _validate_method_compatibility(method, x_vals, y_vals, x_errs, y_errs, warn_mgr):
+    """Check method-data compatibility and add appropriate warnings."""
+    has_x_errors = np.any(x_errs > 0.005 * x_vals)
+    has_y_errors = np.any(y_errs > 0)
+    
+    if method == 'curve_fit':
+        if has_x_errors:
+            warn_mgr.add("curve_fit ignores x-errors. Consider 'odr' for x-error handling.", 'user')
+        if not has_y_errors:
+            warn_mgr.add("curve_fit with no y-errors: unweighted fit, parameter uncertainties scaled by residuals.", 'user')
+    
+    elif method == 'odr':
+        if not has_x_errors and has_y_errors:
+            warn_mgr.add("ODR selected but x-errors negligible. 'minuit' might be more appropriate.", 'user')
+        if not has_x_errors and not has_y_errors:
+            warn_mgr.add("ODR with no significant errors: unweighted fit.", 'user')
+    
+    elif method == 'minuit':
+        if has_x_errors:
+            warn_mgr.add("minuit (LeastSquares) ignores x-errors. Consider 'odr' for x-error handling.", 'user')
+        if not has_y_errors:
+            raise ValueError("minuit with LeastSquares cost requires non-zero y-errors for weighting.")
+
+
+def _setup_initial_guess(p0, n_params, parameter_names, warn_mgr) -> List[float]:
+    """Setup and validate initial parameter guess."""
+    if p0 is None:
+        p0_default = 1.0
+        p0_list = [p0_default] * n_params
+        warn_mgr.add(f"No initial guess provided. Using default value of {p0_default} for {parameter_names}.", 'user')
+        return p0_list
+    
+    if not isinstance(p0, (list, tuple)):
+        raise TypeError("p0 must be a list or tuple of initial parameter guesses.")
+    
+    if len(p0) != n_params:
+        raise ValueError(f"p0 length ({len(p0)}) != number of parameters ({n_params})")
+    
+    return list(p0)
+
+
+def _fit_with_curve_fit(func, x_vals, y_vals, y_errs, p0_list, warn_mgr, **kwargs) -> Dict[str, Any]:
+    """Optimized scipy.curve_fit wrapper."""
+    has_y_errors = np.any(y_errs > 0)
+    sigma_y = y_errs if has_y_errors else None
+    absolute_sigma = has_y_errors # If True, the errors are NOT scaled to give reduced χ²=1
+    
+    # Check for problematic zero errors
+    if has_y_errors and np.any(y_errs==0.0):
+        warn_mgr.add("Found zero y-errors in curve_fit - may cause numerical issues.", 'general')
+    
+    # Extract curve_fit specific parameters with sensible defaults
+    cf_kwargs = {
+        'sigma': sigma_y,
+        'absolute_sigma': absolute_sigma,
+        'method': kwargs.pop('method', 'lm'),
+        'check_finite': kwargs.pop('check_finite', True),
+        **kwargs
+    }
+    
+    try:
+        popt, pcov = curve_fit(func, x_vals, y_vals, p0=p0_list, **cf_kwargs)
+        
+        # Check covariance matrix validity
+        if np.any(~np.isfinite(pcov)):
+            warn_mgr.add("Covariance matrix contains Inf/NaN - poorly constrained fit.", 'general')
+            return {'success': False, 'params': popt, 'errors': np.full_like(popt, np.nan), 'cov_matrix': pcov}
+        
+        param_errors = np.sqrt(np.diag(pcov))
+        return {'success': True, 'params': popt, 'errors': param_errors, 'cov_matrix': pcov}
+        
+    except (RuntimeError, ValueError) as e:
+        warn_mgr.add(f"curve_fit failed: {e}", 'general')
+        return {'success': False, 'params': np.full(len(p0_list), np.nan), 
+                'errors': np.full(len(p0_list), np.nan), 'cov_matrix': None}
+
+
+def _fit_with_odr(func, x_vals, y_vals, x_errs, y_errs, p0_list, warn_mgr, **kwargs) -> Dict[str, Any]:
+    """Optimized scipy.odr wrapper."""
+    has_x_errors = np.any(x_errs > 0)
+    has_y_errors = np.any(y_errs > 0)
+    
+    # Setup weights (ODR prefers weights over errors when possible)
+    sx = x_errs if has_x_errors else None
+    sy = y_errs if has_y_errors else None
+    
+    def odr_func_wrapper(beta, x):
+        try:
+            return func(x, *beta)
+        except Exception:
+            return np.full_like(x, np.nan) if hasattr(x, '__len__') else np.nan
+    
+    try:
+        model = Model(odr_func_wrapper)
+        data = RealData(x_vals, y_vals, sx=sx, sy=sy)
+        
+        # ODR-specific parameters with defaults
+        odr_kwargs = {
+            'maxit': kwargs.pop('maxit', 1000),
+            **kwargs
+        }
+        
+        odr_obj = ODR(data, model, beta0=p0_list, **odr_kwargs)
+        output = odr_obj.run()
+        
+        # Check success (info codes 0-3 indicate convergence)
+        success = output.info in [0, 1, 2, 3]
+        if not success:
+            warn_mgr.add(f"ODR failed: {output.stopreason} (info={output.info})", 'general')
+        elif output.info > 0:
+            warn_mgr.add(f"ODR converged with warnings: {output.stopreason}", 'general')
+        
+        # Handle covariance matrix scaling
+        cov_matrix = None
+        if output.cov_beta is not None:
+            if sx is not None or sy is not None:  # Weighted fit
+                cov_matrix = output.cov_beta
+            else:  # Unweighted - scale by residual variance
+                cov_matrix = output.cov_beta * output.res_var
+        
+        param_errors = np.sqrt(np.diag(output.cov_beta)) if success else np.full(len(p0_list), np.nan)
+        
+        return {'success': success, 'params': output.beta, 'errors': param_errors, 
+                'cov_matrix': cov_matrix, 'fit_object': output}
+                
+    except Exception as e:
+        warn_mgr.add(f"ODR fitting failed: {e}", 'general')
+        return {'success': False, 'params': np.full(len(p0_list), np.nan),
+                'errors': np.full(len(p0_list), np.nan), 'cov_matrix': None}
+
+
+def _fit_with_minuit(func, x_vals, y_vals, y_errs, p0_list, parameter_names, warn_mgr, 
+                     minuit_limits=None, **kwargs) -> Dict[str, Any]:
+    """Optimized iminuit wrapper."""
+    try:
+        # Create cost function
+        cost_func = LeastSquares(x_vals, y_vals, y_errs, func)
+        
+        # Setup initial parameters
+        p0_dict = dict(zip(parameter_names, p0_list))
+        
+        # Create Minuit instance
+        minuit_obj = Minuit(cost_func, **p0_dict)
+        
+        # Apply parameter limits
+        if minuit_limits:
+            for name, limits in minuit_limits.items():
+                if name in minuit_obj.parameters:
+                    minuit_obj.limits[name] = limits
+                else:
+                    warn_mgr.add(f"Parameter '{name}' in minuit_limits not found.", 'user')
+        
+        # Run optimization
+        minuit_obj.migrad(**kwargs)
+        
+        # Calculate Hessian for accurate errors
+        if minuit_obj.valid:
+            try:
+                minuit_obj.hesse()
+            except RuntimeError as e:
+                warn_mgr.add(f"HESSE calculation failed: {e}", 'general')
+        
+        success = minuit_obj.valid and minuit_obj.fmin.is_valid
+        
+        if success:
+            # Extract results in parameter order
+            params = np.array([minuit_obj.values[name] for name in parameter_names])
+            errors = np.array([minuit_obj.errors[name] for name in parameter_names])
+            
+            # Extract covariance matrix
+            cov_matrix = None
+            if minuit_obj.covariance is not None:
+                cov_matrix = np.array([[minuit_obj.covariance[i, j] 
+                                      for j in range(len(parameter_names))] 
+                                     for i in range(len(parameter_names))])
+            
+            return {'success': True, 'params': params, 'errors': errors, 
+                    'cov_matrix': cov_matrix, 'fit_object': minuit_obj}
+        else:
+            warn_mgr.add(f"Minuit optimization failed (valid={minuit_obj.valid})", 'general')
+            # Try to extract parameters even on failure
+            try:
+                params = np.array([minuit_obj.values[name] for name in parameter_names])
+                errors = np.array([minuit_obj.errors[name] for name in parameter_names])
+            except Exception:
+                params = np.full(len(parameter_names), np.nan)
+                errors = np.full(len(parameter_names), np.nan)
+            
+            return {'success': False, 'params': params, 'errors': errors, 
+                    'cov_matrix': None, 'fit_object': minuit_obj}
+            
+    except Exception as e:
+        warn_mgr.add(f"Minuit setup/execution failed: {e}", 'general')
+        return {'success': False, 'params': np.full(len(p0_list), np.nan),
+                'errors': np.full(len(p0_list), np.nan), 'cov_matrix': None}
+
+
+def _calculate_chi_square(x_vals, y_vals, y_errs, func, params, method, fit_object=None) -> Optional[float]:
+    """Unified chi-square calculation for all methods."""
+    try:
+        if method == 'odr' and fit_object and hasattr(fit_object, 'sum_square'):
+            # ODR provides sum_square directly
+            return fit_object.sum_square # fit_object.res_var is the reduced chi square instead
+            
+        elif method == 'minuit' and fit_object and hasattr(fit_object, 'fval'):
+            # Minuit LeastSquares cost function value IS chi-square
+            return fit_object.fval
+            
+        else:  # curve_fit or manual calculation
+            if not np.all(np.isfinite(params)):
+                return None
+                
+            with np.errstate(divide='ignore', invalid='ignore'):
+                y_pred = func(x_vals, *params)
+                
+                # Handle zero errors safely
+                sigma_safe = np.where(y_errs > 0, y_errs, 1.0)
+                residuals = (y_vals - y_pred) / sigma_safe
+                
+                # Only include finite residuals
+                finite_mask = np.isfinite(residuals)
+                if np.any(finite_mask):
+                    return np.sum(residuals[finite_mask]**2)
+                    
+        return None
+        
+    except Exception:
+        return None
+
+
+def _calculate_fit_statistics(chi_square, n_points, n_params, method, has_meaningful_errors) -> Dict[str, Optional[float]]:
+    """Calculate degrees of freedom and reduced chi-square."""
+    dof = n_points - n_params if n_points > n_params else None
+    reduced_chi_square = None
+    
+    if chi_square is not None and dof is not None and dof > 0 and has_meaningful_errors:
+        reduced_chi_square = chi_square / dof
+    
+    return {'dof': dof, 'reduced_chi_square': reduced_chi_square}
+
+
 def perform_fit(x_data: Union[Measurement, np.ndarray, List, Tuple],
                 y_data: Union[Measurement, np.ndarray, List, Tuple],
                 func: Callable,
-                p0: Optional[Union[List[float], Tuple[float, ...]]] = None, # Changed: Always list/tuple
+                p0: Optional[Union[List[float], Tuple[float, ...]]] = None,
                 parameter_names: Optional[List[str]] = None,
                 method: str = 'auto',
                 mask: Optional[np.ndarray] = None,
@@ -190,522 +506,130 @@ def perform_fit(x_data: Union[Measurement, np.ndarray, List, Tuple],
                 minuit_limits: Optional[Dict[str, Tuple[Optional[float], Optional[float]]]] = None,
                 **kwargs) -> FitResult:
     """
-    Performs curve fitting using `scipy.optimize.curve_fit` (Least Squares),
-    `scipy.odr` (Orthogonal Distance Regression), or `iminuit.Minuit` (robust minimization).
-
-    Choice of Method:
-    - `curve_fit`: Standard least-squares fitting. Minimizes sum of squared residuals
-      weighted by *y-uncertainties*. Assumes x-data is exact. Good for simple cases
-      with negligible x-error.
-    - `odr`: Orthogonal Distance Regression. Minimizes orthogonal distances considering
-      *both x and y uncertainties*. Best when x-uncertainties are significant.
-    - `minuit`: Uses the MINUIT2 algorithm (via `iminuit`) to minimize a cost function.
-      Uses `iminuit.cost.LeastSquares` by default, equivalent to a Chi-squared cost
-      function `sum(((y - model)/y_err)**2)`, making it a robust alternative to
-      `curve_fit`, often better with complex functions or poor initial guesses.
-      Requires y-errors for weighting; ignores x-errors in this mode.
-    - `auto`: Selects 'odr' if `x_data` has significant errors (relative error > 0.5%),
-      otherwise defaults to 'curve_fit' (or 'minuit' if iminuit is installed).
+    Performs curve fitting using scipy.optimize.curve_fit, scipy.odr, or iminuit.
 
     Args:
-        x_data: Independent variable data. Measurement, array, list, or tuple.
-        y_data: Dependent variable data. Measurement, array, list, or tuple.
-        func: Model function `f(x, p1, p2, ...)` or `f(x, **params)`. The order
-              of parameters must match `p0` and `parameter_names`.
-        p0: Initial guess for parameters as a list or tuple `[p1_guess, p2_guess, ...]`.
-            The order must match the function signature (after `x`) and the optional
-            `parameter_names`. If None, defaults to 1.0 for all parameters.
-            Providing good guesses is highly recommended, especially for non-linear models.
-        parameter_names: List `['name1', 'name2', ...]`. Order must match function
-                         signature (excluding x) and `p0`. If None, inferred from the
-                         function signature using `inspect`. Required if the function
-                         signature cannot be introspected easily (e.g., lambda, partial).
-        method: Fitting method: 'auto', 'curve_fit', 'odr', 'minuit'. (Default 'auto').
-        mask: Optional boolean NumPy array to select data points (True = use).
-        calculate_stats: If True, calculate Chi², DoF, Reduced Chi². Requires valid
-                         uncertainties (at least y_err for curve_fit/minuit) and N > n_params.
-                         (Default True).
-        minuit_limits (Dict): Optional parameter limits for Minuit, e.g.,
-                              `{'param_name': (lower_bound, upper_bound)}`. Use None for
-                              no limit on one side (e.g., `(0, None)`). Assumes parameter
-                              names in the dict are correct. (Default None).
-        **kwargs: Additional keyword arguments passed directly to the underlying
-                  fitting routine (`curve_fit`, `ODR.run`, `Minuit.migrad`). Common
-                  options include `maxfev` (max function evaluations for curve_fit),
-                  `maxit` (max iterations for ODR), `ncall` (max function calls for Minuit).
+        x_data: Independent variable data (Measurement, array, list, or tuple)
+        y_data: Dependent variable data (Measurement, array, list, or tuple)  
+        func: Model function f(x, p1, p2, ...) with x as first parameter
+        p0: Initial parameter guess as list/tuple. Defaults to [1.0, ...] if None
+        parameter_names: Parameter names list. Inferred from function if None
+        method: Fitting method ('auto', 'curve_fit', 'odr', 'minuit')
+        mask: Boolean array to select data points (True = use point)
+        calculate_stats: Whether to calculate chi-square statistics
+        minuit_limits: Parameter bounds for minuit as {'param': (lower, upper)}
+        **kwargs: Additional arguments passed to underlying fitting routine
 
     Returns:
-        FitResult: Object containing fitted parameters, stats, etc.
+        FitResult: Complete fitting results with parameters, statistics, etc.
 
     Raises:
-        ValueError: Incompatible inputs, shapes, names, or invalid method.
-        TypeError: Inputs not convertible to Measurement objects or invalid p0 type.
-        ImportError: If `method='minuit'` is chosen but `iminuit` is not installed.
-
-    Notes on Difficult Fits:
-        - If the fit fails or `success=False`, check the initial guess `p0`. Visualizing
-          the model with `p0` against the data can help.
-        - For `minuit`, use `minuit_limits` to constrain parameters to physically
-          reasonable ranges.
-        - Ensure the model function `func` is correctly defined and behaves as expected.
-        - Consider if the chosen `method` is appropriate for the data's error structure.
+        ValueError: For incompatible inputs or invalid method selection
+        TypeError: For incorrect input types
+        ImportError: If minuit requested but not available
     """
-    # --- Input Validation and Conversion ---
-    if not isinstance(x_data, Measurement):
-        try: x_data = Measurement(values=x_data, name=getattr(x_data, 'name', 'x'))
-        except Exception as e: raise TypeError(f"Could not convert x_data to Measurement: {e}")
-    if not isinstance(y_data, Measurement):
-        try: y_data = Measurement(values=y_data, name=getattr(y_data, 'name', 'y'))
-        except Exception as e: raise TypeError(f"Could not convert y_data to Measurement: {e}")
-
+    warn_mgr = _FitWarnings()
+    
     try:
-        common_shape = np.broadcast(x_data.value, y_data.value).shape
-    except ValueError:
-        raise ValueError(f"Shape mismatch: x_data ({x_data.shape}) and y_data ({y_data.shape}) "
-                         "cannot be broadcast together.")
-
-    x_val = np.asarray(x_data.value).flatten() # Ensure 1D for simplicity here
-    x_err = np.asarray(x_data.error).flatten()
-    y_val = np.asarray(y_data.value).flatten()
-    y_err = np.asarray(y_data.error).flatten()
-
-    # Ensure data is broadcast to common shape *before* flattening if needed
-    # This part might need adjustment if multi-dimensional fits are intended
-    if x_val.shape != common_shape: x_val = np.broadcast_to(x_val, common_shape).flatten()
-    if x_err.shape != common_shape: x_err = np.broadcast_to(x_err, common_shape).flatten()
-    if y_val.shape != common_shape: y_val = np.broadcast_to(y_val, common_shape).flatten()
-    if y_err.shape != common_shape: y_err = np.broadcast_to(y_err, common_shape).flatten()
-
-
-    # --- Masking ---
-    active_mask = np.ones_like(x_val, dtype=bool)
-    original_mask_provided = mask is not None
-    if original_mask_provided:
-        mask_arr = np.asarray(mask, dtype=bool).flatten()
-        # Ensure mask can be broadcast or matches the flattened data shape
-        if mask_arr.size == 1:
-             active_mask[:] = mask_arr # Broadcast single value
-        elif mask_arr.shape == active_mask.shape:
-             active_mask = mask_arr
+        # Input validation and data preparation
+        x_vals, y_vals, x_errs, y_errs, n_points, active_mask = _validate_and_prepare_data(x_data, y_data, mask)
+        
+        # Parameter setup
+        parameter_names, n_params = _extract_parameter_info(func, parameter_names)
+        
+        # Method selection and validation
+        resolved_method, method_warnings = _determine_method(x_vals, y_vals, x_errs, y_errs, n_points, method)
+        warn_mgr.warnings.extend(method_warnings.warnings)
+        _validate_method_compatibility(resolved_method, x_vals, y_vals, x_errs, y_errs, warn_mgr)
+        
+        # Initial guess setup
+        p0_list = _setup_initial_guess(p0, n_params, parameter_names, warn_mgr)
+        
+        # Perform fitting based on selected method
+        if resolved_method == 'curve_fit':
+            fit_result = _fit_with_curve_fit(func, x_vals, y_vals, y_errs, p0_list, warn_mgr, **kwargs)
+        elif resolved_method == 'odr':
+            fit_result = _fit_with_odr(func, x_vals, y_vals, x_errs, y_errs, p0_list, warn_mgr, **kwargs)
+        elif resolved_method == 'minuit':
+            fit_result = _fit_with_minuit(func, x_vals, y_vals, y_errs, p0_list, parameter_names, 
+                                        warn_mgr, minuit_limits, **kwargs)
         else:
-             raise ValueError(f"Mask shape {mask_arr.shape} incompatible with flattened data shape {active_mask.shape}")
-
-    # Apply mask *after* ensuring consistent shapes
-    x_fit = x_val[active_mask]
-    y_fit = y_val[active_mask]
-    x_err_fit = x_err[active_mask]
-    y_err_fit = y_err[active_mask]
-
-    n_points = len(x_fit)
-    if n_points == 0:
-        warnings.warn("No data points after masking. Fit cannot proceed.", RuntimeWarning)
-        return FitResult(x_data=x_data, y_data=y_data, function=func, method="N/A (no data)",
-                         mask=mask if original_mask_provided else None, success=False)
-
-    # --- Parameter Setup ---
-    try:
-        sig = inspect.signature(func)
-        func_param_names_all = list(sig.parameters.keys())
-        if len(func_param_names_all) < 2:
-            raise ValueError("Fit function needs >= 2 args: independent var (x) and >= 1 parameter.")
-        actual_param_names_from_func = func_param_names_all[1:]
-        n_params = len(actual_param_names_from_func)
+            raise ValueError(f"Unknown method: {resolved_method}")
+        
+        # Package parameters into Measurement objects
+        fit_params = {}
+        params_array = fit_result['params']
+        errors_array = fit_result['errors']
+        
+        for i, name in enumerate(parameter_names):
+            val = params_array[i] if i < len(params_array) else np.nan
+            err = errors_array[i] if i < len(errors_array) else np.nan
+            if np.isnan(val):
+                err = np.nan  # Ensure NaN propagation
+            fit_params[name] = Measurement(val, err, name=name)
+        
+        # Calculate statistics if requested
+        chi_square = None
+        stats = {'dof': None, 'reduced_chi_square': None}
+        
+        if calculate_stats and fit_result['success']:
+            # Determine if errors are meaningful for chi-square calculation
+            has_meaningful_errors = (
+                (resolved_method == 'odr' and (np.any(x_errs > 0) or np.any(y_errs > 0))) or
+                (resolved_method in ['curve_fit', 'minuit'] and np.any(y_errs > 0))
+            )
+            
+            chi_square = _calculate_chi_square(
+                x_vals, y_vals, y_errs, func, params_array, 
+                resolved_method, fit_result.get('fit_object')
+            )
+            
+            stats = _calculate_fit_statistics(
+                chi_square, n_points, n_params, resolved_method, has_meaningful_errors
+            )
+        
+        # Create and populate FitResult object
+        result = FitResult(
+            parameters=fit_params,
+            covariance_matrix=fit_result.get('cov_matrix'),
+            chi_square=chi_square,
+            dof=stats['dof'],
+            reduced_chi_square=stats['reduced_chi_square'],
+            function=func,
+            parameter_names=parameter_names,
+            x_data=x_data if isinstance(x_data, Measurement) else Measurement(values=x_data, name='x'),
+            y_data=y_data if isinstance(y_data, Measurement) else Measurement(values=y_data, name='y'),
+            method=resolved_method,
+            mask=active_mask,
+            success=fit_result['success'],
+            fit_object=fit_result.get('fit_object')
+        )
+        
+        # Emit all collected warnings
+        warn_mgr.emit_all()
+        
+        return result
+        
     except Exception as e:
-         raise ValueError(f"Could not inspect function signature for '{getattr(func,'__name__','anonymous')}': {e}")
-
-    # Determine final parameter names
-    if parameter_names is None:
-        parameter_names = actual_param_names_from_func # Use names from function
-    elif len(parameter_names) != n_params:
-        raise ValueError(f"Provided parameter_names count ({len(parameter_names)}) != function parameters ({n_params}). "
-                         f"Function expects: {actual_param_names_from_func}")
-    # Now parameter_names holds the definitive list of names in order
-
-    # --- Method Selection ---
-    if method == 'minuit' and not _has_iminuit:
-        raise ImportError("Method 'minuit' selected, but iminuit is not installed. "
-                          "Please install it (`pip install iminuit`).")
-
-
-    has_significant_x_errors = np.any(x_err_fit/x_fit > 0.005) # Relative error > 0.5%
-    has_any_y_errors = np.any(y_err_fit > 0) # Check if *any* y-errors are provided
-    y_errors_all_zero = not has_any_y_errors # True if all y_err are zero or effectively zero
-
-    resolved_method = method
-    if method == 'auto':
-        if _has_iminuit: # Prefer minuit if available and no significant X errors
-            resolved_method = 'odr' if has_significant_x_errors else 'minuit'
-        else: # Fallback if iminuit is not installed
-             resolved_method = 'odr' if has_significant_x_errors else 'curve_fit'
-        print(f"Info: Method 'auto' resolved to '{resolved_method}'.") # Simplified auto-resolve logic slightly
-    elif method == 'curve_fit':
-        if has_significant_x_errors:
-            warnings.warn("Method 'curve_fit' selected, but significant X errors detected. "
-                          "X errors will be ignored. Consider 'odr' or 'auto'.", UserWarning)
-        if y_errors_all_zero:
-             warnings.warn("curve_fit: No Y errors provided (or all zero). "
-                           "Fit will be unweighted. Parameter errors will be scaled by residuals "
-                           "and may not be statistically meaningful. Chi² cannot be calculated.", UserWarning)
-    elif method == 'odr':
-        if not has_significant_x_errors and not y_errors_all_zero:
-            warnings.warn("Method 'odr' selected, but X errors appear negligible. "
-                          "'curve_fit' or 'minuit' might be more appropriate if only Y errors are present.", UserWarning)
-        if y_errors_all_zero and not has_significant_x_errors:
-             warnings.warn("ODR: Neither significant X nor Y errors provided. Fit will be unweighted.", UserWarning)
-
-    elif method == 'minuit':
-        if has_significant_x_errors:
-             warnings.warn("Method 'minuit' (with LeastSquares cost) selected, but significant X errors detected. "
-                           "This cost function ignores X errors. Results might be biased. Consider 'odr'.", UserWarning)
-        if y_errors_all_zero:
-             # This is fatal for LeastSquares, raise error before attempting fit
-             raise ValueError("Method 'minuit' (with LeastSquares cost) requires non-zero y-errors for weighting. All provided y_err are zero or errors are missing.")
-        elif np.any(np.isclose(y_err_fit, 0.0)):
-             # Non-fatal, but good to know
-             warnings.warn("Minuit/LeastSquares: Found zero values in y_err_fit. "
-                           "These points will have infinite weight.", UserWarning)
-
-    elif method not in ['curve_fit', 'odr']:
-        raise ValueError(f"Invalid method '{method}'. Must be 'auto', 'curve_fit', 'odr', or 'minuit'")
-
-    fit_method_name = resolved_method
-
-    # --- Initial Guess Setup (Unified) ---
-    p0_list: List[float] = []
-    if p0 is None:
-        p0_list = [1.0] * n_params
-        warnings.warn(f"No initial guess (p0) provided. Using default guess {p0_list} "
-                      f"for parameters {parameter_names}. Fit convergence may be poor.", UserWarning)
-    elif isinstance(p0, (list, tuple)):
-        if len(p0) != n_params:
-            raise ValueError(f"p0 list/tuple length ({len(p0)}) != number of parameters ({n_params}). "
-                             f"Expected {n_params} guesses for parameters: {parameter_names}.")
-        p0_list = list(p0)
-    else:
-        raise TypeError("p0 must be a list or tuple of initial parameter guesses "
-                        f"(or None). Received type: {type(p0)}.")
-
-    # --- Perform the Fit ---
-    params_opt: np.ndarray = np.full(n_params, np.nan)
-    params_std_err: np.ndarray = np.full(n_params, np.nan)
-    cov_matrix: Optional[np.ndarray] = None
-    fit_success = False
-    fit_extra_info = None # Store Minuit object or ODR output
-    m: Optional[Minuit] = None # Explicitly define m for Minuit case
-
-    try:
-        if fit_method_name == 'odr':
-            # Check if ODR is viable
-            if y_errors_all_zero and not has_significant_x_errors:
-                 warnings.warn("ODR selected but no errors provided for weighting. Performing unweighted fit.", UserWarning)
-                 sx = None
-                 sy = None
-            else:
-                 sx = None if np.all(x_err_fit==0) else x_err_fit # ODR handles None
-                 sy = y_err_fit if has_any_y_errors else None
-
-            def odr_func_wrapper(beta, x): # beta = params
-                try: return func(x, *beta)
-                except Exception as e:
-                     return np.full_like(x, np.nan) if isinstance(x, np.ndarray) else np.nan
-
-            odr_model = Model(odr_func_wrapper)
-            data = RealData(x_fit, y_fit, sx=sx, sy=sy)
-            # Sensible default for maxit, allow override via kwargs
-            odr_instance = ODR(data, odr_model, beta0=p0_list, maxit=kwargs.pop('maxit', 1000), **kwargs)
-            output = odr_instance.run()
-            fit_extra_info = output
-
-            # ODR success codes: 0, 1, 2, 3 indicate some level of success/convergence
-            if output.info in [0, 1, 2, 3]:
-                 params_opt = output.beta
-                 params_std_err = output.sd_beta
-                 if output.cov_beta is not None:
-                      # ODR scales cov_beta by res_var ONLY if fit is implicitly scaled (no errors given)
-                      # If errors ARE given (sx or sy not None), cov_beta is the correct covariance matrix.
-                      # If errors are NOT given, then cov_beta must be multiplied by res_var.
-                      # Scipy ODR docs are a bit confusing here, but common practice (and curve_fit comparison)
-                      # suggests this interpretation.
-                      if sx is not None or sy is not None: # Weighted fit
-                           cov_matrix = output.cov_beta
-                           # Check if res_var is reasonable, ODR sets it to 1 if weighted?
-                           # if not np.isclose(output.res_var, 1.0/(n_points - n_params)) and not np.isclose(output.res_var, 1.0):
-                           #      warnings.warn(f"ODR weighted fit has res_var={output.res_var:.3g}. Check documentation for covariance interpretation.", RuntimeWarning)
-                      else: # Unweighted fit, variance is estimated from residuals
-                           cov_matrix = output.cov_beta * output.res_var
-                 else:
-                      warnings.warn("ODR fit successful but covariance matrix (cov_beta) is None.", RuntimeWarning)
-                 fit_success = True
-                 if output.info > 0:
-                      warnings.warn(f"ODR completed but with potential issues. Stop reason: '{output.stopreason}'. Info code: {output.info}.", RuntimeWarning)
-            else:
-                 warnings.warn(f"ODR fitting failed. Stop reason: '{output.stopreason}'. Info code: {output.info}.", RuntimeWarning)
-                 params_opt = output.beta if hasattr(output, 'beta') else params_opt
-                 params_std_err = output.sd_beta if hasattr(output, 'sd_beta') else params_std_err
-                 fit_success = False
-
-        # --- Modified Minuit Section ---
-        elif fit_method_name == 'minuit':
-            # Ensure y_errors_all_zero was checked earlier and raised ValueError if true
-
-            # Instantiate Cost Function
-            try:
-                # LeastSquares requires y_err > 0. Already checked for all zeros.
-                cost_func = LeastSquares(x_fit, y_fit, y_err_fit, func)
-            except Exception as e:
-                 raise ValueError(f"Failed to initialize iminuit.cost.LeastSquares: {e}. Check function signature and data.")
-
-            # Create initial parameters dictionary for Minuit
-            p0_dict = dict(zip(parameter_names, p0_list))
-
-            # Instantiate Minuit
-            m = Minuit(cost_func, **p0_dict)
-            fit_extra_info = m # Store Minuit object
-
-            # Apply limits if provided (simplified)
-            if minuit_limits:
-                try:
-                    for name, limits in minuit_limits.items():
-                        if name in m.parameters: # Basic check
-                            m.limits[name] = limits
-                        else:
-                            # Warn once if a name is wrong, but don't stop
-                            warnings.warn(f"Parameter name '{name}' in minuit_limits not found in function parameters.", UserWarning)
-                except Exception as e:
-                     warnings.warn(f"Error applying Minuit limits: {e}", RuntimeWarning)
-
-
-            # Run Migrad minimizer
-            m.migrad(**kwargs) # Pass extra kwargs like ncall
-
-            # Run Hesse for accurate errors if Migrad finished
-            if m.valid:
-                try:
-                    m.hesse() # Calculate Hessian errors
-                except RuntimeError as e:
-                    warnings.warn(f"Minuit HESSE calculation failed: {e}. Errors from MIGRAD might be less accurate.", RuntimeWarning)
-
-            # Check final validity
-            fit_success = m.valid and m.fmin.is_valid # Check if function minimum is valid
-
-            if fit_success:
-                # Get values/errors in the order defined by parameter_names
-                params_opt = np.array([m.values[name] for name in parameter_names])
-                params_std_err = np.array([m.errors[name] for name in parameter_names])
-
-                # --- CORRECTED COVARIANCE EXTRACTION ---
-                if m.covariance is not None:
-                    # Create numpy array and populate using indices
-                    cov_matrix = np.zeros((n_params, n_params))
-                    param_indices = {name: i for i, name in enumerate(parameter_names)}
-                    for p1_name in parameter_names:
-                        for p2_name in parameter_names:
-                            idx1 = param_indices[p1_name]
-                            idx2 = param_indices[p2_name]
-                            # Access covariance matrix elements using indices or names
-                            # Note: m.covariance indexing might depend slightly on iminuit version
-                            # Trying direct tuple indexing first, common in newer versions
-                            try:
-                                cov_matrix[idx1, idx2] = m.covariance[idx1, idx2]
-                            except (TypeError, IndexError):
-                                # Fallback if tuple indexing fails (maybe older version expects names?)
-                                try:
-                                    cov_matrix[idx1, idx2] = m.covariance[p1_name, p2_name]
-                                except Exception as e:
-                                    warnings.warn(f"Could not access covariance element for ({p1_name}, {p2_name}): {e}. Covariance matrix might be incomplete.", RuntimeWarning)
-                                    cov_matrix[idx1, idx2] = np.nan # Mark as unavailable
-
-                else:
-                    warnings.warn("Minuit fit valid, but covariance matrix could not be obtained (is None).", RuntimeWarning)
-                    # Leave cov_matrix as None
-                # --- END CORRECTION ---
-
-            else:
-                 warnings.warn(f"Minuit optimization failed or did not converge properly. "
-                               f"(valid={m.valid}, fmin.is_valid={m.fmin.is_valid}). "
-                               f"Check results carefully.", RuntimeWarning)
-                 # Attempt to grab parameters even on failure
-                 try:
-                     params_opt = np.array([m.values[name] for name in parameter_names])
-                     params_std_err = np.array([m.errors[name] for name in parameter_names])
-                 except Exception:
-                     pass # Keep NaNs if extraction fails
-                 # Leave cov_matrix as None if fit failed
-        # --- End of Modified Minuit Section ---
-
-        else: # curve_fit
-            sigma_y = y_err_fit if has_any_y_errors else None
-            use_absolute_sigma = has_any_y_errors # Use absolute if errors were provided
-
-            if not use_absolute_sigma:
-                 warnings.warn("curve_fit: No Y errors provided. Using absolute_sigma=False. "
-                               "Parameter errors will be scaled by residuals. "
-                               "Chi² cannot be calculated.", UserWarning)
-
-            if use_absolute_sigma and np.any(np.isclose(sigma_y, 0.0)):
-                warnings.warn("curve_fit: Found zero values in y_err (sigma). "
-                              "These points will cause issues (division by zero). "
-                              "Result or errors might be inf/nan.", UserWarning)
-                # curve_fit handles infinite weights poorly, often results in inf/nan cov matrix
-                # No automatic fix applied here, user must handle zero errors if using curve_fit
-
-            try:
-                popt, pcov = curve_fit(func, x_fit, y_fit, p0=p0_list,
-                                       sigma=sigma_y,
-                                       absolute_sigma=use_absolute_sigma,
-                                       check_finite=kwargs.pop('check_finite', True), # Default True
-                                       maxfev=kwargs.pop('maxfev', 5000), # Sensible default
-                                       **kwargs)
-
-                params_opt = popt
-                with np.errstate(invalid='ignore'): # Ignore sqrt(negative/inf) warning
-                    params_std_err = np.sqrt(np.diag(pcov))
-                cov_matrix = pcov
-
-                # Check if pcov contains inf/nan which indicates failure even if no exception was raised
-                if np.any(~np.isfinite(pcov)):
-                     warnings.warn("curve_fit completed, but covariance matrix contains Inf/NaN values. "
-                                   "This often indicates a poorly constrained fit or issues with zero errors.", RuntimeWarning)
-                     fit_success = False # Treat as failure if cov is unusable
-                     params_std_err.fill(np.nan) # Mark errors as invalid
-                else:
-                     fit_success = True # curve_fit raises exception on primary failure
-
-            except RuntimeError as e:
-                # This usually means optimal parameters not found
-                warnings.warn(f"curve_fit failed: {e}", RuntimeWarning)
-                fit_success = False
-                # p0 might be returned in popt, or it might be nonsense. Leave as NaN.
-            except ValueError as e:
-                 # Can happen with shape mismatches internally, or NaN/inf in input if check_finite=False
-                 warnings.warn(f"curve_fit failed due to ValueError: {e}", RuntimeWarning)
-                 fit_success = False
-
-
-    # --- General Error Handling (Catches errors within fit blocks if not caught internally) ---
-    except ImportError as e: # Catch the iminuit import error here as well
-         raise e # Re-raise import error
-    except ValueError as e: # Catch ValueErrors from data checks, param mismatches etc.
-         warnings.warn(f"Fitting failed due to input error ({fit_method_name}): {e}", RuntimeWarning)
-         fit_success = False
-    except TypeError as e: # Catch TypeErrors from p0 etc.
-        warnings.warn(f"Fitting failed due to type error ({fit_method_name}): {e}", RuntimeWarning)
-        fit_success = False
-    except Exception as e:
-        # Catch any other unexpected errors during the fitting process itself
-        import traceback
-        warnings.warn(f"Unexpected error during fitting process ({fit_method_name}): {e}\n{traceback.format_exc()}", RuntimeWarning)
-        # Try to capture the state before failing if possible
-        if m is not None: fit_extra_info = m # Already assigned in minuit block
-        elif 'output' in locals() and isinstance(output, ODR.Output): fit_extra_info = output
-        fit_success = False
-
-
-    # --- Package Results ---
-    fit_params_dict = {}
-    for i, name in enumerate(parameter_names):
-        # Ensure index is within bounds before accessing potentially modified arrays
-        val = params_opt[i] if i < len(params_opt) and np.isfinite(params_opt[i]) else np.nan
-        err = params_std_err[i] if i < len(params_std_err) and np.isfinite(params_std_err[i]) else np.nan
-        # Ensure NaN propagates if value is NaN, even if error calculation somehow yielded a number
-        if np.isnan(val): err = np.nan
-        fit_params_dict[name] = Measurement(val, err, name=name)
-
-    result = FitResult(
-        parameters=fit_params_dict,
-        covariance_matrix=cov_matrix, # Might be None or contain NaN/inf
-        function=func,
-        parameter_names=parameter_names, # Store the definitive names list
-        x_data=x_data, y_data=y_data,
-        method=fit_method_name,
-        mask=mask if original_mask_provided else None,
-        success=fit_success,
-        fit_object=fit_extra_info # Store Minuit/ODR object
-    )
-
-    # --- Calculate Goodness-of-Fit Statistics ---
-    result.dof = n_points - n_params # Calculate DoF regardless of success, might be <= 0
-
-    # Conditions for calculating Chi2: Fit succeeded, stats requested, DoF calculable, and errors appropriate for method
-    can_calculate_stats = calculate_stats and fit_success and result.dof is not None
-    meaningful_errors_for_chi2 = False
-    chi2_source = "N/A"
-
-    if fit_method_name == 'odr':
-        # ODR's sum_square is chi2 if fit was weighted
-        if fit_extra_info and hasattr(fit_extra_info, 'sum_square'):
-            if sx is not None or sy is not None: # Weighted fit?
-                 meaningful_errors_for_chi2 = True
-                 chi2_source = "ODR sum_square (weighted)"
-            # else: warnings.warn("Cannot calculate meaningful Chi² for unweighted ODR fit.", UserWarning) # Already warned
-
-    elif fit_method_name == 'minuit':
-        # Minuit's fval with LeastSquares cost IS the Chi² (since non-zero y_err was required)
-        if fit_extra_info and hasattr(fit_extra_info, 'fval'):
-            meaningful_errors_for_chi2 = True
-            chi2_source = "Minuit fval (LeastSquares)"
-        # else: y_errors_all_zero case already raised an error
-
-    else: # curve_fit case
-        # Chi² meaningful only if absolute_sigma=True (i.e., weighted fit)
-        if use_absolute_sigma:
-             meaningful_errors_for_chi2 = True
-             chi2_source = "Manual calculation (curve_fit, absolute_sigma=True)"
-        # else: warnings.warn("Cannot calculate meaningful Chi² for curve_fit: Fit used absolute_sigma=False (unweighted).", UserWarning) # Already warned
-
-    # Proceed if conditions met
-    if can_calculate_stats and meaningful_errors_for_chi2:
-        chi2_val = None
+        # Create failure result
+        warn_mgr.add(f"Fit operation failed: {e}", 'general')
+        warn_mgr.emit_all()
+        
+        # Try to extract basic info for failure result
         try:
-            if fit_method_name == 'odr':
-                chi2_val = fit_extra_info.sum_square
-            elif fit_method_name == 'minuit':
-                chi2_val = fit_extra_info.fval
-            else: # curve_fit with absolute_sigma=True
-                # Check params_opt are finite before using them
-                if np.all(np.isfinite(params_opt)):
-                    with np.errstate(divide='ignore', invalid='ignore'):
-                        y_pred = func(x_fit, *params_opt)
-                        # Use y_err_fit which was passed as sigma. Handle potential zeros.
-                        sigma_safe = np.where(np.isclose(y_err_fit, 0.0), 1.0, y_err_fit) # Avoid division by zero visually
-                        residuals = (y_fit - y_pred) / sigma_safe
-                        # Check for NaNs/Infs resulting from calculation (e.g., func output issues) or zero errors
-                        finite_mask = np.isfinite(residuals)
-                        if np.all(finite_mask):
-                             chi2_val = np.sum(residuals**2)
-                        else:
-                             # If some residuals are non-finite, calculate sum only on finite ones and warn.
-                             chi2_val = np.sum(residuals[finite_mask]**2)
-                             warnings.warn("Chi² calculated for curve_fit excluded non-finite residuals (check function or zero errors).", RuntimeWarning)
-                else:
-                    warnings.warn("Cannot calculate Chi² for curve_fit: Optimal parameters contain NaN/inf.", RuntimeWarning)
-
-
-            # Assign if calculation was successful (might be None if issues above)
-            if chi2_val is not None and np.isfinite(chi2_val):
-                result.chi_square = chi2_val
-                if result.dof > 0:
-                     result.reduced_chi_square = chi2_val / result.dof
-                else: # DoF <= 0 case
-                     warnings.warn(f"DoF = {result.dof} <= 0. Reduced Chi² cannot be calculated.", RuntimeWarning)
-            else:
-                 warnings.warn(f"Could not compute a valid Chi² value ({chi2_source}).", RuntimeWarning)
-
-        except Exception as e:
-             warnings.warn(f"Error during Chi² calculation ({chi2_source}): {e}", RuntimeWarning)
-
-    # Add final warnings if stats were requested but couldn't be calculated
-    elif calculate_stats and not fit_success:
-         warnings.warn(f"Cannot calculate fit statistics (Chi², etc.): Fit failed (success=False).", RuntimeWarning)
-    elif calculate_stats and not meaningful_errors_for_chi2:
-         warnings.warn(f"Fit successful, but cannot calculate meaningful Chi² statistic: Method '{fit_method_name}' requires appropriate data errors for weighting (check {chi2_source}).", RuntimeWarning)
-    elif calculate_stats and result.dof is None: # Should not happen if n_points > 0
-         warnings.warn(f"Cannot calculate fit statistics: Degrees of freedom calculation failed.", RuntimeWarning)
-
-    # Final check on DoF for reduced chi2 even if calculated above
-    if result.chi_square is not None and (result.dof is None or result.dof <= 0):
-         result.reduced_chi_square = None # Ensure it's None if DoF is invalid
-
-
-    return result
-# --- END OF FILE fitting.py ---
+            param_names, n_params = _extract_parameter_info(func, parameter_names)
+        except:
+            param_names = parameter_names or []
+            n_params = len(param_names)
+        
+        failure_params = {name: Measurement(np.nan, np.nan, name=name) for name in param_names}
+        
+        return FitResult(
+            parameters=failure_params,
+            parameter_names=param_names,
+            function=func,
+            x_data=x_data if isinstance(x_data, Measurement) else Measurement(values=x_data, name='x'),
+            y_data=y_data if isinstance(y_data, Measurement) else Measurement(values=y_data, name='y'),
+            method=method,
+            success=False
+        )
