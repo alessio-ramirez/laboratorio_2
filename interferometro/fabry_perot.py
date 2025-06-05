@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #FIGURA INTERFERENZA
-def int_fabry (A, d, cos) :
+def int_fabry (cos, A, d) :
     lambd = 632.8 *10e-9 
     return A + (2*d/lambd)*cos
 
@@ -14,13 +14,10 @@ l = Measurement(128, 0.5, magnitude=-2)
 diam = [2.0, 3.6, 4.8, 5.7, 6.5]
 err_diam = 0.1
 diam = Measurement(diam, err_diam, magnitude=-2)
-theta = np.arctan(diam/2/l)
-print(theta)
-cos= np.cos(theta)
-print(cos)
+cos= np.cos(np.arctan(diam/(2*l)))
 k = Measurement([5,4,3,2,1])
-#fit = perform_fit(cos, k, int_fabry, method='odr')
-#plot_fit(fit, show_plot=True, show_params=True, show_stats=True)
+fit = perform_fit(cos, k, int_fabry, method='odr')
+plot_fit(fit, show_plot=True, show_params=True, show_stats=True)
 
 #CALIBRAZIONE MICROMETRO 
 #nonio mosso sempre tra le stesse posizioni
@@ -30,4 +27,4 @@ delta_n = Measurement(delta_n, 1)
 lambd = 632.8 *10e-9
 delta_d = lambd*delta_n/2
 delta_d_m = weighted_mean(delta_d)
-print(delta_d_m)
+#print(delta_d_m)
