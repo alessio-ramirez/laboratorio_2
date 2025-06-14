@@ -295,6 +295,136 @@ L'esperimento ha permesso di caratterizzare con successo le proprietà del prism
 I dati sono stati interpolati usando la legge di Cauchy, arrestando lo sviluppo al termine in $1/\lambda^2$. Questa scelta è giustificata sia dal piccolo valore del parametro $B$ ottenuto (Tabella \ref{tab:fit cauchy}), che suggerisce una rapida convergenza della serie, sia dall'esito del test del chi-quadro. Il valore di $\chi^2/\nu = 1.1$ indica un'eccellente compatibilità tra il modello e i dati sperimentali, rendendo superfluo l'inserimento di ulteriori parametri, inoltre l'utilizzo di "sole" 5 righe spettrali è giustificato dal fatto che per altre righe avremmo dovuto utilizzare errori almeno il doppio più grandi.
 In definitiva, la procedura si è dimostrata valida e ha portato a una stima precisa dei parametri di Cauchy del prisma, confermando la validità di tale legge per descrivere la dispersione nel materiale analizzato.
 
+\section{Identificazione gas ignoto}
+\subsection{Obiettivo}
+L'obiettivo di questa esperienza è l'identificazione di un gas ignoto mediante lo studio del suo spettro di emissione utilizzando un prisma.
+\subsection{Metodo} 
+La procedura sperimentale per l'identificazione del gas ignoto è analoga a quella utilizzata per la caratterizzazione dell'indice di rifrazione del prisma. Infatti, in questa parte dell'esperimento, abbiamo utilizzato il prisma per studiare lo spettro di emissione di una lampada contenente tale gas. Nella prima parte dell'esperienza siamo stati in grado di ricavare i coefficenti $A$ e $B$ della legge di Cauchy $n(\lambda)=A+\frac{B}{\lambda^2}$; invertendo dunque per $\lambda$ si ottiene:
+\begin{center}
+    $\lambda=\sqrt{\frac{B}{n-A}}$
+    \label{eq: Lambda_gas_ignoto_prisma}
+\end{center}
+Le lunghezze d'onda così ottenute possono essere confrontate con spettri di emissione di gas noti presenti sui database online del sito del NIST.
+Il calcolo di $n$ è stato effettuato, come nell'esperimento precedente, medianete la misura sperimentale dell'angolo di minima deviazione corrispondente a ciascuna riga spettrale (equazione (.)) ed i valori di $A$ e $B$ sono quelli calcolati in precedenza, infatti il prisma utilizzato per l'esperimento è il medesimo.
+%TODO inserire riferimento a equazione di n
+Gli errori sugli angoli sono stati valutati considerando la sensibilità dell'appararto presente in laboratorio.
+\subsection{Dati}
+I dati raccolti dall'osservazione delle righe spettrali sono riportati nella tabella \ref{tab:Angoli_gas_ignoto_prisma}. Ivi sono stati intabulati i valori degli angoli di minima deviazione misurati in corrispondenza di alcune righe di colore riportato. 
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Colore} & \textbf{$\text{ang\_min}$ (rad)} \\
+\hline
+Rosso   & $0.838 \pm 0.010$\\
+Giallo ocra & $0.846 \pm 0.010$\\
+Azzurro          & $0.855 \pm 0.010$\\
+Blu scuro        & $0.873 \pm 0.010$\\
+\hline
+\end{tabular}
+\caption{colore e angolo minimo prisma}
+\label{tab:Angoli_gas_ignoto_prisma}
+\end{table}
+Vogliamo osservare che lo spettro di emissione osservato era composto da molte righe spettrali, in laboratorio abbiamo deciso di campionarne solo alcune, più evidenti delle altre. Tale scelta è stata effettuata per motivi logistici, infatti molte righe adiacenti risultavano quasi indistinguibili.   
+\subsection{Analisi dati}
+Sulla base dei dati ottenuti sperimentalmente siamo stati in grado di calcolare le lunghezze d'onda associate a ciascuna riga osservata. L'equazione utilizzata per calcolare la lunghezza d'onda in corrispondenza di ciascun angolo di minima deviazione è l'equazione \ref{eq: Lambda_gas_ignoto_prisma} ed il relativo errore $\delta_{\lambda}$ è:
+\begin{center}
+\[
+\delta_\lambda = \sqrt{
+\left( \frac{\delta_B}{2\lambda(n - A)} \right)^2 +
+\left( \frac{B \cdot \delta_n}{2\lambda(n - A)^2} \right)^2 +
+\left( \frac{B \cdot \delta_A}{2\lambda(n - A)^2} \right)^2
+}
+\]
+\label{eq: errore su lambda}
+\end{center}
+I risultati così ottenuti sono riportati nella tabella \ref{tab: tabella lunghezze d'onda prisma} dove ciascuna lunghezza d'onda calcolata è affiancata al relativo colore osservato in laboratorio.
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Lunghezza d'onda (nm)} & \textbf{Colore} \\
+\hline
+$581\pm 100$ & Rosso \\
+$536\pm 100$ & Giallo ocra \\
+$500\pm 90$& Azzurro \\
+$446\pm 70$& Blu scuro \\
+\hline
+\end{tabular}
+\caption{Lunghezze d'onda e colori prisma}
+\label{tab: tabella lunghezze d'onda prisma}
+\end{table}
+Lo spettro di emissione relativo ai valori medi delle lunghezze d'onda calcolate è rappresentato nell'immagine \ref{Fig: spettro emissione gas ignoto prisma}.
+\begin{center}
+	\includegraphics[width=0.9\textwidth]{grafici/spettro emissione gas ignoto prisma.png}
+\captionof{figure}{spettro di emissione gas ignoto (prisma)}
+\label{Fig: spettro emissione gas ignoto prisma}
+\end{center}
+Come è possibile osservare i colori delle righe spettrali calcolati e riportati nell'immagine \ref{Fig: spettro emissione gas ignoto prisma} sono diversi da quelli osservati in laboratorio durante l'acquisizione dei dati riportati nella tabella \ref{tab: tabella lunghezze d'onda prisma}. Tuttavia se si considerano gli errori elevati v'è coerenza fra colore osservato in laboratorio e lunghezza d'onda calcolata.
+
+
+\subsection{Conclusione}
+In conclusione non possiamo affermare con certezza la natura del gas ignoto presente nel tubo. Gli errori troppo elevati rendono infatti impossibile affermare con certezza di quale elementi sia composto o meno. Il fatto che il prisma non fosse posizionato sul supporto in maniera simmetrica (per problemi di natura tecnica) avvalora la nostra scelta. L'identificazione del gas ignoto si baserà dunque unicamente sui dati acquisiti con il reticolo. Infatti, come si potrà osservare in seguito, le lunghezze d'onda ricavate nella configurazione del reticolo risulteranno del tutto compatibili con quelle misurate utilizzando il prisma proprio a causa degli errori elevati. talune lunghezze d'onda risulteranno però concordi con le osservazioni sperimentali (in colore) ed avranno errori sensibilmente minori.
+\section{Identificazione gas ignoto}
+\subsection{Obiettivo}
+L'obiettivo di questa esperienza è l'identificazione di un gas ignoto mediante lo studio del suo spettro di emissione utilizzando un reticolo.
+\subsection{Metodo}
+La procedura sperimentale per l'identificazione del gas ignoto è analoga a quella utilizzata per la caratterizzazione del passo del reticolo. in particolare per questa esperienza abbiamo utilizzato il reticolo con $300 \frac{righe}{mm}$. Dalla misura sperimentale degli angoli in corrispondenza dei quali si osservano le righe spettrali, si può ricavare la lungezza d'onda delle righe mediante la formula:
+\begin{center}
+    $\lambda=\frac{dsin(\theta)}{m}$
+    \label{eq: lambda_gas_ignoto_reticolo}
+\end{center}
+dove $d$ è il passo del reticolo, $\theta$ è l'angolo per il quale si osserva una determinata riga spettrale e $m$ è l'ordine della riga spettrale osservata. Per l'esperimento abbiamo deciso di utilizzare il reticolo da $300\frac{righe}{mm}$, dunque il valore di $d$ utilizzato è quello calcolato precedentemente con relativa incertezza.
+Le lunghezze d'onda così ottenute posssono essere confrontate con spettri di emissione di gas noti presenti sui database online del sito del NIST.
+L'angolo $\theta$ è stato misurato come media dell'angolo relativo alla riga spettrale a destra e a sinistra. tale scelta è stata fatta per ridurre l'errore e controllare la corretta perpendicolarità del reticolo rispetto all'apparato. L'angolo $\theta$ è dunque calcolato con la formula $\theta=\frac{|\theta_{dx}+\theta_{sx}|}{2}$ e, visto che gli errori a detsra e sinistra sono uguali ($\delta_{\theta_{dx}}=\delta_{\theta_{sx}}$) e corrispondono alla sensibilità dello strumento $s$, l'errore su $\theta$ è $\delta_\theta=\frac{s}{\sqrt{2}}$. Il campionamento è stato effettuato unicamente per il primo ordine di righe spettrali ($m=1$) per motivi tempistici.
+
+\subsection{Dati}
+Idati raccolti dall'osservazione delle righe spettrali sono riportati nella tabella \ref{tab: angolo e colore gas ignoto reticolo}. Sono stati tabulati gli angoli misurati in corrispondenza di alcune righe di colore riportato. Come prima è stata effettuata unicamente l'osservazione di poche delle molte righe spettrali presenti per motivi logistici.
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+$\theta$ & Colore \\ \hline
+$11.25^\circ$ & Rosso \\
+$10.00^\circ$ & Giallo ocra \\
+$8.25^\circ$  & Azzurro \\
+$7.875^\circ$ & Blu scuro \\
+\hline
+\end{tabular}
+\caption{Valori di $\theta$ e relativi colori osservati}
+\label{tab: angolo e colore gas ignoto reticolo}
+\end{table}
+Vogliamo notare che, come era successo nell'esperimento precedente con prisma, durante l'esperienza in laboratorio le righe spettrali erano numerose e le righe adiacenti erano quasi indistinguibili. Abbiamo deciso dunque di campionare solo alcune righe spettrali, ovvero le più intense e distinguibili. 
+\subsection{Analisi dati}
+Sulla base dei dati ottenuti sperimentalmente siamo stati in grado di calcolare le lunghezze d'onda associate a ciascuna riga osservata. L'equazione utilizzata per calcolare la lunghezza d'onda in corrispondenza di ciascun angolo $\theta$ è l'equazione \ref{eq: lambda_gas_ignoto_reticolo} ed il relativo errore $\delta_\lambda$ (per $m=1$) è:
+\begin{center}
+$\delta_\lambda=\sqrt{(cos(\theta)\delta_\theta)^2+(sin(\theta)\delta_d)^2}$
+\end{center}
+I risultati così ottenuti sono riportati nella tabella \ref{tab: tabella lunghezze d'onda reticolo} dove ciascuna lunghezza d'onda calcolata con relativo errore è affiancata al relativo colore osservato in laboratorio.
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Lunghezza d'onda (nm)} & \textbf{Colore} \\
+\hline
+$656 \pm 20$ & Rosso  \\
+$584 \pm 20$ & Giallo ocra\\
+$483 \pm 20$ & Azzurro \\
+$461 \pm 20$ & Blu scuro \\
+\hline
+\end{tabular}
+\caption{Lunghezze d'onda e colori reticolo}
+\label{tab: tabella lunghezze d'onda reticolo}
+\end{table}
+Lo spettro di emissione relativo ai volori medi delle lunghezze d'onda calcolate è rappresentato nell'immagine \ref{Fig: spettro emissione gas ignoto reticolo}:
+\begin{center}
+	\includegraphics[width=0.9\textwidth]{grafici/spettro gas ignoto reticolo 300.png}
+\captionof{figure}{spettro di emissione gas ignoto (reticolo)}
+\label{Fig: spettro emissione gas ignoto reticolo}
+\end{center}
+Come è possibile notare, a differenza della configuarzione con prisma, c'è coerenza fra colore osservato in laboratorio e lunghezza d'onda media calcolata.
+
+\subsection{Conclusione}
 
 \end{document}
 
