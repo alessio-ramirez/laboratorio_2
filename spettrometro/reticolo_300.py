@@ -15,7 +15,7 @@ theta_0 = Measurement(84.5, err_ang)
 theta_dx = Measurement(105.25, err_ang)
 theta_sx = Measurement(64.25, err_ang)
 theta = ((theta_dx - theta_sx)/2)*np.pi/180 #in radianti
-latex_table_data (theta_dx, theta_sx, theta, caption='Posizione angolare massimi di interferenza', orientation='h' )
+latex_table_data (theta_dx, theta_sx, theta*180/np.pi, caption='Posizione angolare massimi di interferenza', orientation='h' )
 lambda_nota = 588.995 * 10**(-9) #considerata senza errore, lunghezza d'onda della riga più intensa
 
 d = k*lambda_nota/np.sin(theta)

@@ -40,4 +40,4 @@ ang_min = (angolo_0 - angolo) * np.pi / 180
 n = np.sin((ang_min + alfa)/2)/np.sin(alfa/2)
 lambda_ignota = np.sqrt(B/(n-A))
 #print(f"n={n}, A={A}, B={B}, angolo minima deviazione={ang_min}")
-#print(lambda_ignota)
+print(lambda_ignota)

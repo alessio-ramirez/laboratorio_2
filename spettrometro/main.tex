@@ -44,7 +44,7 @@ Per minimizzare l'errore $\delta_{\theta}$ sulla posizione del massimo abbiamo m
 \subsubsection{Dati}
 Il valore di $\theta$ ottenuto è riportato in tabella \ref{tab:angoli_d}. L'errore su $\theta$ segue dalla propagazione degli errori:
 \begin{align}
-\delta_{theta} = \sqrt{\delta_{theta_{dx}}^2+\delta_{theta_{sx}}^2}
+\delta_{theta} = \frac{1}{2}\sqrt{\delta_{theta_{dx}}^2+\delta_{theta_{sx}}^2}
 \label{eq:err_angolo}
 \end{align}
 In particolare $\delta_{theta_{dx}} =\delta_{theta_{sx}}= 0.25^\circ$, corrispondente alla sensibilità del goniometro.
@@ -56,7 +56,7 @@ Dal momento che l'errore non dipende dalla riga spettrale osservata abbiamo scel
 \hline
 $\theta_{dx} [^\circ]$ & 105.25 ± 0.25 \\\hline
 $\theta_{sx} [^\circ]$ & 64.25 ± 0.25 \\\hline
-$\theta [^\circ]$ & 20.50 ± 0.35  \\\hline
+$\theta [^\circ]$ & 20.50 ± 0.17  \\\hline
 \end{tabular}
 \caption{Posizione angolare massimi di interferenza reticolo 300 righe/mm}
 \label{tab:angoli_d}
@@ -153,7 +153,6 @@ Inoltre dall'utilizzo di reticoli aventi passo differente abbiamo potuto valutar
 I valori di $\theta$ ottenuti per i due reticoli sono riportati nelle tabelle \ref{tab:angoli_600} e \ref{tab:angoli_1200}. L'errore su $\theta$ segue dalla propagazione degli errori:
 \begin{align}
 \delta_{theta} = \sqrt{\delta_{theta_{dx}}^2+\delta_{theta_{sx}}^2}
-\label{eq:err_angolo}
 \end{align}
 con $\delta_{theta_{dx}} =\delta_{theta_{sx}}= 0.5^\circ$.
 
@@ -208,8 +207,9 @@ Come per la prima parte di misurazioni effettuate con il reticolo possiamo consi
 Caratterizzare un prisma a dispersione: valutarne le caratteristiche geometriche e determinare i parametri della legge di Cauchy che ne descrive l'indice di rifrazione.
 
 \subsubsection{Metodo}
-Una volta completata la messa a fuoco dello spettrometro abbiamo posizionato il prisma a dispersione sulla piattaforma posta tra telescopio e collimatore. Nonostante la regolazione della piattaforma, quest'ultima non era perfettamente complanare con l'asse congiungente collimatore e oculare; di conseguenza il posizionamento del prisma non è avvenuto centralmente rispetto alla piattaforma per poter fare in modo che i raggi luminosi rifratti fossero individuabili dal telescopio.
-\newline\\
+Una volta completata la messa a fuoco dello spettrometro abbiamo posizionato il prisma a dispersione sulla piattaforma posta tra telescopio e collimatore. Nonostante la regolazione della piattaforma, quest'ultima non era perfettamente complanare con l'asse congiungente collimatore e oculare; di conseguenza il posizionamento del prisma non è avvenuto centralmente rispetto alla piattaforma, per poter fare in modo che i raggi luminosi rifratti fossero individuabili dal telescopio.
+\newline
+\newline
 \textbf{Angolo al vertice} \newline
 Per determinare l'angolo al vertice $\alpha$ si è sfruttato il potere riflessivo delle due facce lucide del prisma. Abbiamo dapprima ruotato il telescopio posizionandolo ad un angolo $\theta_i$ tale per cui risultava visibile il raggio riflesso proveniente dalla prima faccia lucida del prisma. Abbiamo poi ruotato la piattaforma (quindi il prisma posto su di essa) fino ad individuare nuovamente con il telescopio il raggio riflesso dalla seconda faccia lucida del prisma, visibile dopo una rotazione di un angolo $\beta$. L'angolo al vertice risulta quindi:
 \begin{align}
@@ -219,7 +219,7 @@ Per determinare l'angolo al vertice $\alpha$ si è sfruttato il potere riflessiv
 \textbf{Angolo di minima deviazione}\newline
 Per la determinazione dell'angolo di minima deviazione è stata utilizzata una lampada al mercurio, in modo da poter considerare note a priori (e quindi prive di errore) le lunghezze d'onda delle singole righe d'emissione, ricavate dal sito del NIST.
 Sono state prese in considerazione 5 diverse righe spettrali. La prima riga corrisponde al doppietto giallo più intenso del mercurio, le cui righe sono state considerate come sovrapposte, in quanto difficili da distinguere, con lunghezza d'onda media di quelle indicate sul sito del NIST.
-L'angolo di minima deviazione corrisponde alla posizione angolare tale per cui la deviazione interna dovuta alla rifrazione del raggio incidente è minimizzata. Tale angolo dipende dal potere rifrattivo del prisma (quindi dal suo indice di rifrazione $n$), a sua volte dipendente dalla lunghezza d'onda della radiazione; di conseguenza variabile a seconda della riga spettrale osservata. In particolare si ha:
+L'angolo di minima deviazione corrisponde alla posizione angolare tale per cui la deviazione interna dovuta alla rifrazione del raggio incidente è minimizzata. Tale angolo dipende dal potere rifrattivo del prisma (quindi dal suo indice di rifrazione $n$), a sua volta dipendente dalla lunghezza d'onda della radiazione; di conseguenza variabile a seconda della riga spettrale osservata. In particolare si ha:
 \begin{align}
     \sin(\frac{\theta_m + \alpha}{2}) = n\sin(\frac{\alpha}{2})
 \label{eq:angolo min deviazione}
@@ -290,6 +290,10 @@ Risultati & 1.5660 ± 0.0099 & 9.4 ± 2.1 f & 3.31 & 3 & 1.1 \\\hline
 
 \subsubsection{Conclusione}
 %commentare perchè si arresta sviluppo al secondo ordine (b piccolo), come si è scelto quante righe misurare, immagine del fit
+\subsubsection{Conclusione}
+L'esperimento ha permesso di caratterizzare con successo le proprietà del prisma. Misurando l'angolo di minima deviazione per cinque righe spettrali del mercurio, come riportato in Tabella \ref{tab:indice di rifrazione e angoli}, è stato possibile determinare la relazione tra l'indice di rifrazione e la lunghezza d'onda.
+I dati sono stati interpolati usando la legge di Cauchy, arrestando lo sviluppo al termine in $1/\lambda^2$. Questa scelta è giustificata sia dal piccolo valore del parametro $B$ ottenuto (Tabella \ref{tab:fit cauchy}), che suggerisce una rapida convergenza della serie, sia dall'esito del test del chi-quadro. Il valore di $\chi^2/\nu = 1.1$ indica un'eccellente compatibilità tra il modello e i dati sperimentali, rendendo superfluo l'inserimento di ulteriori parametri, inoltre l'utilizzo di "sole" 5 righe spettrali è giustificato dal fatto che per altre righe avremmo dovuto utilizzare errori almeno il doppio più grandi.
+In definitiva, la procedura si è dimostrata valida e ha portato a una stima precisa dei parametri di Cauchy del prisma, confermando la validità di tale legge per descrivere la dispersione nel materiale analizzato.
 
 
 \end{document}
