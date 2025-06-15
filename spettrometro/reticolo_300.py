@@ -45,40 +45,6 @@ lambda_s_2 = d*np.sin(angolo_2)/k2
 righe = {'lambda':[lambda_s_1.value, lambda_s_2.value], 'errore': [lambda_s_1.error, lambda_s_2.error], 'colori': ['yellow', 'lime', 'lime']}
 #print (lambda_s_1, lambda_s_2, lambda_s_3)
 
-def plot_spettro_colorato(righe, save_path=None):
-    fig, ax = plt.subplots(figsize=(10, 4))
-    
-    # Impostazioni grafiche
-    ax.set_xlabel('Lunghezza d\'onda (nm)', fontsize=12)
-    ax.set_title('Righe emissioni sodio', fontsize=14)
-    ax.grid(True, linestyle='--', alpha=0.6)
-    
-    # Altezza fissa per tutte le righe
-    intensita_fissa = 1.
-    
-    # Plot delle righe con colori e errori
-    for lam, err, colore in zip(righe['lambda'], righe['errore'], righe['colori']):
-        # Linea verticale colorata
-        ax.vlines(lam, 0, intensita_fissa, color=colore, linestyle='-', linewidth=2, alpha=0.7, label=f'{lam} nm')
-        # Barra di errore orizzontale (nera per contrasto)
-        ax.errorbar(lam, intensita_fissa, xerr=err, fmt='none', ecolor='black', capsize=4, elinewidth=1)
-    
-    # Legenda e ottimizzazione layout
-    ax.legend(loc='upper right', fontsize=10)
-    plt.tight_layout()
-    
-    # Salva o mostra
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
-
-plot_spettro_colorato(righe, save_path='./grafici/spettro_colorato.png')
-
-
-
-
-
-
 #IDENTIFICAZIONE GAS IGNOTO
 #in ordine: giallo senape, rosso intenso, azzurro, blu scuro
 k = 1
@@ -87,7 +53,7 @@ angolo_dx = [96, 97.25, 94.25, 94]
 theta = ((np.array(angolo_dx) - np.array(angolo_sx))/2) #in radianti
 angolo = Measurement(theta, err_ang)*np.pi / 180
 lambda_ignoto = d*np.sin(angolo)/k
-#print(lambda_ignoto)
+print(lambda_ignoto)
 
 
 
