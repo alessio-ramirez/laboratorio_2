@@ -27,6 +27,174 @@
 \maketitle
 \tableofcontents
 \newpage
+
+\section{Misure con il prisma}
+\subsection{Caratterizzazione del prisma}
+\subsubsection{Obiettivo}
+Caratterizzare un prisma a dispersione: valutarne le caratteristiche geometriche e determinare i parametri della legge di Cauchy che ne descrive l'indice di rifrazione.
+
+\subsubsection{Metodo}
+Una volta completata la messa a fuoco dello spettrometro abbiamo posizionato il prisma a dispersione sulla piattaforma posta tra telescopio e collimatore. Nonostante la regolazione della piattaforma, quest'ultima non era perfettamente complanare con l'asse congiungente collimatore e oculare; di conseguenza il posizionamento del prisma non è avvenuto centralmente rispetto alla piattaforma, per poter fare in modo che i raggi luminosi rifratti fossero individuabili dal telescopio.
+\newline
+\newline
+\textbf{Angolo al vertice} \newline
+Per determinare l'angolo al vertice $\alpha$ si è sfruttato il potere riflessivo delle due facce lucide del prisma. Abbiamo dapprima ruotato il telescopio posizionandolo ad un angolo $\theta_i$ tale per cui risultava visibile il raggio riflesso proveniente dalla prima faccia lucida del prisma. Abbiamo poi ruotato la piattaforma (quindi il prisma posto su di essa) fino ad individuare nuovamente con il telescopio il raggio riflesso dalla seconda faccia lucida del prisma, visibile dopo una rotazione di un angolo $\beta$. L'angolo al vertice risulta quindi:
+\begin{align}
+    \alpha = \frac{\theta_i -\beta}{2}
+\label{eq:angolo al vertice}
+\end{align}
+\textbf{Angolo di minima deviazione}\newline
+Per la determinazione dell'angolo di minima deviazione è stata utilizzata una lampada al mercurio, in modo da poter considerare note a priori (e quindi prive di errore) le lunghezze d'onda delle singole righe d'emissione, ricavate dal sito del NIST.
+Sono state prese in considerazione 5 diverse righe spettrali. La prima riga corrisponde al doppietto giallo più intenso del mercurio, le cui righe sono state considerate come sovrapposte, in quanto difficili da distinguere, con lunghezza d'onda media di quelle indicate sul sito del NIST.
+L'angolo di minima deviazione corrisponde alla posizione angolare tale per cui la deviazione interna dovuta alla rifrazione del raggio incidente è minimizzata. Tale angolo dipende dal potere rifrattivo del prisma (quindi dal suo indice di rifrazione $n$), a sua volta dipendente dalla lunghezza d'onda della radiazione; di conseguenza variabile a seconda della riga spettrale osservata. In particolare si ha:
+\begin{align}
+    \sin\left(\frac{\theta_m + \alpha}{2}\right) = n\sin\left(\frac{\alpha}{2}\right)
+\label{eq:angolo min deviazione}
+\end{align}
+Quindi per determinare $n$ indice di rifrazione si è utilizzata la relazione:
+\begin{align}
+    n= \frac{\sin\left(\frac{\theta_m + \alpha}{2}\right)}{\sin\left(\frac{\alpha}{2}\right)}
+\label{eq:indice di rifrazione}
+\end{align}
+La misura di $\theta_m$ è stata effettuata determinando la posizione del prisma per cui si aveva un'inversione del moto della riga spettrale rispetto alla rotazione del prisma. Più precisamente scelta una determinata riga spettrale l'abbiamo seguita con il telescopio, ruotandolo simultaneamente alla piattaforma fino a quando la riga non tornava indietro e si misurava l'angolo rispetto alla direzione del raggio in-deflesso (cioè alla congiungente telescopio-collimatore). L'angolo di minima deviazione è quindi determinato da: 
+\begin{align}
+    \theta_m = \theta_0-\theta_R
+\label{eq:posizione zero}
+\end{align}
+dove $\theta_0$ indica la posizione angolare dello zero e $\theta_R$ la posizione angolare del telescopio necessaria a osservare l'angolo di minima deviazione.
+\newline\\
+\textbf{Legge di Cauchy} \newline
+Determinato l'angolo di minima deviazione corrispondente a ogni lunghezza d'onda abbiamo proceduto allo studio della relazione tra $\lambda$ e $n$, descritta dalla legge di Cauchy:
+\begin{align}
+    n(\lambda) = A + \frac{B}{\lambda^2} + ...
+\label{eq:Cauchy}
+\end{align}
+al fine di determinare i parametri $A$ e $B$.
+
+\subsubsection{Dati}
+Per quanto riguarda l'angolo al vertice abbiamo misurato $\theta_i = (145.50\pm0.25)^\circ$ e $\beta=(19.0\pm0.25)^\circ$. \footnote{Tutti gli angoli sono stati misurati mediante l'utilizzo del goniometro posto sulla piattaforma. Lo zero coincide quindi con il valore $0$ del goniometro.} L'errore è stato valutato uguale per tutti gli angoli, $\delta_{\theta}=0.25^\circ$, corrispondente alla sensibilità del goniometro, ne consegue che per propagazione degli errori l'errore su $\alpha$ si riduce di un fattore $\sqrt{2}$. Abbiamo scelto di considerare come errore la sensibilità dal momento che le misure angolari non sono risultate affette da errore casuale. Per confermare ciò abbiamo provato a ripetere una misura di $\theta_m$ e abbiamo ottenuto nuovamente lo stesso valore, entro la sensibilità di misura. Si ha quindi $\alpha = (61.8 \pm 0.2)^\circ$. 
+Quanto misurato e utilizzato per ricavare $\theta_m$ e $n(\lambda)$ per ciascuna lunghezza d'onda $\lambda_i$ secondo le relazioni \ref{eq:posizione zero} e \ref{eq:angolo min deviazione} si trova in tabella \ref{tab:indice di rifrazione e angoli}. Gli errori sull'indice di rifrazione $\delta_n$ sono ricavati applicando la formula generale della propagazione degli errori alla relazione \ref{eq:indice di rifrazione}, da cui si ottiene:
+\begin{align}
+    \delta_n = \sqrt{\left(\frac{\cos(\frac{\alpha+\theta_m}{2})\sin(\frac{\alpha}{2})-\cos(\frac{\alpha}{2})\sin(\frac{\alpha+\theta_m}{2})}{2\sin^2(\frac{\alpha}{2})}\delta_{\alpha}\right)^2+\left(\frac{\delta_{\theta_m}\cos(\frac{\alpha+\theta_m}{2})}{2\sin(\frac{\alpha}{2})}\right)^2}
+\end{align}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|ccccc|}
+\hline
+$\lambda [nm]$ & 578.0134 & 546.9598 & 435.8328 & 434.7500 & 404.6563 \\\hline
+$\theta_R [^\circ]$ & 48.5 ± 0.3 & 47.5 ± 0.3 & 47.0 ± 0.3 & 47.5 ± 0.3 & 47.5 ± 0.3 \\\hline
+$\theta_0 [^\circ]$ & 97.0 ± 0.3 & 95.5 ± 0.3 & 96.5 ± 0.3 & 98.0 ± 0.3 & 99.0 ± 0.3 \\\hline
+$\theta_m [^\circ]$ & 48.5 ± 0.4 & 48.0 ± 0.4 & 49.5 ± 0.4 & 50.5 ± 0.4 & 51.5 ± 0.4 \\\hline
+n & 1.599 ± 0.006 & 1.594 ± 0.006 & 1.608 ± 0.006 & 1.618 ± 0.006 & 1.627 ± 0.006 \\\hline
+\end{tabular}
+\caption{Angolo di minima deviazione e indice di rifrazione per ciascuna riga}
+\label{tab:indice di rifrazione e angoli}
+\end{table}
+
+\subsubsection{Analisi dati}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{grafici/cauchy.pdf}
+	\caption{Andamento fit legge di Cauchy}
+	\label{fig:grafico cauchy}
+\end{figure}
+
+Per lo studio dell'andamento $n(\lambda)$ abbiamo interpolato i dati presenti in \ref{tab:indice di rifrazione e angoli} con la relazione di Cauchy \ref{eq:Cauchy}. La miglior stima di $A$ e $B$ figura in tabella \ref{tab:fit cauchy}, affiancata dai risultati del test del chi quadro applicato al fit.
+Il medesimo fit è rappresentato nel grafico \ref{fig:grafico cauchy}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|ccccc|}
+\hline
+Fit & A & B & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+Risultati & 1.5660 ± 0.0099 & 9.4 ± 2.1 fm$^2$ & 3.31 & 3 & 1.1 \\\hline
+\end{tabular}
+\caption{Risultati fit legge di Cauchy}
+\label{tab:fit cauchy}
+\end{table}
+
+\subsubsection{Conclusione}
+L'esperimento ha permesso di caratterizzare con successo le proprietà del prisma. Misurando l'angolo di minima deviazione per cinque righe spettrali del mercurio, come riportato in Tabella \ref{tab:indice di rifrazione e angoli}, è stato possibile determinare la relazione tra l'indice di rifrazione e la lunghezza d'onda.
+I dati sono stati interpolati usando la legge di Cauchy, arrestando lo sviluppo al termine in $1/\lambda^2$. Questa scelta è giustificata sia dal piccolo valore del parametro $B$ ottenuto (Tabella \ref{tab:fit cauchy}), che suggerisce una rapida convergenza della serie, sia dall'esito del test del chi-quadro. Il valore di $\chi^2/\nu = 1.1$ indica un'eccellente compatibilità tra il modello e i dati sperimentali, rendendo superfluo l'inserimento di ulteriori parametri, inoltre l'utilizzo di "sole" 5 righe spettrali è giustificato dal fatto che per altre righe avremmo dovuto utilizzare errori almeno il doppio più grandi.
+In definitiva, la procedura si è dimostrata valida e ha portato a una stima precisa dei parametri di Cauchy del prisma, confermando la validità di tale legge per descrivere la dispersione nel materiale analizzato.
+
+\subsection{Identificazione gas ignoto con il prisma}
+\subsubsection{Obiettivo}
+L'obiettivo di questa esperienza è l'identificazione di un gas ignoto mediante lo studio del suo spettro di emissione utilizzando un prisma.
+
+\subsubsection{Metodo} 
+La procedura sperimentale per l'identificazione del gas ignoto è analoga a quella utilizzata per la caratterizzazione dell'indice di rifrazione del prisma. Infatti, in questa parte dell'esperimento, abbiamo utilizzato il prisma per studiare lo spettro di emissione di una lampada contenente tale gas. Nella prima parte dell'esperienza siamo stati in grado di ricavare i coefficienti $A$ e $B$ della legge di Cauchy $n(\lambda)=A+\frac{B}{\lambda^2}$; invertendo dunque per $\lambda$ si ottiene:
+\begin{align}
+    \lambda=\sqrt{\frac{B}{n-A}}
+\label{eq:lambda_gas_ignoto_prisma}
+\end{align}
+Le lunghezze d'onda così ottenute possono essere confrontate con spettri di emissione di gas noti presenti sui database online del sito del NIST.
+Il calcolo di $n$ è stato effettuato, come nell'esperimento precedente, mediante la misura sperimentale dell'angolo di minima deviazione corrispondente a ciascuna riga spettrale (equazione \ref{eq:indice di rifrazione}) ed i valori di $A$ e $B$ sono quelli calcolati in precedenza, infatti il prisma utilizzato per l'esperimento è il medesimo.
+Gli errori sugli angoli sono stati valutati considerando la sensibilità dell'apparato presente in laboratorio.
+
+\subsubsection{Dati}
+I dati raccolti dall'osservazione delle righe spettrali sono riportati nella tabella \ref{tab:angoli_gas_ignoto_prisma}. Ivi sono stati intabulati i valori degli angoli di minima deviazione misurati in corrispondenza di alcune righe di colore riportato. 
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Colore} & \textbf{$\theta_m$ [rad]} \\
+\hline
+Rosso   & $0.838 \pm 0.010$\\
+Giallo ocra & $0.846 \pm 0.010$\\
+Azzurro          & $0.855 \pm 0.010$\\
+Blu scuro        & $0.873 \pm 0.010$\\
+\hline
+\end{tabular}
+\caption{Colore e angolo di minima deviazione - prisma}
+\label{tab:angoli_gas_ignoto_prisma}
+\end{table}
+Vogliamo precisare che lo spettro di emissione osservato era composto da molte righe spettrali, in laboratorio abbiamo deciso di campionarne solo alcune, più evidenti delle altre. Tale scelta è stata effettuata poichè molte righe adiacenti risultavano quasi indistinguibili.   
+
+\subsubsection{Analisi dati}
+Sulla base dei dati ottenuti sperimentalmente siamo stati in grado di calcolare le lunghezze d'onda associate a ciascuna riga osservata. L'equazione utilizzata per calcolare la lunghezza d'onda in corrispondenza di ciascun angolo di minima deviazione è l'equazione \ref{eq:lambda_gas_ignoto_prisma} ed il relativo errore $\delta_{\lambda}$ è:
+\begin{align}
+\delta_\lambda = \sqrt{
+\left( \frac{\delta_B}{2\lambda(n - A)} \right)^2 +
+\left( \frac{B \cdot \delta_n}{2\lambda(n - A)^2} \right)^2 +
+\left( \frac{B \cdot \delta_A}{2\lambda(n - A)^2} \right)^2
+}
+\label{eq:errore_su_lambda_prisma}
+\end{align}
+I risultati così ottenuti sono riportati nella tabella \ref{tab:tabella_lunghezze_d'onda_prisma} dove ciascuna lunghezza d'onda calcolata è affiancata al relativo colore osservato in laboratorio.
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Lunghezza d'onda [nm]} & \textbf{Colore} \\
+\hline
+$581\pm 100$ & Rosso \\
+$536\pm 100$ & Giallo ocra \\
+$500\pm 90$& Azzurro \\
+$446\pm 70$& Blu scuro \\
+\hline
+\end{tabular}
+\caption{Lunghezze d'onda e colori - prisma}
+\label{tab:tabella_lunghezze_d'onda_prisma}
+\end{table}
+Lo spettro di emissione relativo ai valori medi delle lunghezze d'onda calcolate è rappresentato nella figura \ref{fig:spettro_emissione_gas_ignoto_prisma}.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{grafici/spettro emissione gas ignoto prisma.png}
+\caption{Spettro di emissione gas ignoto (prisma)}
+\label{fig:spettro_emissione_gas_ignoto_prisma}
+\end{figure}
+Come è possibile osservare i colori delle righe spettrali calcolati e riportati nella figura \ref{fig:spettro_emissione_gas_ignoto_prisma} sono diversi da quelli osservati in laboratorio durante l'acquisizione dei dati riportati nella tabella \ref{tab:tabella_lunghezze_d'onda_prisma}. Tuttavia se si considerano gli errori elevati vi è coerenza fra colore osservato in laboratorio e lunghezza d'onda calcolata.
+
+\subsubsection{Conclusione}
+L'identificazione del gas ignoto tramite il prisma si è rivelata problematica, principalmente a causa delle elevate incertezze associate alle lunghezze d'onda calcolate, come mostrato in Tabella \ref{tab:tabella_lunghezze_d'onda_prisma}. Le incertezze relative, dell'ordine del 15-20\%, sono un risultato diretto della propagazione degli errori attraverso l'equazione \ref{eq:errore_su_lambda_prisma}. In particolare, l'errore è dominato dall'incertezza sui parametri $A$ e $B$ della legge di Cauchy, che vengono amplificati nel calcolo di $\lambda$.
+
+Queste ampie barre d'errore rendono qualsiasi confronto quantitativo con spettri noti poco significativo: le nostre misure risulterebbero compatibili con un vasto numero di righe spettrali di elementi diversi, impedendo un'identificazione univoca. Ad esempio, la riga misurata a $(581 \pm 100)\,$nm è statisticamente compatibile sia con il doppietto del sodio (589 nm) sia con una riga dell'elio (584 nm).
+
+Nonostante la limitata precisione, questa parte dell'esperimento serve a evidenziare in modo quantitativo la superiorità del reticolo di diffrazione come strumento spettroscopico per l'identificazione di elementi. Come si vedrà nella sezione successiva, l'uso del reticolo permette di ridurre drasticamente le incertezze, consentendo un'identificazione più affidabile del gas.
+
 \section{Misura con il reticolo}
 
 \subsection{Caratterizzazione del reticolo}
@@ -203,173 +371,6 @@ Come per la prima parte di misurazioni effettuate con il reticolo possiamo consi
 
 
 
-\section{Misure con il prisma}
-\subsection{Caratterizzazione del prisma}
-\subsubsection{Obiettivo}
-Caratterizzare un prisma a dispersione: valutarne le caratteristiche geometriche e determinare i parametri della legge di Cauchy che ne descrive l'indice di rifrazione.
-
-\subsubsection{Metodo}
-Una volta completata la messa a fuoco dello spettrometro abbiamo posizionato il prisma a dispersione sulla piattaforma posta tra telescopio e collimatore. Nonostante la regolazione della piattaforma, quest'ultima non era perfettamente complanare con l'asse congiungente collimatore e oculare; di conseguenza il posizionamento del prisma non è avvenuto centralmente rispetto alla piattaforma, per poter fare in modo che i raggi luminosi rifratti fossero individuabili dal telescopio.
-\newline
-\newline
-\textbf{Angolo al vertice} \newline
-Per determinare l'angolo al vertice $\alpha$ si è sfruttato il potere riflessivo delle due facce lucide del prisma. Abbiamo dapprima ruotato il telescopio posizionandolo ad un angolo $\theta_i$ tale per cui risultava visibile il raggio riflesso proveniente dalla prima faccia lucida del prisma. Abbiamo poi ruotato la piattaforma (quindi il prisma posto su di essa) fino ad individuare nuovamente con il telescopio il raggio riflesso dalla seconda faccia lucida del prisma, visibile dopo una rotazione di un angolo $\beta$. L'angolo al vertice risulta quindi:
-\begin{align}
-    \alpha = \frac{\theta_i -\beta}{2}
-\label{eq:angolo al vertice}
-\end{align}
-\textbf{Angolo di minima deviazione}\newline
-Per la determinazione dell'angolo di minima deviazione è stata utilizzata una lampada al mercurio, in modo da poter considerare note a priori (e quindi prive di errore) le lunghezze d'onda delle singole righe d'emissione, ricavate dal sito del NIST.
-Sono state prese in considerazione 5 diverse righe spettrali. La prima riga corrisponde al doppietto giallo più intenso del mercurio, le cui righe sono state considerate come sovrapposte, in quanto difficili da distinguere, con lunghezza d'onda media di quelle indicate sul sito del NIST.
-L'angolo di minima deviazione corrisponde alla posizione angolare tale per cui la deviazione interna dovuta alla rifrazione del raggio incidente è minimizzata. Tale angolo dipende dal potere rifrattivo del prisma (quindi dal suo indice di rifrazione $n$), a sua volta dipendente dalla lunghezza d'onda della radiazione; di conseguenza variabile a seconda della riga spettrale osservata. In particolare si ha:
-\begin{align}
-    \sin\left(\frac{\theta_m + \alpha}{2}\right) = n\sin\left(\frac{\alpha}{2}\right)
-\label{eq:angolo min deviazione}
-\end{align}
-Quindi per determinare $n$ indice di rifrazione si è utilizzata la relazione:
-\begin{align}
-    n= \frac{\sin\left(\frac{\theta_m + \alpha}{2}\right)}{\sin\left(\frac{\alpha}{2}\right)}
-\label{eq:indice di rifrazione}
-\end{align}
-La misura di $\theta_m$ è stata effettuata determinando la posizione del prisma per cui si aveva un'inversione del moto della riga spettrale rispetto alla rotazione del prisma. Più precisamente scelta una determinata riga spettrale l'abbiamo seguita con il telescopio, ruotandolo simultaneamente alla piattaforma fino a quando la riga non tornava indietro e si misurava l'angolo rispetto alla direzione del raggio in-deflesso (cioè alla congiungente telescopio-collimatore). L'angolo di minima deviazione è quindi determinato da: 
-\begin{align}
-    \theta_m = \theta_0-\theta_R
-\label{eq:posizione zero}
-\end{align}
-dove $\theta_0$ indica la posizione angolare dello zero e $\theta_R$ la posizione angolare del telescopio necessaria a osservare l'angolo di minima deviazione.
-\newline\\
-\textbf{Legge di Cauchy} \newline
-Determinato l'angolo di minima deviazione corrispondente a ogni lunghezza d'onda abbiamo proceduto allo studio della relazione tra $\lambda$ e $n$, descritta dalla legge di Cauchy:
-\begin{align}
-    n(\lambda) = A + \frac{B}{\lambda^2} + ...
-\label{eq:Cauchy}
-\end{align}
-al fine di determinare i parametri $A$ e $B$.
-
-\subsubsection{Dati}
-Per quanto riguarda l'angolo al vertice abbiamo misurato $\theta_i = (145.50\pm0.25)^\circ$ e $\beta=(19.0\pm0.25)^\circ$. \footnote{Tutti gli angoli sono stati misurati mediante l'utilizzo del goniometro posto sulla piattaforma. Lo zero coincide quindi con il valore $0$ del goniometro.} L'errore è stato valutato uguale per tutti gli angoli, $\delta_{\theta}=0.25^\circ$, corrispondente alla sensibilità del goniometro, ne consegue che per propagazione degli errori l'errore su $\alpha$ si riduce di un fattore $\sqrt{2}$. Abbiamo scelto di considerare come errore la sensibilità dal momento che le misure angolari non sono risultate affette da errore casuale. Per confermare ciò abbiamo provato a ripetere una misura di $\theta_m$ e abbiamo ottenuto nuovamente lo stesso valore, entro la sensibilità di misura. Si ha quindi $\alpha = (61.8 \pm 0.2)^\circ$. 
-Quanto misurato e utilizzato per ricavare $\theta_m$ e $n(\lambda)$ per ciascuna lunghezza d'onda $\lambda_i$ secondo le relazioni \ref{eq:posizione zero} e \ref{eq:angolo min deviazione} si trova in tabella \ref{tab:indice di rifrazione e angoli}. Gli errori sull'indice di rifrazione $\delta_n$ sono ricavati applicando la formula generale della propagazione degli errori alla relazione \ref{eq:indice di rifrazione}, da cui si ottiene:
-\begin{align}
-    \delta_n = \sqrt{\left(\frac{\cos(\frac{\alpha+\theta_m}{2})\sin(\frac{\alpha}{2})-\cos(\frac{\alpha}{2})\sin(\frac{\alpha+\theta_m}{2})}{2\sin^2(\frac{\alpha}{2})}\delta_{\alpha}\right)^2+\left(\frac{\delta_{\theta_m}\cos(\frac{\alpha+\theta_m}{2})}{2\sin(\frac{\alpha}{2})}\right)^2}
-\end{align}
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|l|ccccc|}
-\hline
-$\lambda [nm]$ & 578.0134 & 546.9598 & 435.8328 & 434.7500 & 404.6563 \\\hline
-$\theta_R [^\circ]$ & 48.5 ± 0.3 & 47.5 ± 0.3 & 47.0 ± 0.3 & 47.5 ± 0.3 & 47.5 ± 0.3 \\\hline
-$\theta_0 [^\circ]$ & 97.0 ± 0.3 & 95.5 ± 0.3 & 96.5 ± 0.3 & 98.0 ± 0.3 & 99.0 ± 0.3 \\\hline
-$\theta_m [^\circ]$ & 48.5 ± 0.4 & 48.0 ± 0.4 & 49.5 ± 0.4 & 50.5 ± 0.4 & 51.5 ± 0.4 \\\hline
-n & 1.599 ± 0.006 & 1.594 ± 0.006 & 1.608 ± 0.006 & 1.618 ± 0.006 & 1.627 ± 0.006 \\\hline
-\end{tabular}
-\caption{Angolo di minima deviazione e indice di rifrazione per ciascuna riga}
-\label{tab:indice di rifrazione e angoli}
-\end{table}
-
-\subsubsection{Analisi dati}
-
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.5\textwidth]{grafici/cauchy.pdf}
-	\caption{Andamento fit legge di Cauchy}
-	\label{fig:grafico cauchy}
-\end{figure}
-
-Per lo studio dell'andamento $n(\lambda)$ abbiamo interpolato i dati presenti in \ref{tab:indice di rifrazione e angoli} con la relazione di Cauchy \ref{eq:Cauchy}. La miglior stima di $A$ e $B$ figura in tabella \ref{tab:fit cauchy}, affiancata dai risultati del test del chi quadro applicato al fit.
-Il medesimo fit è rappresentato nel grafico \ref{fig:grafico cauchy}.
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|l|ccccc|}
-\hline
-Fit & A & B & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & 1.5660 ± 0.0099 & 9.4 ± 2.1 fm$^2$ & 3.31 & 3 & 1.1 \\\hline
-\end{tabular}
-\caption{Risultati fit legge di Cauchy}
-\label{tab:fit cauchy}
-\end{table}
-
-\subsubsection{Conclusione}
-L'esperimento ha permesso di caratterizzare con successo le proprietà del prisma. Misurando l'angolo di minima deviazione per cinque righe spettrali del mercurio, come riportato in Tabella \ref{tab:indice di rifrazione e angoli}, è stato possibile determinare la relazione tra l'indice di rifrazione e la lunghezza d'onda.
-I dati sono stati interpolati usando la legge di Cauchy, arrestando lo sviluppo al termine in $1/\lambda^2$. Questa scelta è giustificata sia dal piccolo valore del parametro $B$ ottenuto (Tabella \ref{tab:fit cauchy}), che suggerisce una rapida convergenza della serie, sia dall'esito del test del chi-quadro. Il valore di $\chi^2/\nu = 1.1$ indica un'eccellente compatibilità tra il modello e i dati sperimentali, rendendo superfluo l'inserimento di ulteriori parametri, inoltre l'utilizzo di "sole" 5 righe spettrali è giustificato dal fatto che per altre righe avremmo dovuto utilizzare errori almeno il doppio più grandi.
-In definitiva, la procedura si è dimostrata valida e ha portato a una stima precisa dei parametri di Cauchy del prisma, confermando la validità di tale legge per descrivere la dispersione nel materiale analizzato.
-
-\subsection{Identificazione gas ignoto con il prisma}
-\subsubsection{Obiettivo}
-L'obiettivo di questa esperienza è l'identificazione di un gas ignoto mediante lo studio del suo spettro di emissione utilizzando un prisma.
-
-\subsubsection{Metodo} 
-La procedura sperimentale per l'identificazione del gas ignoto è analoga a quella utilizzata per la caratterizzazione dell'indice di rifrazione del prisma. Infatti, in questa parte dell'esperimento, abbiamo utilizzato il prisma per studiare lo spettro di emissione di una lampada contenente tale gas. Nella prima parte dell'esperienza siamo stati in grado di ricavare i coefficienti $A$ e $B$ della legge di Cauchy $n(\lambda)=A+\frac{B}{\lambda^2}$; invertendo dunque per $\lambda$ si ottiene:
-\begin{align}
-    \lambda=\sqrt{\frac{B}{n-A}}
-\label{eq:lambda_gas_ignoto_prisma}
-\end{align}
-Le lunghezze d'onda così ottenute possono essere confrontate con spettri di emissione di gas noti presenti sui database online del sito del NIST.
-Il calcolo di $n$ è stato effettuato, come nell'esperimento precedente, mediante la misura sperimentale dell'angolo di minima deviazione corrispondente a ciascuna riga spettrale (equazione \ref{eq:indice di rifrazione}) ed i valori di $A$ e $B$ sono quelli calcolati in precedenza, infatti il prisma utilizzato per l'esperimento è il medesimo.
-Gli errori sugli angoli sono stati valutati considerando la sensibilità dell'apparato presente in laboratorio.
-
-\subsubsection{Dati}
-I dati raccolti dall'osservazione delle righe spettrali sono riportati nella tabella \ref{tab:angoli_gas_ignoto_prisma}. Ivi sono stati intabulati i valori degli angoli di minima deviazione misurati in corrispondenza di alcune righe di colore riportato. 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Colore} & \textbf{$\theta_m$ [rad]} \\
-\hline
-Rosso   & $0.838 \pm 0.010$\\
-Giallo ocra & $0.846 \pm 0.010$\\
-Azzurro          & $0.855 \pm 0.010$\\
-Blu scuro        & $0.873 \pm 0.010$\\
-\hline
-\end{tabular}
-\caption{Colore e angolo di minima deviazione - prisma}
-\label{tab:angoli_gas_ignoto_prisma}
-\end{table}
-Vogliamo precisare che lo spettro di emissione osservato era composto da molte righe spettrali, in laboratorio abbiamo deciso di campionarne solo alcune, più evidenti delle altre. Tale scelta è stata effettuata poichè molte righe adiacenti risultavano quasi indistinguibili.   
-
-\subsubsection{Analisi dati}
-Sulla base dei dati ottenuti sperimentalmente siamo stati in grado di calcolare le lunghezze d'onda associate a ciascuna riga osservata. L'equazione utilizzata per calcolare la lunghezza d'onda in corrispondenza di ciascun angolo di minima deviazione è l'equazione \ref{eq:lambda_gas_ignoto_prisma} ed il relativo errore $\delta_{\lambda}$ è:
-\begin{align}
-\delta_\lambda = \sqrt{
-\left( \frac{\delta_B}{2\lambda(n - A)} \right)^2 +
-\left( \frac{B \cdot \delta_n}{2\lambda(n - A)^2} \right)^2 +
-\left( \frac{B \cdot \delta_A}{2\lambda(n - A)^2} \right)^2
-}
-\label{eq:errore_su_lambda_prisma}
-\end{align}
-I risultati così ottenuti sono riportati nella tabella \ref{tab:tabella_lunghezze_d'onda_prisma} dove ciascuna lunghezza d'onda calcolata è affiancata al relativo colore osservato in laboratorio.
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Lunghezza d'onda [nm]} & \textbf{Colore} \\
-\hline
-$581\pm 100$ & Rosso \\
-$536\pm 100$ & Giallo ocra \\
-$500\pm 90$& Azzurro \\
-$446\pm 70$& Blu scuro \\
-\hline
-\end{tabular}
-\caption{Lunghezze d'onda e colori - prisma}
-\label{tab:tabella_lunghezze_d'onda_prisma}
-\end{table}
-Lo spettro di emissione relativo ai valori medi delle lunghezze d'onda calcolate è rappresentato nella figura \ref{fig:spettro_emissione_gas_ignoto_prisma}.
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{grafici/spettro emissione gas ignoto prisma.png}
-\caption{Spettro di emissione gas ignoto (prisma)}
-\label{fig:spettro_emissione_gas_ignoto_prisma}
-\end{figure}
-Come è possibile osservare i colori delle righe spettrali calcolati e riportati nella figura \ref{fig:spettro_emissione_gas_ignoto_prisma} sono diversi da quelli osservati in laboratorio durante l'acquisizione dei dati riportati nella tabella \ref{tab:tabella_lunghezze_d'onda_prisma}. Tuttavia se si considerano gli errori elevati vi è coerenza fra colore osservato in laboratorio e lunghezza d'onda calcolata.
-
-\subsubsection{Conclusione}
-L'identificazione del gas ignoto tramite il prisma si è rivelata problematica, principalmente a causa delle elevate incertezze associate alle lunghezze d'onda calcolate, come mostrato in Tabella \ref{tab:tabella_lunghezze_d'onda_prisma}. Le incertezze relative, dell'ordine del 15-20\%, sono un risultato diretto della propagazione degli errori attraverso l'equazione \ref{eq:errore_su_lambda_prisma}. In particolare, l'errore è dominato dall'incertezza sui parametri $A$ e $B$ della legge di Cauchy, che vengono amplificati nel calcolo di $\lambda$.
-
-Queste ampie barre d'errore rendono qualsiasi confronto quantitativo con spettri noti (ad esempio, tramite z-test) poco significativo: le nostre misure risulterebbero compatibili con un vasto numero di righe spettrali di elementi diversi, impedendo un'identificazione univoca. Ad esempio, la riga misurata a $(581 \pm 100)\,$nm è statisticamente compatibile sia con il doppietto del Sodio (589 nm) sia con una riga dell'Elio (584 nm).
-
-Nonostante la limitata precisione, questa parte dell'esperimento serve a evidenziare in modo quantitativo la superiorità del reticolo di diffrazione come strumento spettroscopico per l'identificazione di elementi. Come si vedrà nella sezione successiva, l'uso del reticolo permette di ridurre drasticamente le incertezze, consentendo un'identificazione più affidabile del gas.
-
 \subsection{Identificazione gas ignoto con il reticolo}
 \subsubsection{Obiettivo}
 L'obiettivo di questa esperienza è l'identificazione di un gas ignoto mediante lo studio del suo spettro di emissione utilizzando un reticolo.
@@ -382,7 +383,7 @@ La procedura sperimentale per l'identificazione del gas ignoto è analoga a quel
 \end{align}
 dove $d$ è il passo del reticolo, $\theta$ è l'angolo per il quale si osserva una determinata riga spettrale e $m$ è l'ordine della riga spettrale osservata. Per l'esperimento abbiamo deciso di utilizzare il reticolo da $300\frac{righe}{mm}$, dunque il valore di $d$ utilizzato è quello calcolato precedentemente con relativa incertezza.
 Le lunghezze d'onda così ottenute possono essere confrontate con spettri di emissione di gas noti presenti sui database online del sito del NIST.
-L'angolo $\theta$ è stato misurato come media dell'angolo relativo alla riga spettrale a destra e a sinistra. Tale scelta è stata fatta per ridurre l'errore e controllare la corretta perpendicolarità del reticolo rispetto all'apparato. L'angolo $\theta$ è dunque calcolato con la formula $\theta=\frac{|\theta_{dx}+\theta_{sx}|}{2}$ e, visto che gli errori a destra e sinistra sono uguali ($\delta_{\theta_{dx}}=\delta_{\theta_{sx}}$) e corrispondono alla sensibilità dello strumento $s$, l'errore su $\theta$ è $\delta_\theta=\frac{s}{\sqrt{2}}$. Il campionamento è stato effettuato unicamente per il primo ordine di righe spettrali ($m=1$) per motivi tempistici.
+L'angolo $\theta$ è stato misurato come differenza di angolo destro e sinistro, verificando che fossero simmetrici. Tale scelta è stata fatta per ridurre l'errore, e controllare la corretta perpendicolarità del reticolo rispetto all'apparato. L'angolo $\theta$ è dunque calcolato con la formula $\theta=\frac{|\theta_{dx}-\theta_{sx}|}{2}$ e, visto che gli errori a destra e sinistra sono uguali ($\delta_{\theta_{dx}}=\delta_{\theta_{sx}}$) e corrispondono alla sensibilità dello strumento $\delta_s$, l'errore su $\theta$ è $\delta_\theta=\frac{\delta_s}{\sqrt{2}}$. Il campionamento è stato effettuato unicamente per il primo ordine di righe spettrali ($m=1$) per motivi tempistici.
 
 \subsubsection{Dati}
 I dati raccolti dall'osservazione delle righe spettrali sono riportati nella tabella \ref{tab:angolo_e_colore_gas_ignoto_reticolo}. Sono stati tabulati gli angoli misurati in corrispondenza di alcune righe di colore riportato. Come prima è stata effettuata unicamente l'osservazione di poche delle molte righe spettrali presenti per motivi logistici.
@@ -431,8 +432,7 @@ Lo spettro di emissione relativo ai valori medi delle lunghezze d'onda calcolate
 \label{fig:spettro_emissione_gas_ignoto_reticolo}
 \end{figure}
 Come è possibile notare, a differenza della configurazione con il prisma, c'è coerenza fra colore osservato in laboratorio e lunghezza d'onda media calcolata.
-\paragraph{Identificazione del gas e test di compatibilità}
-Le lunghezze d'onda misurate, in particolare la riga rossa a 656 nm e quella azzurra a 483 nm, suggeriscono fortemente la presenza di \textbf{Idrogeno (H)}. Le altre righe suggeriscono la presenza di un secondo gas, verosimilmente \textbf{Elio (He)}.
+Le lunghezze d'onda misurate, in particolare la riga rossa a 656 nm e quella azzurra a 483 nm, suggeriscono fortemente la presenza di idrogeno. Le altre righe suggeriscono la presenza di un secondo gas, verosimilmente elio.
 
 Per verificare questa ipotesi, abbiamo confrontato le nostre misure con i valori di riferimento delle strong lines del NIST per Idrogeno, Elio e Sodio. I risultati sono riassunti in Tabella \ref{tab:z_test}.
 \begin{table}[H]
@@ -441,16 +441,20 @@ Per verificare questa ipotesi, abbiamo confrontato le nostre misure con i valori
 \label{tab:z_test}
 \begin{tabular}{l c c c c}
 \toprule
-\textbf{Gas} & \textbf{656 ± 20 nm} & \textbf{584 ± 20 nm} & \textbf{483 ± 20 nm} & \textbf{461 ± 20 nm} \\
+Gas & 656 ± 20 nm & 584 ± 20 nm & 483 ± 20 nm & 461 ± 20 nm \\
 \midrule
-Idrogeno (H) & $z = 0.01$ & --- & $z=0.16$ & $z=1.35$ \\
-Elio (He)    & 0.59 & 0.18 & 0.58 & 0.52 \\
-Sodio (Na)   & --- & 0.26 & --- & 0.29 \\
+Idrogeno & $z = 0.01$ & --- & $z=0.16$ & --- \\
+Elio & --- & $z=0.18$ & --- & $z=0.70$ \\
+Sodio & --- & $z=0.25$ & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsubsection{Conclusione}
+In base ai risultati dell'analisi, possiamo ipotizzare che il gas ignoto è costituito da una miscela di idrogeno, elio ed altri gas.
+Tutti i valori di z sono inferiori a 1, indicando una buona compatibilità statistica. Ipotizziamo la non presenza del sodio in quanto esso presenta compatibilità con una sola strong line, che è a sua volta compatibile con l'elio.
+
+Questo esperimento dimostra chiaramente la superiorità del reticolo di diffrazione rispetto al prisma per l'identificazione spettroscopica. Mentre il prisma ha prodotto incertezze del 15-20\% che impedivano del tutto un'identificazione univoca, il reticolo ha fornito misure con incertezze di circa il 3\%, che permette ancora di ipotizzare la presenza di differenti gas, ma in maniera più ragionevole.
 
 \end{document}
 
