@@ -34,7 +34,7 @@ lambd = 632.8e-9
 t = Measurement(6.8, 0.1, magnitude=-3) #spessore vetro
 theta_i = Measurement(0, 0.1) #angolo minimo cammino ottico (sensibilità goniometro 0.1 gradi)
 theta_f = [2, 4, 6, 8, 10]
-theta_f = Measurement(theta_f, 1)
+theta_f = Measurement(theta_f, 0.1)
 theta = (theta_f-theta_i)*np.pi/180
 delta_n = [3, 13, 26, 58, 87]
 delta_n_err = [1, 1, 1, 2, 3]

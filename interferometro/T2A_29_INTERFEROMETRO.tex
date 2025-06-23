@@ -65,12 +65,12 @@
 
 \section{Interferometro di Fabry-Perot}
 \subsection{Obiettivo}
-Verificare la legge che descrive la posizione dei massimi di interferenza per la configurazione di Fabry-Perot
+Verificare la legge che descrive la posizione dei massimi di interferenza per la configurazione di Fabry-Perot.
 
 \subsection{Metodo}
 Nella configurazione di Fabry-Perot, il laser emesso, che passa per una lente divergente, viene parzialmente riflesso nella cavità formata da due specchi paralleli e conseguentemente si hanno cammini ottici differenti per i raggi riflessi e trasmessi. 
 
-L'interferometro di Fabry-Perot è costituito da due superfici riflettenti parallele separate da una distanza $d$ regolabile. Il fascio laser incidente viene parzialmente riflesso e trasmesso ad ogni quando incontra ogni parete della cavità, generando multiple riflessioni all'interno di quest'ultima. I raggi che emergono dalla cavità interferiscono tra loro, producendo una figura di interferenza
+L'interferometro di Fabry-Perot è costituito da due superfici riflettenti parallele separate da una distanza $d$ regolabile. Il fascio laser incidente viene parzialmente riflesso e trasmesso ogni volta che incontra una parete della cavità, generando multiple riflessioni all'interno di quest'ultima. I raggi che emergono dalla cavità interferiscono tra loro, producendo una figura di interferenza.
 
 La condizione per l'interferenza costruttiva è data dalla relazione:
 \begin{align}
@@ -78,31 +78,33 @@ La condizione per l'interferenza costruttiva è data dalla relazione:
 \end{align}
 dove $d$ è la distanza tra gli specchi, $\theta$ è l'angolo di incidenza rispetto alla normale, $N$ è un intero che indica l'ordine del massimo e $\lambda$ è la lunghezza d'onda della luce.
 
-Per verificare questa legge, sono stati misurati i diametri dei massimi di interferenza proiettati sulla parete, per diversi ordini di massimi, ed è stata misurata la distanza $L$ tra la lente e la parete, con queste misure si è ricavato l'angolo $\theta$ con la seguente relazione
+Per verificare questa legge, sono stati misurati i diametri dei massimi di interferenza proiettati sulla parete, per diversi ordini di massimi, ed è stata misurata la distanza $L$ tra la lente e la parete. Con queste misure si è ricavato l'angolo $\theta$ con la seguente relazione:
 \[\theta = \arctan \left(\frac{\text{diametro}}{2L}\right)\]
 
 \subsection{Dati}
-La distanza tra lente e parete, rimasta fissa per tutte le misure, è stata misurata come $L=\SI{128 \pm 0.5}{\centi\meter}$, i dati per i vari diametri, e i relativi coseni sono riportati in tabella \ref{tab:fabry-perot-dati}.
+La distanza tra lente e parete, rimasta fissa per tutte le misure, è stata misurata come $L=\SI{128 \pm 0.5}{\centi\meter}$. I dati per i vari diametri e i relativi coseni sono riportati in \cref{tab:fabry-perot-dati}.
+
 \begin{table}[htbp]
 \centering
 \caption{Dati Figura di Interferenza (Fabry-Perot)}
 \begin{tabular}{|c|c|c|}
 \hline
 Diametro & $\cos(\theta)$ & $N$ \\\hline\hline
-20 ± 1 mm & 999.969 ± 0.003 mrad & 5 \\
-36 ± 1 mm & 999.901 ± 0.006 mrad & 4 \\
-48 ± 1 mm & 999.824 ± 0.007 mrad & 3 \\
-57 ± 1 mm & 999.752 ± 0.009 mrad & 2 \\
-65 ± 1 mm & 999.68 ± 0.01 mrad & 1 \\
+\SI{20 \pm 1}{\milli\meter} & \SI{999.969 \pm 0.003e-3}{\milli\radian} & 5 \\
+\SI{36 \pm 1}{\milli\meter} & \SI{999.901 \pm 0.006e-3}{\milli\radian} & 4 \\
+\SI{48 \pm 1}{\milli\meter} & \SI{999.824 \pm 0.007e-3}{\milli\radian} & 3 \\
+\SI{57 \pm 1}{\milli\meter} & \SI{999.752 \pm 0.009e-3}{\milli\radian} & 2 \\
+\SI{65 \pm 1}{\milli\meter} & \SI{999.68 \pm 0.01e-3}{\milli\radian} & 1 \\
 \hline
 \end{tabular}
 \label{tab:fabry-perot-dati}
 \end{table}
+
 \subsection{Analisi Dati}
-è stata dunque fatta la seguente interpolazione
+È stata dunque fatta la seguente interpolazione:
 \[\cos \theta = \frac{N\lambda}{2d} + A\]
-con $d$ e $A$ parametri liberi e $\lambda=\SI{632.8e-9}{\meter}$ lunghezza d'onda del laser He-Ne è stata assunta senza errore. La presenza del termine di shift $A$ è giustificata dal fatto che non è possibile determinare con certezza l'ordine assoluto $N$, con conseguenti effetti sistematici.
-Il grafico dell'interpolazione è visibile in figura \ref{fig:fabry-perot-interpolazione}, i risultati in tabella \ref{tab:fabry-perot-risultati}.
+con $d$ e $A$ parametri liberi e $\lambda=\SI{632.8e-9}{\meter}$ lunghezza d'onda del laser He-Ne assunta senza errore. La presenza del termine di shift $A$ è giustificata dal fatto che non è possibile determinare con certezza l'ordine assoluto $N$, con conseguenti effetti sistematici.
+Il grafico dell'interpolazione è visibile in \cref{fig:fabry-perot-interpolazione}, i risultati in \cref{tab:fabry-perot-risultati}.
 
 \begin{figure}[htbp]
 \centering
@@ -116,128 +118,137 @@ Il grafico dell'interpolazione è visibile in figura \ref{fig:fabry-perot-interp
 \begin{tabular}{|l|ccccc|}
 \hline
 parametri & A & d & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-risultati & \num{996.0 \pm 0.077 e-3} & $\SI{4.3 \pm 1.4}{\milli\meter}$ & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
+risultati & \SI{996.0 \pm 0.077e-3}{} & \SI{4.3 \pm 1.4}{\milli\meter} & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
 \end{tabular}
 \caption{Risultati Interpolazione (Fabry-Perot)}
 \label{tab:fabry-perot-risultati}
 \end{table}
 
 \subsection{Conclusioni}
-Dall'interpolazione si evince che la legge prevista è compatibile con l'osservazione sperimentale L'esperimento dimostra quindi che la condizione $2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot.
+Dall'interpolazione si evince che la legge prevista è compatibile con l'osservazione sperimentale. L'esperimento dimostra quindi che la condizione $2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot.
 
 \section{Calibrazione micrometro con interferometro di Fabry-Perot}
 \subsection{Obiettivo}
-Verificare la calibrazione del nonio presente nella strumentazione attraverso lo studio della figura di interferenza prodotta su uno schermo\dots
-Confrontare poi la precisione ottenuta sulle misure con quella garantita dal micrometro.
+Verificare la calibrazione del nonio presente nella strumentazione attraverso lo studio della figura di interferenza prodotta su uno schermo e confrontare poi la precisione ottenuta sulle misure con quella garantita dal micrometro.
+
 \subsection{Metodo}
-Una volta montato e allineato l'interferometro, mantenendoo la configurazione utilizzata per lo studio della figura di interferenza, abbiamo ruotato il 
+Una volta montato e allineato l'interferometro, mantenendo la configurazione utilizzata per lo studio della figura di interferenza, abbiamo ruotato il 
 nonio di una distanza fissa $d$, corrispondente all'allargamento della cavità di Fabry-Perot. Tale variazione della dimensione della cavità causa uno
-scorrimento della figura di interferenza, in particolare dalla relazione \ref{} si può ricavare:
-%TODO mettere riferimento a relazione posizione massimi di interferenza
+scorrimento della figura di interferenza. In particolare, dalla relazione della posizione dei massimi di interferenza si può ricavare:
 \begin{align}
     2 \Delta d \cos  \theta = \Delta N \lambda
-\label{eq:calibrazione micrometro fabry-perot}
+\label{eq:calibrazione-micrometro-fabry-perot}
 \end{align}
-Fissata l'osservazione di un punto sulla figura di interferenza $\Delta N$ indica il numero di frange di cui si è osservato il passaggio attraverso quel punto, la lunghezza d'onda è $\lambda = 632.8 nm$ (come indicato sul manuale PASCO) e $\theta$ rappresenta la posizione angolare a cui si trova il punto osservato, ossia l'angolo rispetto all'orizzontale di cui è inclinato il fascio.
-Abbiamo variato le dimensioni della cavità 7 volte dello stesso tratto $d$ e per ciascuna di esse abbiamo misurato $\Delta N$, ricavando così 7 diversi valori di $\Delta d$, calcolato invertendo la relazione \ref{eq:calibrazione micrometro fabry-perot} come:
+Fissata l'osservazione di un punto sulla figura di interferenza, $\Delta N$ indica il numero di frange di cui si è osservato il passaggio attraverso quel punto, la lunghezza d'onda è $\lambda = \SI{632.8}{\nano\meter}$ (come indicato sul manuale PASCO) e $\theta$ rappresenta la posizione angolare a cui si trova il punto osservato, ossia l'angolo rispetto all'orizzontale di cui è inclinato il fascio.
+Abbiamo variato le dimensioni della cavità 7 volte dello stesso tratto $d$ e per ciascuna di esse abbiamo misurato $\Delta N$, ricavando così 7 diversi valori di $\Delta d$, calcolato invertendo la \cref{eq:calibrazione-micrometro-fabry-perot} come:
 \begin{align}
     \Delta d = \frac{\lambda \Delta N}{2\cos{\theta}}
-\label{eq:calibrazione micrometro fabry-perot invertita}
+\label{eq:calibrazione-micrometro-fabry-perot-invertita}
 \end{align}
 
 \subsection{Dati}
-In tabella \ref{tab: micrometro fabry-perot} sono riportati i valori di $\Delta N$, ai quali è associata una sensibilità fissa $\delta_{\Delta N}$ pari ad 1 frangia, motivata dalla possibilità di errore umano nel conteggio del numero di frange osservate.
+In \cref{tab:micrometro-fabry-perot} sono riportati i valori di $\Delta N$, ai quali è associata una sensibilità fissa $\delta_{\Delta N}$ pari ad 1 frangia, motivata dalla possibilità di errore umano nel conteggio del numero di frange osservate.
 
 \begin{table}[htbp]
 \centering
-\caption{Shift di frangia osservato (interferomentro di Fabry-Perot)}
+\caption{Shift di frangia osservato (interferometro di Fabry-Perot)}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & 24 ± 1 & 23 ± 1 & 23 ± 1 & 24 ± 1 & 25 ± 1 & 25 ± 1 & 23 ± 1 \\\hline
+$\Delta N$ & \num{24 \pm 1} & \num{23 \pm 1} & \num{23 \pm 1} & \num{24 \pm 1} & \num{25 \pm 1} & \num{25 \pm 1} & \num{23 \pm 1} \\\hline
 \end{tabular}
-\label{tab: micrometro fabry-perot}
+\label{tab:micrometro-fabry-perot}
 \end{table}
 
 \subsection{Analisi dati}
-Dal momento che l'angolo $\theta$ è molto piccolo nel ricavare $\Delta d$ è stata utilizzata l'approssimazione $\cos{\theta}\approx1$ da cui consegue:
+Dal momento che l'angolo $\theta$ è molto piccolo, nel ricavare $\Delta d$ è stata utilizzata l'approssimazione $\cos{\theta}\approx1$, da cui consegue:
 \begin{align}
-    \Delta d_{approx} = \frac{\lambda \Delta N}{2}
-\label{eq:calibrazione micrometro fabry-perot invertita}
+    \Delta d_{\text{approx}} = \frac{\lambda \Delta N}{2}
+\label{eq:calibrazione-micrometro-fabry-perot-approssimata}
 \end{align}
-L'imprecisione introdotta da tale considerazione è stata valutata considerando il minimo valore di $\cos{\theta}$, ossia quello che più si discosta dall'approssimazione $\cos{\theta}\approx1$, precedentemente misurato. Per quanto mostrato in tabella \ref{} tale valore risulta $\cos_{min}=0.99968$.
-%TODO riferimento tabella contenente coseni figura interferenza
-Abbiamo quindi sostituito $\cos_{min}$ a 1 e osservato la variazione di $\Delta d_{approx}$ rispetto a $\Delta d$ ottenendo: $\Delta d_{approx} = 0.99968\Delta_d$. L'approssimazione utilizzata introduce quindi un'incertezza relativa $\frac{\Delta d- \Delta d_{approx}}{\Delta d}=\sigma_{\Delta d}=0.03\%$, da confrontare poi con l'errore sul valore di $\Delta d$.
-L'errore sull'allargamento della cavità di Fabry-Perot è determinato propagando gli errori rispetto alla relazione \ref{eq:calibrazione micrometro fabry-perot invertita}, ricavando quindi:
+L'imprecisione introdotta da tale considerazione è stata valutata considerando il minimo valore di $\cos{\theta}$, ossia quello che più si discosta dall'approssimazione $\cos{\theta}\approx1$, precedentemente misurato. Per quanto mostrato in \cref{tab:fabry-perot-dati}, tale valore risulta $\cos_{\min}=\num{0.99968}$.
+
+Abbiamo quindi sostituito $\cos_{\min}$ a 1 e osservato la variazione di $\Delta d_{\text{approx}}$ rispetto a $\Delta d$, ottenendo: $\Delta d_{\text{approx}} = \num{0.99968}\Delta d$. L'approssimazione utilizzata introduce quindi un'incertezza relativa $\frac{\Delta d- \Delta d_{\text{approx}}}{\Delta d}=\sigma_{\Delta d}=\SI{0.03}{\percent}$, da confrontare poi con l'errore sul valore di $\Delta d$.
+L'errore sull'allargamento della cavità di Fabry-Perot è determinato propagando gli errori rispetto alla \cref{eq:calibrazione-micrometro-fabry-perot-approssimata}, ricavando quindi:
 \begin{align}
    \sigma_{\Delta d}= \frac{\lambda \delta_{\Delta N}}{2}
-\label{eq:errore calibrazione micrometro fabry}
+\label{eq:errore-calibrazione-micrometro-fabry}
 \end{align}
-Quanto calcolato dalle relazioni \ref{eq:calibrazione micrometro fabry-perot invertita} e \ref{eq:errore calibrazione micrometro fabry} è visualizzabile in tabella \ref{tab: distanze calibrazione fabry-perot}.
+Quanto calcolato dalle \cref{eq:calibrazione-micrometro-fabry-perot-approssimata,eq:errore-calibrazione-micrometro-fabry} è visualizzabile in \cref{tab:distanze-calibrazione-fabry-perot}.
+
 \begin{table}[htbp]
 \centering
 \caption{Distanze calibrazione micrometro (interferometro di Fabry-Perot)}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta d [\mu m]$ & 7.6 ± 0.3  & 7.3 ± 0.3  & 7.3 ± 0.3  & 7.6 ± 0.3  & 7.9 ± 0.3 & 7.9 ± 0.3 & 7.3 ± 0.3 \\\hline
+$\Delta d \SI{}{\micro\meter}$ & \SI{7.6 \pm 0.3}{} & \SI{7.3 \pm 0.3}{} & \SI{7.3 \pm 0.3}{} & \SI{7.6 \pm 0.3}{} & \SI{7.9 \pm 0.3}{} & \SI{7.9 \pm 0.3}{} & \SI{7.3 \pm 0.3}{} \\\hline
 \end{tabular}
-\label{tab: distanze calibrazione fabry-perot}
+\label{tab:distanze-calibrazione-fabry-perot}
 \end{table}
-Come si può osservare l'errore relativo introdotto dalla sensibilità di misura risulta molto maggiore di $\sigma_{\Delta d}$; l'approssimazione ad 1 di $\cos{\theta}$ è quindi lecita.
+
+Come si può osservare, l'errore relativo introdotto dalla sensibilità di misura risulta molto maggiore di $\sigma_{\Delta d}$; l'approssimazione ad 1 di $\cos{\theta}$ è quindi lecita.
 
 \subsection{Conclusione}
-Per ricavare la migliore stima di $\Delta_d$ e per ridurne l'incertezza abbiamo calcolato la media tra i valori presenti in tabella \ref{tab: distanze calibrazione fabry-perot}, ottenendo $\Delta d_{best} = (7.5 \pm 0.1) \mu m$. Possiamo quindi concludere come l'utilizzo dell'interferometro ci abbia permesso di misurare distanze con una precisione pari a $0.1 \mu m$, dieci volte superiore rispetto alla sensibilità del micrometro.
+Per ricavare la migliore stima di $\Delta d$ e per ridurne l'incertezza abbiamo calcolato la media tra i valori presenti in \cref{tab:distanze-calibrazione-fabry-perot}, ottenendo $\Delta d_{\text{best}} = \SI{7.5 \pm 0.1}{\micro\meter}$. Possiamo quindi concludere come l'utilizzo dell'interferometro ci abbia permesso di misurare distanze con una precisione pari a \SI{0.1}{\micro\meter}, dieci volte superiore rispetto alla sensibilità del micrometro.
 
-
-\section{Calibrazione micrometro con interferometro di Michaelson}
+\section{Calibrazione micrometro con interferometro di Michelson}
 \subsection{Obiettivo}
-L'obiettivo di questa esperienza è la calibrazione del micrometro mediante l'utilizzo di un interferometro nella configurazione di Michaelson. In particolare si vuole dimostrare che la sensibilità del micrometro è superiore alla precisione ricavata mediante l'utilizzo delle formule riguardanti l'interferenza, ovvero che la misura indiretta dello spostamento dello specchio mediante il conteggio delle frange è più precisa della misura diretta.
+L'obiettivo di questa esperienza è la calibrazione del micrometro mediante l'utilizzo di un interferometro nella configurazione di Michelson. In particolare si vuole dimostrare che la sensibilità del micrometro è inferiore alla precisione ricavata mediante l'utilizzo delle formule riguardanti l'interferenza, ovvero che la misura indiretta dello spostamento dello specchio mediante il conteggio delle frange è più precisa della misura diretta.
+
 \subsection{Metodo}
-Per effettuare le misure è stato creato un interferometro di Michaelson la cui rappresentazione schematica è riportata nell'immagine \ref{Fig: Configurazione Michaelson}:
-\begin{center}
-	\includegraphics[width=0.9\textwidth]{grafici/configurazione michaelson.png}
-\captionof{figure}{Configurazione interferometro Michaelson}
-\label{Fig: Configurazione Michaelson}
-\end{center}
-L'interferometro è composto da un laser che invia un raggio luminoso ad una lente divergente, la quale rende i raggi della sorgente paralleli fra di loro. Il raggio collimato incide poi su uno specchio semiriflettente creando così due diversi fasci che compiono percorsi separati per poi incontrarsi nuovamente su uno schermo. I diversin raggi incidenti hanno cammino ottico diverso proprio a causa delle diverse distanze che percorrono, quando incidono sullo schermo creano dunque una figura di interferenza. Tale figura è osservabile a occhio nudo e si presenta come un'alternanza di cerchi concentrici, ciascuno relativo ad un punto di interferenza costuttiva. Variando la posizione dello specchio movibile è possibile cambiare anche il cammino ottico e dunque la figura di interferenza, in tal caso si osserverà un'alternanza di frange concentriche il cui numero varierà secondo la relazione: 
-\begin{center}
-    $2d=\Delta N \lambda $
-\end{center}
-dove $d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=632.8 nm$ è la lunghezza d'ionda del fascio incidente ed è un valore noto. Lo spostamento dello specchio modile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un micrometro con scala graduata di precisione $1 \mu m$. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, variando la posizione dello specchio movibile e contando ad occhio le frange.
-\subsection{dati}
-Nella tabella \ref{tab: micrometro Michaelson} sono riportati i valori di $\Delta N$ contati in laboratorio per ciascuna delle 7 misure effettuate. Per effettuare tale misura abbiamo variato la posizione dello specchio di un valore costante tramite il micrometro sull'apparato e abbiamo contato il relativo numero di frange che si alternavano sullo schermo. L'errore sul numero di frange contate associato a ciascun valore è di $\pm1$ ed è motivato dal fatto che le frange si devono presentare in valori discreti e dal fatto che il conteggio è stato effettuato manualmente. 
+Per effettuare le misure è stato creato un interferometro di Michelson la cui rappresentazione schematica è riportata in \cref{fig:configurazione-michelson}:
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{grafici/configurazione michaelson.png}
+\caption{Configurazione interferometro Michelson}
+\label{fig:configurazione-michelson}
+\end{figure}
+
+L'interferometro è composto da un laser che invia un raggio luminoso ad una lente divergente, la quale rende i raggi della sorgente paralleli fra di loro. Il raggio collimato incide poi su uno specchio semiriflettente creando così due diversi fasci che compiono percorsi separati per poi incontrarsi nuovamente su uno schermo. I diversi raggi incidenti hanno cammino ottico diverso proprio a causa delle diverse distanze che percorrono; quando incidono sullo schermo creano dunque una figura di interferenza. Tale figura è osservabile a occhio nudo e si presenta come un'alternanza di cerchi concentrici, ciascuno relativo ad un punto di interferenza costruttiva. Variando la posizione dello specchio movibile è possibile cambiare anche il cammino ottico e dunque la figura di interferenza; in tal caso si osserverà un'alternanza di frange concentriche il cui numero varierà secondo la relazione: 
+\begin{align}
+    2d=\Delta N \lambda
+\end{align}
+dove $d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=\SI{632.8}{\nano\meter}$ è la lunghezza d'onda del fascio incidente ed è un valore noto. Lo spostamento dello specchio mobile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un micrometro con scala graduata di precisione \SI{1}{\micro\meter}. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, variando la posizione dello specchio movibile e contando ad occhio le frange.
+
+\subsection{Dati}
+Nella \cref{tab:micrometro-michelson} sono riportati i valori di $\Delta N$ contati in laboratorio per ciascuna delle 7 misure effettuate. Per effettuare tale misura abbiamo variato la posizione dello specchio di un valore costante tramite il micrometro sull'apparato e abbiamo contato il relativo numero di frange che si alternavano sullo schermo. L'errore sul numero di frange contate associato a ciascun valore è di $\pm1$ ed è motivato dal fatto che le frange si devono presentare in valori discreti e dal fatto che il conteggio è stato effettuato manualmente. 
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & 23 ± 1 & 25 ± 1 & 26 ± 1 & 23 ± 1 & 26 ± 1 & 24 ± 1 & 24 ± 1 \\\hline
+$\Delta N$ & \num{23 \pm 1} & \num{25 \pm 1} & \num{26 \pm 1} & \num{23 \pm 1} & \num{26 \pm 1} & \num{24 \pm 1} & \num{24 \pm 1} \\\hline
 \end{tabular}
-\caption{Shift di frangia osservato (interferomentro di Michaelson)}
-\label{tab: micrometro Michaelson}
+\caption{Shift di frangia osservato (interferometro di Michelson)}
+\label{tab:micrometro-michelson}
 \end{table}
+
 \subsection{Analisi dati}
 A partire dai dati raccolti siamo riusciti a calcolare il valore di $d$ atteso tramite la formula: 
-\begin{center}
-    $d=\frac{\Delta N \lambda}{2}$
-\end{center}
-Otteniamo così vari valori di $d$ i quali sono riportati nella tabella \ref{tab: valori d michaelson}:
+\begin{align}
+    d=\frac{\Delta N \lambda}{2}
+\end{align}
+Otteniamo così vari valori di $d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$d(\mu m)$ & 7.3 ± 0.3 & 7.9 ± 0.3 & 8.2 ± 0.3 & 7.3 ± 0.3 & 8.2 ± 0.3 & 7.6 ± 0.3 & 7.6 ± 0.3 \\\hline
+$d$ \SI{}{\micro\meter} & \SI{7.3 \pm 0.3}{} & \SI{7.9 \pm 0.3}{} & \SI{8.2 \pm 0.3}{} & \SI{7.3 \pm 0.3}{} & \SI{8.2 \pm 0.3}{} & \SI{7.6 \pm 0.3}{} & \SI{7.6 \pm 0.3}{} \\\hline
 \end{tabular}
 \caption{Valore di d calcolato}
-\label{tab: valori d michaelson}
-\end{table} 
-Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati. otteniamo così $d=(7.7\pm0.1 )\mu m$.
-siccome i valori degli spostamenti dello specchio movibile per gli esperimenti di Fabry-Perot e di Michaelson sono uguali in quanto li abbiamo decisi così, ha senso fare un test di compatibilità tra i due valori ottenuti:
-$t=\frac{|d_{Michaelson}-d_{Fabry-Perot}|}{\sqrt{2\sigma^2}}$=1.42 che equivale a una probabilità entro t-sigma di $p=0,84$
-\subsection{Conclusioni}
-Innanzitutto possiamo osservare che i valori di $\Delta d$ sono compatibili fra di loro, inoltre la sensibilità ottenuta mediante il calcolo di $\Delta d$ in maniera indiretta contando il numero di frange presenta una sensibilità maggiore rispetto a quella del micrometro, dunque è più affida.
+\label{tab:valori-d-michelson}
+\end{table}
 
+Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati, ottenendo così $d=\SI{7.7\pm0.1}{\micro\meter}$.
+Siccome i valori degli spostamenti dello specchio movibile per gli esperimenti di Fabry-Perot e di Michelson sono uguali in quanto li abbiamo decisi così, ha senso fare un test di compatibilità tra i due valori ottenuti:
+$t=\frac{|d_{\text{Michelson}}-d_{\text{Fabry-Perot}}|}{\sqrt{2\sigma^2}}=\num{1.42}$ che equivale a una probabilità entro $t$-sigma di $p=\num{0.84}$.
+
+\subsection{Conclusioni}
+Innanzitutto possiamo osservare che i valori di $\Delta d$ sono compatibili fra di loro. Inoltre, la sensibilità ottenuta mediante il calcolo di $\Delta d$ in maniera indiretta contando il numero di frange presenta una sensibilità maggiore rispetto a quella del micrometro, dunque è più affidabile.
 
 \end{document}
