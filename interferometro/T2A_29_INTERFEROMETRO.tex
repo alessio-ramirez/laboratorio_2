@@ -62,6 +62,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
+\newpage
 
 \section{Interferometro di Fabry-Perot}
 \subsection{Obiettivo}
@@ -251,4 +252,67 @@ $t=\frac{|d_{\text{Michelson}}-d_{\text{Fabry-Perot}}|}{\sqrt{2\sigma^2}}=\num{1
 \subsection{Conclusioni}
 Innanzitutto possiamo osservare che i valori di $\Delta d$ sono compatibili fra di loro. Inoltre, la sensibilità ottenuta mediante il calcolo di $\Delta d$ in maniera indiretta contando il numero di frange presenta una sensibilità maggiore rispetto a quella del micrometro, dunque è più affidabile.
 
+
+\section{Interferenza con un righello}
+\subsection{Obiettivo}
+Stimare la lunghezza d'onda $\lambda$ di un laser attraverso l'analisi della figura di interferenza prodotta dall'illuminazione obliqua di un righello. 
+
+\subsection{Metodo}
+Quando un fascio laser monocromatico e coerente incide obliquamente su un righello metallico dotato di incisioni regolari, si verificano fenomeni di diffrazione ai bordi delle tacche che agiscono come un reticolo di diffrazione. La relazione che descrive la posizione dei massimi di interferenza in questa configurazione è: 
+\begin{align}
+    d(\cos\theta_i - \cos\theta_N) = N\lambda
+\end{align}
+dove $d=\SI{1}{\milli\meter}$ è il passo del reticolo, in questo caso la distanza tra le incisioni del righello, $\theta_i$ è l'angolo di incidenza del fascio laser, $\theta_N$ è l'angolo corrispondente al massimo di ordine $N$, e $\lambda$ è la lunghezza d'onda del laser, stimato come $\lambda=\SI{632.8}{\nano\meter}$ per il laser He-Ne utilizzato.
+
+La distanza tra la parete e il punto di riflessione del laser sul righello è stato stimato come $L=\SI{124 \pm 5}{\centi\meter}$, il motivo di un incertezza così alta è dovuto al fatto che non è stato possibile individuare con precisione il punto di riflessione corrispondente al primo massimo. Il righello presentava una "striscia" di punti di diffrazione, tuttavia questa incertezza, come si vedrà dall'analisi dati, non ha un impatto significativo sul risultato finale. $\theta_i$ è stato dunque calcolato con $L$ e la distanza tra l'immagine del raggio indeflesso e di quello riflesso, $r$, con la seguente relazione:
+\begin{align}   
+    \theta_i = \arctan\left(\frac{r}{L}\right)
+\end{align}
+similmente $\theta_N$ è stato calcolato come:
+\begin{align}
+    \theta_N = \arctan\left(\frac{r_N}{L}\right)
+\end{align}
+dove $r_N$ è la distanza tra l'immagine del raggio indeflesso e di quello riflesso per il massimo di ordine $N$.
+\subsection{Dati}
+è stato misurato $r=4.7\pm0.2$, da cui $\theta_i=0.038\pm0.002$ rad, le misure di $r_N$ per i vari massimi sono riportate in \cref{tab:interferenza-righello}, insieme agli altri dati.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|ccccc|}
+\hline
+Label & 1 & 2 & 3 & 4 & 5 \\\hline\hline
+$r_N$ & 70 ± 2 mm & 85 ± 2 mm & 96 ± 2 mm & 110 ± 2 mm & 120 ± 2 mm \\\hline
+$\cos(\theta_i) - \cos(\theta_N)$ & 872 ± 200 µ & 1.6 ± 0.2 m & 2.3 ± 0.3 m & 3.2 ± 0.4 m & 3.9 ± 0.4 m \\\hline
+$N$ & 1 & 2 & 3 & 4 & 5 \\\hline
+\end{tabular}
+\caption{Dati della figura di interferenza (righello)}
+\label{tab:interferenza-righello}
+\end{table}
+
+\subsection{Analisi dati}
+L'interpolazione
+\begin{align}
+    (\cos\theta_i - \cos\theta_N) = \frac{N\lambda}{d}
+\end{align}
+è riportata in \cref{fig:interferenza-righello-interpolazione}, i risultati sono riportati in \cref{tab:interferenza-righello-risultati}.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1.0\textwidth]{./grafici/righello.pdf}
+\caption{Interpolazione della legge di interferenza (righello)}
+\label{fig:interferenza-righello-interpolazione}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Risultati del Fit - Interferenza del Righello}
+\label{tab:interferenza-righello-risultati}
+\begin{tabular}{|l|cccc|}
+\hline
+parametri & lambd & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+fit (minuit) & 792 ± 45 n & 0.393 & 4 & 0.0983 \\\hline
+\end{tabular}
+\end{table}
+
+\subsection{Conclusioni}
+La lunghezza d'onda stimata è $\lambda = \SI{792 \pm 45}{\nano\meter}$, che è incompatibile con il valore noto di $\lambda = \SI{632.8}{\nano\meter}$ per il laser He-Ne ($\approx 3.5 \sigma$, p-value = 0.0001). Il fit, avendo un chi quadro ridotto, suggerisce che la legge usata descriva correttamente il fenomeno, dal punto di vista della relazione lineare tra $\cos(\theta_i) - \cos(\theta_N)$ e $N$, e la grossa incertezza sulla misura di $L$ non compromette questo risultato, infatti ipotizzando un errore del millimetro risulterebbe comunque un chi quadro ridotto di 0.328. Ipotizziamo dunque che la legge racchiuda correttamente la fisica dietro il fenomeno, ma manchi di qualche fattore correttivo dovuto alla non idealità del sistema. 
 \end{document}
