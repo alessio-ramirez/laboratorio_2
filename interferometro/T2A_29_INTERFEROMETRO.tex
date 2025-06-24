@@ -62,6 +62,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
+\newpage
 
 \section{Interferometro di Fabry-Perot}
 \subsection{Obiettivo}
@@ -120,19 +121,19 @@ Il grafico dell'interpolazione è visibile in \cref{fig:fabry-perot-interpolazio
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1.0\textwidth]{./grafici/fabry_perot_interferenza.pdf}
+\includegraphics[width=0.8\textwidth]{./grafici/fabry_perot_interferenza.pdf}
 \caption{Interpolazione della legge di Fabry-Perot}
 \label{fig:fabry-perot-interpolazione}
 \end{figure}
 
 \begin{table}[htbp]
 \centering
+\caption{Risultati Interpolazione (Fabry-Perot)}
 \begin{tabular}{|l|ccccc|}
 \hline
 Parametri & A & d [\si{\milli\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
 Risultati & \num{996.0 \pm 0.077 e-3} & \num{4.3 \pm 1.4} & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
 \end{tabular}
-\caption{Risultati Interpolazione (Fabry-Perot)}
 \label{tab:fabry-perot-risultati}
 \end{table}
 
@@ -209,7 +210,7 @@ L'obiettivo di questa esperienza è la calibrazione del micrometro mediante l'ut
 Per effettuare le misure è stato creato un interferometro di Michelson la cui rappresentazione schematica è riportata in \cref{fig:configurazione-michelson}:
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{./grafici/configurazione michaelson.png}
+\includegraphics[width=0.8\textwidth]{./grafici/configurazione michaelson.png}
 \caption{Configurazione interferometro Michelson (da manuale PASCO)}
 \label{fig:configurazione-michelson}
 \end{figure}
@@ -238,7 +239,7 @@ A partire dai dati raccolti siamo riusciti a calcolare il valore di $d$ atteso t
 Otteniamo così vari valori di $d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
 \begin{table}[htbp]
 \centering
-\caption{Valore di d calcolato}
+\caption{Valore di $d$ calcolato}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
@@ -291,7 +292,7 @@ Invertendo la \cref{eq:shift-frange-pressione-aria} abbiamo ottenuto:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1.0\textwidth]{./grafici/indice_aria.pdf}
+\includegraphics[width=0.8\textwidth]{./grafici/indice_aria.pdf}
 \caption{Relazione shift di frange-variazione di pressione}
 \label{fig:indice-aria}
 \end{figure}
@@ -305,7 +306,7 @@ Quanto ricavato dall'interpolazione e i risultati del suo test del chi quadro è
 \label{tab:fit-indice-rifrazione-aria}
 \begin{tabular}{|l|cccc|}
 \hline
-Fit & m [\si{\per\pascal}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+Parametri & m [\si{\per\pascal}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
 Risultati & \num{3.16 \pm 0.10 e-7} & 0 & 6 & 0 \\\hline
 \end{tabular}
 \end{table}
@@ -323,7 +324,7 @@ L'obiettivo di questa esperienza è la misura dell'indice di rifrazione del vetr
 Per effettuare le misure è stato creato un interferometro di Michelson (descritto precedentemente) all'interno del quale è stata posizionata una lastra di vetro inclinabile come in \cref{fig:michelson-vetro}:
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{./grafici/Michaelson vetro.png}
+\includegraphics[width=0.6\textwidth]{./grafici/Michaelson vetro.png}
 \caption{Configurazione interferometro Michelson con lastra di vetro (da manuale PASCO)}
 \label{fig:michelson-vetro}
 \end{figure}
@@ -405,7 +406,6 @@ dove $r_N$ è la distanza tra l'immagine del raggio indeflesso e di quello rifle
 \centering
 \begin{tabular}{|l|ccccc|}
 \hline
-Label & 1 & 2 & 3 & 4 & 5 \\\hline\hline
 $r_N$ [\si{\milli\meter}] & \num{70 \pm 2} & \num{85 \pm 2} & \num{96 \pm 2} & \num{110 \pm 2} & \num{120 \pm 2} \\\hline
 $\cos(\theta_i) - \cos(\theta_N)$ [\num{e-6}] & \num{0.872 \pm 0.200} & \num{1.6 \pm 0.2} & \num{2.3 \pm 0.3} & \num{3.2 \pm 0.4} & \num{3.9 \pm 0.4} \\\hline
 $N$ & 1 & 2 & 3 & 4 & 5 \\\hline
@@ -421,7 +421,7 @@ L'interpolazione
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1.0\textwidth]{./grafici/righello.pdf}
+\includegraphics[width=0.8\textwidth]{./grafici/righello.pdf}
 \caption{Interpolazione della legge di interferenza (righello)}
 \label{fig:interferenza-righello-interpolazione}
 \end{figure}
@@ -432,8 +432,8 @@ L'interpolazione
 \centering
 \begin{tabular}{|l|cccc|}
 \hline
-parametri & $\lambda$ [\si{\nano\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-fit (minuit) & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\\hline
+Parametri & $\lambda$ [\si{\nano\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+Risultati & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\\hline
 \end{tabular}
 \end{table}
 
