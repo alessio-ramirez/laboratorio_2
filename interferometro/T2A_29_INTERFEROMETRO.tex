@@ -77,12 +77,12 @@ Verificare la legge che descrive la posizione dei massimi di interferenza per la
 \end{figure}
 Nella configurazione di Fabry-Perot, il laser emesso, che passa per una lente divergente, viene parzialmente riflesso nella cavità formata da due specchi paralleli e conseguentemente si hanno cammini ottici differenti per i raggi riflessi e trasmessi. 
 
-Come schematizzato in figura \ref{fig:fabry-perot-schema} l'interferometro di Fabry-Perot è costituito da due superfici riflettenti parallele separate da una distanza $d$ regolabile. Il fascio laser incidente viene parzialmente riflesso e trasmesso quando incontra ogni parete della cavità, generando multiple riflessioni all'interno di quest'ultima. I raggi che emergono dalla cavità interferiscono tra loro, producendo una figura di interferenza.
-Come lunghezza d'onda $\lambda$ del fascio laser abbiamo calcolato $\lambda = \frac{\lambda_0}{n}$, con $n=1.00029$ indice di rifrazione dell'aria e $\lambda_0 = 632.8$ come indicato sul manuale PASCO. Tramite questo passaggio abbiamo potuto tenere conto del fatto che la propagazione del laser non è avvenuta nel vuoto ma in aria, con conseguente variazione del suo reale cammino ottico.
+Come schematizzato in \cref{fig:fabry-perot-schema} l'interferometro di Fabry-Perot è costituito da due superfici riflettenti parallele separate da una distanza $d$ regolabile. Il fascio laser incidente viene parzialmente riflesso e trasmesso quando incontra ogni parete della cavità, generando multiple riflessioni all'interno di quest'ultima. I raggi che emergono dalla cavità interferiscono tra loro, producendo una figura di interferenza.
+Come lunghezza d'onda $\lambda$ del fascio laser abbiamo calcolato $\lambda = \frac{\lambda_0}{n}$, con $n=\num{1.00029}$ indice di rifrazione dell'aria e $\lambda_0 = \SI{632.8}{\nano\meter}$ come indicato sul manuale PASCO. Tramite questo passaggio abbiamo potuto tenere conto del fatto che la propagazione del laser non è avvenuta nel vuoto ma in aria, con conseguente variazione del suo reale cammino ottico.
 Si può ricavare che la condizione per l'interferenza costruttiva è data dalla relazione:
 \begin{align}
    \delta_r\frac{\lambda}{2\pi}+ 2d \cos \theta = N\lambda
-\label{eq: max interferenza fabry-perot}
+\label{eq:max-interferenza-fabry-perot}
 \end{align}
 dove $d$ è la distanza tra gli specchi, $\theta$ è l'angolo di incidenza del raggio rispetto alla normale allo schermo, $N$ è un intero che indica l'ordine del massimo e $\lambda$ è la lunghezza d'onda della luce.
 
@@ -92,18 +92,19 @@ Per verificare questa legge, sono stati misurati i diametri dei massimi di inter
 \[\theta = \arctan \left(\frac{\text{diametro}}{2L}\right)\]
 
 \subsection{Dati}
-La distanza tra lente e parete, rimasta fissa per tutte le misure, è stata misurata come $L=\SI{128 \pm 0.5}{\centi\meter}$, mentre le misure dei vari diametri, e i relativi valori di $\cos{\theta}$ sono riportati in tabella \ref{tab:fabry-perot-dati}. Da notare come al massimo di ordine maggiore corrisponda l'angolo minore (ossia la frangia luminosa più interna è quella di ordine massimo) dal momento che $n$ ordine del massimo risulta proporzionale a $\cos{\theta}$, il quale aumenta al diminuire di $\theta$.
+La distanza tra lente e parete, rimasta fissa per tutte le misure, è stata misurata come $L=\SI{128 \pm 0.5}{\centi\meter}$, mentre le misure dei vari diametri, e i relativi valori di $\cos{\theta}$ sono riportati in \cref{tab:fabry-perot-dati}. Da notare come al massimo di ordine maggiore corrisponda l'angolo minore (ossia la frangia luminosa più interna è quella di ordine massimo) dal momento che l'ordine del massimo risulta proporzionale a $\cos{\theta}$, il quale aumenta al diminuire di $\theta$.
+
 \begin{table}[htbp]
 \centering
 \caption{Dati Figura di Interferenza (Fabry-Perot)}
 \begin{tabular}{|c|c|c|}
 \hline
-Diametro & $\cos(\theta)$ & $N$ \\\hline\hline
-20 ± 1 mm & 0.999969 ± 0.000003  & 5 \\
-36 ± 1 mm & 0.999901 ± 0.000006  & 4 \\
-48 ± 1 mm & 0.999824 ± 0.000007  & 3 \\
-57 ± 1 mm & 0.999752 ± 0.000009  & 2 \\
-65 ± 1 mm & 0.999680 ± 0.000010  & 1 \\
+Diametro [\si{\milli\meter}] & $\cos(\theta)$ & $N$ \\\hline\hline
+\num{20 \pm 1} & \num{0.999969 \pm 0.000003}  & 5 \\
+\num{36 \pm 1} & \num{0.999901 \pm 0.000006}  & 4 \\
+\num{48 \pm 1} & \num{0.999824 \pm 0.000007}  & 3 \\
+\num{57 \pm 1} & \num{0.999752 \pm 0.000009}  & 2 \\
+\num{65 \pm 1} & \num{0.999680 \pm 0.000010}  & 1 \\
 \hline
 \end{tabular}
 \label{tab:fabry-perot-dati}
@@ -111,11 +112,11 @@ Diametro & $\cos(\theta)$ & $N$ \\\hline\hline
 
 
 \subsection{Analisi Dati}
-Invertendo la relazione \ref{eq: max interferenza fabry-perot} abbiamo dunque ricavato la seguente:
+Invertendo la \cref{eq:max-interferenza-fabry-perot} abbiamo dunque ricavato la seguente:
 \[\cos \theta = \frac{N\lambda}{2d} + A\]
 Tale relazione è stata quindi utilizzata per realizzare un'interpolazione,
-con $d$ e $A$ parametri liberi e $\lambda=\SI{632.6}{nm}$ lunghezza d'onda del laser He-Ne è stata assunta senza errore. La presenza del termine di shift $A$ è giustificata sia dagli effetti di riflessione sia dal fatto che non è possibile determinare con certezza l'ordine assoluto $N$, con conseguenti effetti sistematici.
-Il grafico dell'interpolazione è visibile in figura \ref{fig:fabry-perot-interpolazione}, i risultati in tabella \ref{tab:fabry-perot-risultati}.
+con $d$ e $A$ parametri liberi e $\lambda=\SI{632.6}{\nano\meter}$ lunghezza d'onda del laser He-Ne è stata assunta senza errore. La presenza del termine di shift $A$ è giustificata sia dagli effetti di riflessione sia dal fatto che non è possibile determinare con certezza l'ordine assoluto $N$, con conseguenti effetti sistematici.
+Il grafico dell'interpolazione è visibile in \cref{fig:fabry-perot-interpolazione}, i risultati in \cref{tab:fabry-perot-risultati}.
 
 \begin{figure}[htbp]
 \centering
@@ -128,15 +129,15 @@ Il grafico dell'interpolazione è visibile in figura \ref{fig:fabry-perot-interp
 \centering
 \begin{tabular}{|l|ccccc|}
 \hline
-Parametri & A & d & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & \num{996.0 \pm 0.077 e-3} & $\SI{4.3 \pm 1.4}{\milli\meter}$ & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
+Parametri & A & d [\si{\milli\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+Risultati & \num{996.0 \pm 0.077 e-3} & \num{4.3 \pm 1.4} & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
 \end{tabular}
 \caption{Risultati Interpolazione (Fabry-Perot)}
 \label{tab:fabry-perot-risultati}
 \end{table}
 
 \subsection{Conclusioni}
-Dall'interpolazione e dai risultati del test del chi quadro, visibili in tabella \ref{tab:fabry-perot-risultati}, si evince che la legge prevista è compatibile con l'osservazione sperimentale. Inoltre il valore di $d$, ampiezza della cavità, risulta coerente con quanto atteso. L'esperimento dimostra quindi che la condizione $\delta_r\frac{\lambda}{2\pi}+2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot. 
+Dall'interpolazione e dai risultati del test del chi quadro, visibili in \cref{tab:fabry-perot-risultati}, si evince che la legge prevista è compatibile con l'osservazione sperimentale. Inoltre il valore di $d$, ampiezza della cavità, risulta coerente con quanto atteso. L'esperimento dimostra quindi che la condizione $\delta_r\frac{\lambda}{2\pi}+2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot. 
 
 \section{Calibrazione micrometro con interferometro di Fabry-Perot}
 \subsection{Obiettivo}
@@ -145,20 +146,20 @@ Confrontare poi la precisione ottenuta sulle misure con quella garantita dal mic
 \subsection{Metodo}
 Una volta montato e allineato l'interferometro, mantenendo la configurazione utilizzata per lo studio della figura di interferenza, abbiamo ruotato il 
 nonio di una distanza fissa $d$, corrispondente all'allargamento della cavità di Fabry-Perot. Tale variazione della dimensione della cavità causa uno
-scorrimento della figura di interferenza, in particolare dalla relazione \ref{eq: max interferenza fabry-perot} si può ricavare:
+scorrimento della figura di interferenza, in particolare dalla \cref{eq:max-interferenza-fabry-perot} si può ricavare:
 \begin{align}
     2 \Delta d \cos  \theta = \Delta N \lambda
-\label{eq:calibrazione micrometro fabry-perot}
+\label{eq:calibrazione-micrometro-fabry-perot}
 \end{align}
-Fissata l'osservazione di un punto sulla figura di interferenza $\Delta N$ indica il numero di frange di cui si è osservato il passaggio attraverso quel punto, la lunghezza d'onda è $\lambda = 632.6 nm$ (come calcolato precedentemente) e $\theta$ rappresenta la posizione angolare a cui si trova il punto osservato, ossia l'angolo rispetto all'orizzontale di cui è inclinato il fascio.
-Abbiamo variato le dimensioni della cavità 7 volte dello stesso tratto $d$ e per ciascuna di esse abbiamo misurato $\Delta N$, ricavando così 7 diversi valori di $\Delta d$, calcolato invertendo la relazione \ref{eq:calibrazione micrometro fabry-perot} come:
+Fissata l'osservazione di un punto sulla figura di interferenza $\Delta N$ indica il numero di frange di cui si è osservato il passaggio attraverso quel punto, la lunghezza d'onda è $\lambda = \SI{632.6}{\nano\meter}$ (come calcolato precedentemente) e $\theta$ rappresenta la posizione angolare a cui si trova il punto osservato, ossia l'angolo rispetto all'orizzontale di cui è inclinato il fascio.
+Abbiamo variato le dimensioni della cavità 7 volte dello stesso tratto $d$ e per ciascuna di esse abbiamo misurato $\Delta N$, ricavando così 7 diversi valori di $\Delta d$, calcolato invertendo la \cref{eq:calibrazione-micrometro-fabry-perot} come:
 \begin{align}
     \Delta d = \frac{\lambda \Delta N}{2\cos{\theta}}
-\label{eq:calibrazione micrometro fabry-perot invertita}
+\label{eq:calibrazione-micrometro-fabry-perot-invertita}
 \end{align}
 
 \subsection{Dati}
-In tabella \ref{tab: micrometro fabry-perot} sono riportati i valori di $\Delta N$, ai quali è associata una sensibilità fissa $\delta_{\Delta N}$ pari ad 1 frangia, motivata dalla possibilità di errore umano nel conteggio del numero di frange osservate.
+In \cref{tab:micrometro-fabry-perot} sono riportati i valori di $\Delta N$, ai quali è associata una sensibilità fissa $\delta_{\Delta N}$ pari ad 1 frangia, motivata dalla possibilità di errore umano nel conteggio del numero di frange osservate.
 
 \begin{table}[htbp]
 \centering
@@ -166,86 +167,87 @@ In tabella \ref{tab: micrometro fabry-perot} sono riportati i valori di $\Delta 
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & 24 ± 1 & 23 ± 1 & 23 ± 1 & 24 ± 1 & 25 ± 1 & 25 ± 1 & 23 ± 1 \\\hline
+$\Delta N$ & \num{24 \pm 1} & \num{23 \pm 1} & \num{23 \pm 1} & \num{24 \pm 1} & \num{25 \pm 1} & \num{25 \pm 1} & \num{23 \pm 1} \\\hline
 \end{tabular}
-\label{tab: micrometro fabry-perot}
+\label{tab:micrometro-fabry-perot}
 \end{table}
 
 \subsection{Analisi dati}
 Dal momento che l'angolo $\theta$ è molto piccolo nel ricavare $\Delta d$ è stata utilizzata l'approssimazione $\cos{\theta}\approx1$ da cui consegue:
 \begin{align}
     \Delta d_{approx} = \frac{\lambda \Delta N}{2}
-\label{eq:calibrazione micrometro fabry-perot invertita}
+\label{eq:calibrazione-micrometro-fabry-perot-approssimata}
 \end{align}
-L'imprecisione introdotta da tale considerazione è stata valutata considerando il minimo valore di $\cos{\theta}$, ossia quello che più si discosta dall'approssimazione $\cos{\theta}\approx1$, precedentemente misurato. Per quanto mostrato in tabella \ref{tab:fabry-perot-dati} tale valore risulta $\cos_{min}=0.99968$.
-Abbiamo quindi sostituito $\cos_{min}$ a 1 e osservato la variazione di $\Delta d_{approx}$ rispetto a $\Delta d$ ottenendo: $\Delta d_{approx} = 0.99968\Delta_d$. L'approssimazione utilizzata introduce quindi un'incertezza relativa $\frac{\Delta d- \Delta d_{approx}}{\Delta d}=\sigma_{\Delta d}=0.03\%$, da confrontare poi con l'errore sul valore di $\Delta d$.
-L'errore sull'allargamento della cavità di Fabry-Perot è determinato propagando gli errori rispetto alla relazione \ref{eq:calibrazione micrometro fabry-perot invertita}, ricavando quindi:
+L'imprecisione introdotta da tale considerazione è stata valutata considerando il minimo valore di $\cos{\theta}$, ossia quello che più si discosta dall'approssimazione $\cos{\theta}\approx1$, precedentemente misurato. Per quanto mostrato in \cref{tab:fabry-perot-dati} tale valore risulta $\cos_{min}=\num{0.99968}$.
+Abbiamo quindi sostituito $\cos_{min}$ a 1 e osservato la variazione di $\Delta d_{approx}$ rispetto a $\Delta d$ ottenendo: $\Delta d_{approx} = \num{0.99968}\Delta_d$. L'approssimazione utilizzata introduce quindi un'incertezza relativa $\frac{\Delta d- \Delta d_{approx}}{\Delta d}=\sigma_{\Delta d}=\SI{0.03}{\percent}$, da confrontare poi con l'errore sul valore di $\Delta d$.
+L'errore sull'allargamento della cavità di Fabry-Perot è determinato propagando gli errori rispetto alla \cref{eq:calibrazione-micrometro-fabry-perot-invertita}, ricavando quindi:
 \begin{align}
    \sigma_{\Delta d}= \frac{\lambda \delta_{\Delta N}}{2}
-\label{eq:errore calibrazione micrometro fabry}
+\label{eq:errore-calibrazione-micrometro-fabry}
 \end{align}
-Quanto calcolato dalle relazioni \ref{eq:calibrazione micrometro fabry-perot invertita} e \ref{eq:errore calibrazione micrometro fabry} è visualizzabile in tabella \ref{tab: distanze calibrazione fabry-perot}.
+Quanto calcolato dalle \cref{eq:calibrazione-micrometro-fabry-perot-approssimata,eq:errore-calibrazione-micrometro-fabry} è visualizzabile in \cref{tab:distanze-calibrazione-fabry-perot}.
 \begin{table}[htbp]
 \centering
 \caption{Distanze calibrazione micrometro (interferometro di Fabry-Perot)}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta d [\mu m]$ & 7.6 ± 0.3  & 7.3 ± 0.3  & 7.3 ± 0.3  & 7.6 ± 0.3  & 7.9 ± 0.3 & 7.9 ± 0.3 & 7.3 ± 0.3 \\\hline
+$\Delta d$ [\si{\micro\meter}] & \num{7.6 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.6 \pm 0.3}  & \num{7.9 \pm 0.3} & \num{7.9 \pm 0.3} & \num{7.3 \pm 0.3} \\\hline
 \end{tabular}
-\label{tab: distanze calibrazione fabry-perot}
+\label{tab:distanze-calibrazione-fabry-perot}
 \end{table}
 Come si può osservare l'errore relativo introdotto dalla sensibilità di misura risulta molto maggiore di $\sigma_{\Delta d}$; l'approssimazione ad 1 di $\cos{\theta}$ è quindi lecita.
 
 \subsection{Conclusione}
-Per ricavare la migliore stima di $\Delta_d$ e per ridurne l'incertezza abbiamo calcolato la media tra i valori presenti in tabella \ref{tab: distanze calibrazione fabry-perot}, ottenendo $\Delta d_{best} = (7.5 \pm 0.1) \mu m$. Possiamo quindi concludere come l'utilizzo dell'interferometro ci abbia permesso di misurare distanze con una precisione pari a $0.1 \mu m$, dieci volte superiore rispetto alla sensibilità del micrometro.
+Per ricavare la migliore stima di $\Delta_d$ e per ridurne l'incertezza abbiamo calcolato la media tra i valori presenti in \cref{tab:distanze-calibrazione-fabry-perot}, ottenendo $\Delta d_{best} = \SI{7.5 \pm 0.1}{\micro\meter}$. Possiamo quindi concludere come l'utilizzo dell'interferometro ci abbia permesso di misurare distanze con una precisione pari a \SI{0.1}{\micro\meter}, dieci volte superiore rispetto alla sensibilità del micrometro.
 
 
 \section{Calibrazione micrometro con interferometro di Michelson}
 \subsection{Obiettivo}
 L'obiettivo di questa esperienza è la calibrazione del micrometro mediante l'utilizzo di un interferometro nella configurazione di Michelson. In particolare si vuole dimostrare che la sensibilità del micrometro è inferiore alla precisione ricavata mediante l'utilizzo delle formule riguardanti l'interferenza, ovvero che la misura indiretta dello spostamento dello specchio mediante il conteggio delle frange è più precisa della misura diretta.
 \subsection{Metodo}
-Per effettuare le misure è stato creato un interferometro di Michelson la cui rappresentazione schematica è riportata nell'immagine \ref{Fig: Configurazione Michaelson}:
-\begin{center}
-	\includegraphics[width=0.9\textwidth]{./grafici/configurazione michaelson.png}
-\captionof{figure}{Configurazione interferometro Michelson (da manuale PASCO)}
-\label{Fig: Configurazione Michaelson}
-\end{center}
+Per effettuare le misure è stato creato un interferometro di Michelson la cui rappresentazione schematica è riportata in \cref{fig:configurazione-michelson}:
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{./grafici/configurazione michaelson.png}
+\caption{Configurazione interferometro Michelson (da manuale PASCO)}
+\label{fig:configurazione-michelson}
+\end{figure}
 L'interferometro è composto da un laser che invia un raggio luminoso ad una lente divergente, la quale rende i raggi della sorgente paralleli fra di loro. Il raggio collimato incide poi su uno specchio semi-riflettente creando così due diversi fasci che compiono percorsi separati per poi incontrarsi nuovamente su uno schermo. I diversi raggi incidenti compiono cammini ottici differenti (percorrono distanze diverse), quindi quando incidono sullo schermo creano una figura di interferenza. Tale figura è osservabile a occhio nudo e si presenta come un'alternanza di cerchi concentrici; ciascun cerchio rappresenta una regione di interferenza costruttiva. Variando la posizione dello specchio mobile è possibile cambiare anche il cammino ottico dei due raggi e dunque osservare uno shift della figura di interferenza. In tal caso si osserverà un'alternanza di frange concentriche il cui numero varierà secondo la relazione: 
 \begin{center}
     $2 \Delta d=\Delta N \lambda $
 \end{center}
-dove $\Delta d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=632.6 nm$ è la lunghezza d'onda del fascio incidente ed è considerabile valore noto. Lo spostamento dello specchio mobile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un nonio con scala graduata di precisione $1 \mu m$. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, variando la posizione dello specchio mobile e contando ad occhio le frange.
+dove $\Delta d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=\SI{632.6}{\nano\meter}$ è la lunghezza d'onda del fascio incidente ed è considerabile valore noto. Lo spostamento dello specchio mobile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un nonio con scala graduata di precisione \SI{1}{\micro\meter}. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, variando la posizione dello specchio mobile e contando ad occhio le frange.
 \subsection{Dati}
-Nella tabella \ref{tab: micrometro Michaelson} sono riportati i valori di $\Delta N$ contati in laboratorio per ciascuna delle 7 misure effettuate. Per effettuare tale misura abbiamo variato la posizione dello specchio di un valore costante tramite il micrometro sull'apparato e abbiamo contato il relativo numero di frange che si alternavano sullo schermo. L'errore sul numero di frange contate associato a ciascun valore è di $\pm1$ ed è motivato dal fatto che le frange si devono presentare in valori discreti e dal fatto che il conteggio è stato effettuato manualmente. 
+In \cref{tab:micrometro-michelson} sono riportati i valori di $\Delta N$ contati in laboratorio per ciascuna delle 7 misure effettuate. Per effettuare tale misura abbiamo variato la posizione dello specchio di un valore costante tramite il micrometro sull'apparato e abbiamo contato il relativo numero di frange che si alternavano sullo schermo. L'errore sul numero di frange contate associato a ciascun valore è di $\pm1$ ed è motivato dal fatto che le frange si devono presentare in valori discreti e dal fatto che il conteggio è stato effettuato manualmente. 
 \begin{table}[htbp]
 \centering
 \caption{Shift di frangia osservato (interferometro di Michelson)}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & 23 ± 1 & 25 ± 1 & 26 ± 1 & 23 ± 1 & 26 ± 1 & 24 ± 1 & 24 ± 1 \\\hline
+$\Delta N$ & \num{23 \pm 1} & \num{25 \pm 1} & \num{26 \pm 1} & \num{23 \pm 1} & \num{26 \pm 1} & \num{24 \pm 1} & \num{24 \pm 1} \\\hline
 \end{tabular}
-\label{tab: micrometro Michaelson}
+\label{tab:micrometro-michelson}
 \end{table}
 \subsection{Analisi dati}
 A partire dai dati raccolti siamo riusciti a calcolare il valore di $d$ atteso tramite la formula: 
 \begin{center}
     $\Delta d=\frac{\Delta N \lambda}{2}$
 \end{center}
-Otteniamo così vari valori di $d$ i quali sono riportati nella tabella \ref{tab: valori d michaelson}:
+Otteniamo così vari valori di $d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
 \begin{table}[htbp]
 \centering
 \caption{Valore di d calcolato}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta d(\mu m)$ & 7.3 ± 0.3 & 7.9 ± 0.3 & 8.2 ± 0.3 & 7.3 ± 0.3 & 8.2 ± 0.3 & 7.6 ± 0.3 & 7.6 ± 0.3 \\\hline
+$\Delta d$ [\si{\micro\meter}] & \num{7.3 \pm 0.3} & \num{7.9 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.3 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.6 \pm 0.3} & \num{7.6 \pm 0.3} \\\hline
 \end{tabular}
-\label{tab: valori d michaelson}
+\label{tab:valori-d-michelson}
 \end{table} 
-Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati. Otteniamo così $\Delta d_{best}=(7.7\pm0.1 )\mu m$.
-Siccome i valori degli spostamenti dello specchio mobile per gli esperimenti di Fabry-Perot e di Michelson sono uguali in quanto abbiamo ruotato il nonio in modo identico nel corso delle misurazioni, ci aspettiamo compatibilità tra i valori di $\Delta d$ ottenuti nelle due configurazioni. Abbiamo quindi effettuato il t-test con $t=\frac{|\Delta d_{Michaelson}-\Delta d_{Fabry-Perot}|}{\sqrt{2\sigma^2}}$=1.42, il quale equivale a una probabilità entro t-sigma $p=0,84$
+Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati. Otteniamo così $\Delta d_{best}=\SI{7.7 \pm 0.1}{\micro\meter}$.
+Siccome i valori degli spostamenti dello specchio mobile per gli esperimenti di Fabry-Perot e di Michelson sono uguali in quanto abbiamo ruotato il nonio in modo identico nel corso delle misurazioni, ci aspettiamo compatibilità tra i valori di $\Delta d$ ottenuti nelle due configurazioni. Abbiamo quindi effettuato il t-test con $t=\frac{|\Delta d_{Michelson}-\Delta d_{Fabry-Perot}|}{\sqrt{2\sigma^2}}=\num{1.42}$, il quale equivale a una probabilità entro t-sigma $p=\num{0.84}$
 \subsection{Conclusioni}
 Innanzitutto possiamo osservare che i valori di $\Delta d$ sono compatibili fra di loro, inoltre la sensibilità ottenuta mediante la misura indiretta di $\Delta d$, ricavata osservando il passaggio di frange, risulta notevolmente maggiore rispetto a quella del micrometro, dunque l'utilizzo dell'interferometro ha permesso di misurare distanze in modo più preciso.
 
@@ -262,27 +264,27 @@ Ne consegue che ad una variazione di pressione seguirà una variazione del cammi
 Si ha quindi che è possibile osservare il passaggio attraverso un punto sullo schermo di $\Delta N$ frange, dove $\Delta N$ soddisfa la relazione:
 \begin{align}
     \Delta N \lambda= 2dm(P_f-P_i)
-\label{eq: shift frange pressione aria}
+\label{eq:shift-frange-pressione-aria}
 \end{align}
 Abbiamo quindi proceduto variando più volte la pressione all'interno della cella mediante la pompa collegata al manometro, e contando il numero di frange che passavano sullo schermo in un punto fissato.
 
 \subsection{Dati}
-Abbiamo considerato noti i valori di $\lambda=632.6 nm$ lunghezza d'onda del laser e $d=3 cm$ spessore della cella. I valori di $\Delta P$ e $\Delta N$ misurati sono invece raccolti in tabella \ref{tab: delta p e delta n}. Per quanto riguarda le pressioni esse corrispondono a quanto osservato sul manometro, indicano quindi la variazione $P_f- P_i$ rispetto alla pressione atmosferica ($P_i = 100 kPa$). L'incertezza $\delta_{\Delta P}$ è stata considerata pari alla sensibilità di misura, quindi $\delta_{\Delta P}=2 kPa$; mentre, come nelle esperienze precedenti, abbiamo valutato l'errore sul conteggio dello shift di frange pari ad 1 frangia.
+Abbiamo considerato noti i valori di $\lambda=\SI{632.6}{\nano\meter}$ lunghezza d'onda del laser e $d=\SI{3}{\centi\meter}$ spessore della cella. I valori di $\Delta P$ e $\Delta N$ misurati sono invece raccolti in \cref{tab:delta-p-e-delta-n}. Per quanto riguarda le pressioni esse corrispondono a quanto osservato sul manometro, indicano quindi la variazione $P_f- P_i$ rispetto alla pressione atmosferica ($P_i = \SI{100}{\kilo\pascal}$). L'incertezza $\delta_{\Delta P}$ è stata considerata pari alla sensibilità di misura, quindi $\delta_{\Delta P}=\SI{2}{\kilo\pascal}$; mentre, come nelle esperienze precedenti, abbiamo valutato l'errore sul conteggio dello shift di frange pari ad 1 frangia.
 
 \begin{table}[htbp]
 \centering
 \caption{Variazioni di pressione e shift di frange}
-\label{tab: delta p e delta n}
+\label{tab:delta-p-e-delta-n}
 \begin{tabular}{|l|ccccccc|}
 \hline
 Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta P [kPa]$ & 10 ± 2 & 20 ± 2 & 30 ± 2 & 40 ± 2 & 50 ± 2 & 60 ± 2 & 70 ± 2 \\\hline
-$\Delta N$ & 3 ± 1 & 6 ± 1 & 9 ± 1 & 12 ± 1 & 15 ± 1 & 18 ± 1 & 21 ± 1 \\\hline
+$\Delta P$ [\si{\kilo\pascal}] & \num{10 \pm 2} & \num{20 \pm 2} & \num{30 \pm 2} & \num{40 \pm 2} & \num{50 \pm 2} & \num{60 \pm 2} & \num{70 \pm 2} \\\hline
+$\Delta N$ & \num{3 \pm 1} & \num{6 \pm 1} & \num{9 \pm 1} & \num{12 \pm 1} & \num{15 \pm 1} & \num{18 \pm 1} & \num{21 \pm 1} \\\hline
 \end{tabular}
 \end{table}
 
 \subsection{Analisi dati}
-Invertendo la relazione \ref{eq: shift frange pressione aria} abbiamo ottenuto:
+Invertendo la \cref{eq:shift-frange-pressione-aria} abbiamo ottenuto:
 \begin{align}
     \Delta N = \frac{2dm \Delta P}{\lambda}
 \end{align}
@@ -291,85 +293,89 @@ Invertendo la relazione \ref{eq: shift frange pressione aria} abbiamo ottenuto:
 \centering
 \includegraphics[width=1.0\textwidth]{./grafici/indice_aria.pdf}
 \caption{Relazione shift di frange-variazione di pressione}
-\label{fig: indice aria}
+\label{fig:indice-aria}
 \end{figure}
 
-Tale relazione, la quale lega linearmente $\Delta N$ e $\Delta P$, come è possibile osservare in figura \ref{fig: indice aria}, è stata utilizzata per realizzare un'interpolazione lineare, mirata ad ottenere la migliore stima del parametro $m$.
-Quanto ricavato dall'interpolazione e i risultati del suo test del chi quadro è visibile in tabella \ref{tab: fit indice rifrazione aria}.
+Tale relazione, la quale lega linearmente $\Delta N$ e $\Delta P$, come è possibile osservare in \cref{fig:indice-aria}, è stata utilizzata per realizzare un'interpolazione lineare, mirata ad ottenere la migliore stima del parametro $m$.
+Quanto ricavato dall'interpolazione e i risultati del suo test del chi quadro è visibile in \cref{tab:fit-indice-rifrazione-aria}.
 
 \begin{table}[htbp]
 \centering
 \caption{Risultati fit indice di rifrazione aria}
-\label{tab: fit indice rifrazione aria}
+\label{tab:fit-indice-rifrazione-aria}
 \begin{tabular}{|l|cccc|}
 \hline
-Fit & m [1/kPa] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & 3.16 ± 0.10 n & 0 & 6 & 0 \\\hline
+Fit & m [\si{\per\pascal}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+Risultati & \num{3.16 \pm 0.10 e-7} & 0 & 6 & 0 \\\hline
 \end{tabular}
 \end{table}
 
-Stimato $m_s$ abbiamo poi ricavato l'indice di rifrazione dell'aria a pressione atmosferica ($P_{atm}= 101.325 kPa$) come:
-$n_s = 1+m_sP_{atm}$ con errore $\delta_n = \delta_{m_s}P_{atm}$, ottenendo $n_s =1.00032 \pm 0.00001$.
+Stimato $m_s$ abbiamo poi ricavato l'indice di rifrazione dell'aria a pressione atmosferica ($P_{atm}= \SI{101.325}{\kilo\pascal}$) come:
+$n_s = 1+m_sP_{atm}$ con errore $\delta_n = \delta_{m_s}P_{atm}$, ottenendo $n_s =\num{1.00032 \pm 0.00001}$.
 
 \subsection{Conclusione}
-Come è possibile osservare dall'esito estremamente favorevole del test del chi quadro, riportato in tabella \ref{tab: fit indice rifrazione aria}, possiamo considerare il fit realizzato in accordo con i dati sperimentali. Abbiamo poi osservato come aver ottenuto un valore di $\chi^2/\nu$ nullo non sia da attribuirsi ad errori sovrastimati, infatti anche diminuendo l'errore sui valori di $\Delta N$ e $\Delta P$ si otterrebbe $\chi^2/\nu= 0$, data la completa esattezza. Infine abbiamo confrontato l'indice di rifrazione ricavato sperimentalmente con quello atteso per una temperatura di 25$^\circ$ (pari circa a quella del laboratorio): $n_{att} =1.00029$. Abbiamo utilizzato come test di compatibilità il t-test ottenendo $t= \frac{n_s-n_{att}}{\delta_{n_s}}=3$, esito al quale corrisponde p-value=0. Tale incompatibilità può essere attribuita alla dipendenza dell'indice di rifrazione dell'aria dalla temperatura. Seppur questa dipendenza sia minima essa può causare una variazione di $n_{att}$ coerente con lo scostamento $n_s-n_{att}$.
+Come è possibile osservare dall'esito estremamente favorevole del test del chi quadro, riportato in \cref{tab:fit-indice-rifrazione-aria}, possiamo considerare il fit realizzato in accordo con i dati sperimentali. Abbiamo poi osservato come aver ottenuto un valore di $\chi^2/\nu$ nullo non sia da attribuirsi ad errori sovrastimati, infatti anche diminuendo l'errore sui valori di $\Delta N$ e $\Delta P$ si otterrebbe $\chi^2/\nu= 0$, data la completa esattezza. Infine abbiamo confrontato l'indice di rifrazione ricavato sperimentalmente con quello atteso per una temperatura di \SI{25}{\celsius} (pari circa a quella del laboratorio): $n_{att} =\num{1.00029}$. Abbiamo utilizzato come test di compatibilità il t-test ottenendo $t= \frac{n_s-n_{att}}{\delta_{n_s}}=3$, esito al quale corrisponde p-value=0. Tale incompatibilità può essere attribuita alla dipendenza dell'indice di rifrazione dell'aria dalla temperatura. Seppur questa dipendenza sia minima essa può causare una variazione di $n_{att}$ coerente con lo scostamento $n_s-n_{att}$.
 
 \section{Misura dell'indice di rifrazione del vetro}
 \subsection{Obiettivo}
-L'obiettivo di questa esperienza è la misura dell'indice di rifrazione del vetro di un  piccolo schermo mediante l'utilizzo di un interferometro di Michaelson.
+L'obiettivo di questa esperienza è la misura dell'indice di rifrazione del vetro di un piccolo schermo mediante l'utilizzo di un interferometro di Michelson.
 \subsection{Metodo}
-Per effettuare le misure è stato creato un interferometro di Michaelson (descritto precedentemente) all'interno del quale è stata posizionata una lastra di vetro inclinabile come nell'immagine \ref{Fig: Configurazione Michaelson vetro}:
-\begin{center}
-	\includegraphics[width=0.9\textwidth]{./grafici/Michaelson vetro.png}
-\captionof{figure}{Configurazione interferometro Michaelson con lastra di vetro (da manuale PASCO)}
-\label{Fig: Configurazione Michaelson vetro}
-\end{center}
-La lastra di vetro inclinabile è attaccata ad un'asta di metallo che permette di leggere l'angolo di inclinazione su di una scala graduata. Abbiamo dunque osservato lo shift di frange, campionando $\Delta N$ in funzione dell'angolo di inclinazione della lastra $\theta$. Osserviamo che vi era un angolo di inversione in prossimità del quale le frange cambiavano direzione. Abbiamo dunque deciso di campionare angoli maggiori dell'angolo di inversione per evitare problemi con l'applicazione delle formule. In particolare abbiamo iniziato a misurare gli angoli proprio a partire dall'angolo di minima deviazione, il quale si trovava ad un angolo di $\theta_i = (0\pm 0.2)^\circ$ rispetto al goniometro; la misura dell'angolo finale sarà dunque equivalente al valore letto sul goniometro, tale considerazione influisce unicamente sull'errore. L'errore sull'angolo iniziale è dovuto allo spessore delle linee e dal fatto che fosse difficile individuare il punto preciso in cui le linee cominciavano a muoversi, sia a causa della sensibilità dello strumento sia a causa dello spessore delle linee stesse.La relazione che lega l'indice di rifrazione del vetro all'angolo di inclinazione e al numero di frange è la seguente:
-\begin{center}
-    $n_{\text{vetro}} = \frac{(2d - \Delta N \lambda)(1 - \cos\theta)}{2d(1 - \cos\theta) - \Delta N \lambda}$
-\label{eq:indice rifrazione vetro}
-\end{center}
-dove d è lo spessore della lastra di vetro e $\lambda=632.6nm$ è la lunghezza d'onda del laser in aria, valore noto.
+Per effettuare le misure è stato creato un interferometro di Michelson (descritto precedentemente) all'interno del quale è stata posizionata una lastra di vetro inclinabile come in \cref{fig:michelson-vetro}:
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{./grafici/Michaelson vetro.png}
+\caption{Configurazione interferometro Michelson con lastra di vetro (da manuale PASCO)}
+\label{fig:michelson-vetro}
+\end{figure}
+La lastra di vetro inclinabile è attaccata ad un'asta di metallo che permette di leggere l'angolo di inclinazione su di una scala graduata. Abbiamo dunque osservato lo shift di frange, campionando $\Delta N$ in funzione dell'angolo di inclinazione della lastra $\theta$. Osserviamo che vi era un angolo di inversione in prossimità del quale le frange cambiavano direzione. Abbiamo dunque deciso di campionare angoli maggiori dell'angolo di inversione per evitare problemi con l'applicazione delle formule. In particolare abbiamo iniziato a misurare gli angoli proprio a partire dall'angolo di minima deviazione, il quale si trovava ad un angolo di $\theta_i = \SI{0 \pm 0.2}{\degree}$ rispetto al goniometro; la misura dell'angolo finale sarà dunque equivalente al valore letto sul goniometro, tale considerazione influisce unicamente sull'errore. L'errore sull'angolo iniziale è dovuto allo spessore delle linee e dal fatto che fosse difficile individuare il punto preciso in cui le linee cominciavano a muoversi, sia a causa della sensibilità dello strumento sia a causa dello spessore delle linee stesse. La relazione che lega l'indice di rifrazione del vetro all'angolo di inclinazione e al numero di frange è la seguente:
+\begin{align}
+    n_{\text{vetro}} = \frac{(2d - \Delta N \lambda)(1 - \cos\theta)}{2d(1 - \cos\theta) - \Delta N \lambda}
+\label{eq:indice-rifrazione-vetro}
+\end{align}
+dove $d$ è lo spessore della lastra di vetro e $\lambda=\SI{632.6}{\nano\meter}$ è la lunghezza d'onda del laser in aria, valore noto.
 Come prima la misura di $\Delta N$ è stata effettuata contando l'alternanza di frange ad occhio.
 \subsection{Dati}
-Nella tabella \ref{tab: valori michaelson vetro} sono riportati i valori di $\Delta N$ osservati in laboratorio ed il relativo angolo di inclinazione $\theta$ rispetto all'angolo di minima deviazione. L'angolo $\theta$ è stato calcolato come $\theta = \theta_f - \theta_i$, operazione che non ha effetti sul valore dell'angolo ma solo sulla sua incertezza.
+In \cref{tab:valori-michelson-vetro} sono riportati i valori di $\Delta N$ osservati in laboratorio ed il relativo angolo di inclinazione $\theta$ rispetto all'angolo di minima deviazione. L'angolo $\theta$ è stato calcolato come $\theta = \theta_f - \theta_i$, operazione che non ha effetti sul valore dell'angolo ma solo sulla sua incertezza.
 
 \begin{table}[htbp]
 \centering
+\caption{Dati interferometro Michelson con vetro}
+\label{tab:valori-michelson-vetro}
 \begin{tabular}{|l|ccccc|}
 \hline
 Label & 1 & 2 & 3 & 4 & 5 \\\hline\hline
-$\theta_f(^\circ)$ & 2.0 ± 0.1 & 4.0 ± 0.1 & 6.0 ± 0.1 & 8.0 ± 0.1 & 10.0 ± 0.1 \\\hline
-$\theta(^\circ)$ & 2.0 ± 0.2 & 4.0 ± 0.2 & 6.0 ± 0.2 & 8.0 ± 0.2 & 10.0 ± 0.2 \\\hline
-$\Delta N$ & 3 ± 1 & 13 ± 1 & 26 ± 1 & 58 ± 2 & 87 ± 3 \\\hline
+$\theta_f$ [\si{\degree}] & \num{2.0 \pm 0.1} & \num{4.0 \pm 0.1} & \num{6.0 \pm 0.1} & \num{8.0 \pm 0.1} & \num{10.0 \pm 0.1} \\\hline
+$\theta$ [\si{\degree}] & \num{2.0 \pm 0.2} & \num{4.0 \pm 0.2} & \num{6.0 \pm 0.2} & \num{8.0 \pm 0.2} & \num{10.0 \pm 0.2} \\\hline
+$\Delta N$ & \num{3 \pm 1} & \num{13 \pm 1} & \num{26 \pm 1} & \num{58 \pm 2} & \num{87 \pm 3} \\\hline
 \end{tabular}
 \end{table}
 
-Il conteggio di $\Delta N$ è stato effettuato da 2 persone contemporaneamente, al fine di minimizzare l'errore umano. In tabella sono state riportate le medie del numero di frange da loro contate e come errore è stata scelta la semi-dispersione dei due valori di $\Delta N$ misurati o 1 in caso tale valore fosse $<1$; l'errore su $\theta$ è la sensibilità del goniometro. Invece lo spessore della lastra di vetro è stato considerato noto, cioè $d=(6.8 \pm 0.1)mm$, come indicato sulla scheda PASCO.
+Il conteggio di $\Delta N$ è stato effettuato da 2 persone contemporaneamente, al fine di minimizzare l'errore umano. In tabella sono state riportate le medie del numero di frange da loro contate e come errore è stata scelta la semi-dispersione dei due valori di $\Delta N$ misurati o 1 in caso tale valore fosse $<1$; l'errore su $\theta$ è la sensibilità del goniometro. Invece lo spessore della lastra di vetro è stato considerato noto, cioè $d=\SI{6.8 \pm 0.1}{\milli\meter}$, come indicato sulla scheda PASCO.
 \subsection{Analisi dati}
-A partire dai dati raccolti abbiamo calcolato l'indice di rifrazione del vetro per ciascuna coppia di dati, i vari valori di $n_{vetro}$ ottenuti dalla relazione \ref{eq:indice rifrazione vetro} sono riportati nella tabella \ref{tab:indice_rifrazione_vetro}. L'errore $\delta_{n_{vetro}}$ è stato ricavato applicando la propagazione degli errori alla relazione \ref{eq:indice rifrazione vetro} rispetto all'incertezza su $\Delta N$ e $d$.
-\begin{table}[h!]
+A partire dai dati raccolti abbiamo calcolato l'indice di rifrazione del vetro per ciascuna coppia di dati, i vari valori di $n_{vetro}$ ottenuti dalla \cref{eq:indice-rifrazione-vetro} sono riportati in \cref{tab:indice-rifrazione-vetro}. L'errore $\delta_{n_{vetro}}$ è stato ricavato applicando la propagazione degli errori alla \cref{eq:indice-rifrazione-vetro} rispetto all'incertezza su $\Delta N$ e $d$.
+\begin{table}[htbp]
 \centering
+\caption{Indice rifrazione vetro}
+\label{tab:indice-rifrazione-vetro}
 \begin{tabular}{|c|c|}
 \hline
 \textbf{Misura} & \( n_{\text{vetro}} \) \\
 \hline
-1 & \( 1.3 \pm 0.5 \) \\
-2 & \( 1.3 \pm 0.3 \) \\
-3 & \( 1.3 \pm 0.2 \) \\
-4 & \( 1.4 \pm 0.1 \) \\
-5 & \( 1.4 \pm 0.1 \) \\
+1 & \num{1.3 \pm 0.5} \\
+2 & \num{1.3 \pm 0.3} \\
+3 & \num{1.3 \pm 0.2} \\
+4 & \num{1.4 \pm 0.1} \\
+5 & \num{1.4 \pm 0.1} \\
 \hline
 \end{tabular}
-\caption{Indice rifrazione vetro}
-\label{tab:indice_rifrazione_vetro}
 \end{table}
 L'indice di rifrazione del vetro è stato infine valutato come media dei vari valori ottenuti, così da ridurne l'incertezza relativa. Abbiamo ricavato:
 \begin{center}
-    $n_{vetro}=1.34 \pm 0.07$
+    $n_{vetro}=\num{1.34 \pm 0.07}$
 \end{center}
 \subsection{Conclusioni}
-Non conoscendo in maniera esatta l'indice di rifrazione della lastra di vetro presente in laboratorio non possiamo affermare nulla riguardo alla compatibilità del valore trovato. Tuttavia, in generale, i vari tipi di vetro presentano un indice di rifrazione superiore a $1.5$, che è superiore a quello da noi calcolato. In conclusione l'indice di rifrazione trovato non sembra essere compatibile con il valore atteso di $n>1.5$. 
+Non conoscendo in maniera esatta l'indice di rifrazione della lastra di vetro presente in laboratorio non possiamo affermare nulla riguardo alla compatibilità del valore trovato. Tuttavia, in generale, i vari tipi di vetro presentano un indice di rifrazione superiore a \num{1.5}, che è superiore a quello da noi calcolato. In conclusione l'indice di rifrazione trovato non sembra essere compatibile con il valore atteso di $n>\num{1.5}$. 
+
 \section{Interferenza con un righello}
 \subsection{Obiettivo}
 Stimare la lunghezza d'onda $\lambda$ di un laser attraverso l'analisi della figura di interferenza prodotta dall'illuminazione obliqua di un righello. 
@@ -381,7 +387,7 @@ Quando un fascio laser monocromatico e coerente incide obliquamente su un righel
 \end{align}
 dove $d=\SI{1}{\milli\meter}$ è il passo del reticolo, in questo caso la distanza tra le incisioni del righello, $\theta_i$ è l'angolo di incidenza del fascio laser, $\theta_N$ è l'angolo corrispondente al massimo di ordine $N$, e $\lambda$ è la lunghezza d'onda del laser, stimato come $\lambda=\SI{632.8}{\nano\meter}$ per il laser He-Ne utilizzato.
 
-La distanza tra la parete e il punto di riflessione del laser sul righello è stato stimato come $L=\SI{124 \pm 5}{\centi\meter}$, il motivo di un'incertezza così alta è dovuto al fatto che non è stato possibile individuare con precisione il punto di riflessione corrispondente al primo massimo. Il righello presentava una "striscia" di punti di diffrazione, tuttavia questa incertezza, come si vedrà dall'analisi dati, non ha un impatto significativo sul risultato finale. $\theta_i$ è stato dunque calcolato con $L$ e la distanza tra l'immagine del raggio indeflesso e di quello riflesso, $r$, con la seguente relazione:
+La distanza tra la parete e il punto di riflessione del laser sul righello è stata stimata come $L=\SI{124 \pm 5}{\centi\meter}$, il motivo di un'incertezza così alta è dovuto al fatto che non è stato possibile individuare con precisione il punto di riflessione corrispondente al primo massimo. Il righello presentava una "striscia" di punti di diffrazione, tuttavia questa incertezza, come si vedrà dall'analisi dati, non ha un impatto significativo sul risultato finale. $\theta_i$ è stato dunque calcolato con $L$ e la distanza tra l'immagine del raggio indeflesso e di quello riflesso, $r$, con la seguente relazione:
 \begin{align}   
     \theta_i = \arctan\left(\frac{r}{L}\right)
 \end{align}
@@ -400,8 +406,8 @@ dove $r_N$ è la distanza tra l'immagine del raggio indeflesso e di quello rifle
 \begin{tabular}{|l|ccccc|}
 \hline
 Label & 1 & 2 & 3 & 4 & 5 \\\hline\hline
-$r_N$ [\si{\milli\meter}]& \num{70 \pm 2} & \num{85 \pm 2} & \num{96 \pm 2} & \num{110 \pm 2} & \num{120 \pm 2} \\\hline
-$\cos(\theta_i) - \cos(\theta_N)$ [\num{e-6}]& \num{0.872 \pm 0.200} & \num{1.6 \pm 0.2} & \num{2.3 \pm 0.3} & \num{3.2 \pm 0.4} & \num{3.9 \pm 0.4} \\\hline
+$r_N$ [\si{\milli\meter}] & \num{70 \pm 2} & \num{85 \pm 2} & \num{96 \pm 2} & \num{110 \pm 2} & \num{120 \pm 2} \\\hline
+$\cos(\theta_i) - \cos(\theta_N)$ [\num{e-6}] & \num{0.872 \pm 0.200} & \num{1.6 \pm 0.2} & \num{2.3 \pm 0.3} & \num{3.2 \pm 0.4} & \num{3.9 \pm 0.4} \\\hline
 $N$ & 1 & 2 & 3 & 4 & 5 \\\hline
 \end{tabular}
 \end{table}
@@ -426,8 +432,8 @@ L'interpolazione
 \centering
 \begin{tabular}{|l|cccc|}
 \hline
-parametri & $\lambda$ & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-fit (minuit) & \SI{792 \pm 45}{\nano\meter} & \num{0.393} & 4 & \num{0.0983} \\\hline
+parametri & $\lambda$ [\si{\nano\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
+fit (minuit) & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\\hline
 \end{tabular}
 \end{table}
 
