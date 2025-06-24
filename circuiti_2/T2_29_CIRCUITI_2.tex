@@ -320,7 +320,7 @@ Per la stima dell'errore abbiamo considerato la sensibilità degli strumenti di 
 % Le tabelle dati RLC sono state spostate in appendice
 
 \subsection{Analisi dati}
-Abbiamo poi interpolato i dati raccolti utilizzando per ciascun regime la legge caratterististica, come visibile all'interno dei grafici.
+Abbiamo poi interpolato i dati raccolti utilizzando per ciascun regime la legge caratteristica, come visibile all'interno dei grafici \ref{fig: rlc sottosmorzato}, \ref{fig: rlc sovrasmorzato} e \ref{fig: rlc critico}.
 \begin{itemize}
 	\item regime sottosmorzato : \(V_R(t) = V_0 e^{-\gamma t }\sin (\beta t)\)
 	\item regime sovrasmorzato : \(V_R(t) = V_0 e^{-\gamma t } (e^{\beta t} - e^{-\beta t}) \)
@@ -329,6 +329,17 @@ Abbiamo poi interpolato i dati raccolti utilizzando per ciascun regime la legge 
 Riportiamo nella Tabella \ref{tab:rlc_fit_results} i valori delle costanti caratteristiche del circuito stimate in ciascuna configurazione e i rispettivi errori, ccome ottenuto dal fit.
 
 %grafici (da inserire se disponibili)
+\begin{center}
+    \includegraphics[width=0.9\linewidth]{grafici/sottosmorzato.png}
+    \captionof{figure}{Regime sottosmorzato - Dati e Fit}
+    \label{fig: rlc sottosmorzato}
+    \includegraphics[width=0.9\linewidth]{grafici/sovrasmorzato.png}
+    \captionof{figure}{Regime sovrasmorzato - Dati e Fit}
+    \label{fig: rlc sovrasmorzato}
+    \includegraphics[width=0.9\linewidth]{grafici/critico.png}
+    \captionof{figure}{Regime di smorzamento critico - Dati e Fit}
+    \label{fig: rlc critico}
+\end{center}
 
 %tabelle parametri stimati RLC
 \begin{table}[htbp]

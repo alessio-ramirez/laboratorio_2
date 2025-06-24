@@ -9,25 +9,54 @@
 \usepackage{caption}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage{amsmath}
-%dark mode
-\usepackage{darkmode}
+\usepackage{booktabs} % Opzionale, per tabelle più belle se vuoi (\toprule, \midrule, \bottomrule)
+\usepackage{ragged2e} % Per \Centering nelle minipage
+\usepackage{float} % Per [htbp]
+\usepackage{fullwidth}
+%\usepackage{darkmode} % Disabilitato come nell'originale
+%\enabledarkmode
+\usepackage[margin=2cm]{geometry}
 
-
-% figure support
-\usepackage{import}
-\usepackage{xifthen}
-\pdfminorversion=7
-\usepackage{pdfpages}
-\usepackage{transparent}
-\newcommand{\incfig}[1]{%
-    \def\svgwidth{\columnwidth}
-    \import{./figures/}{#1.pdf_tex}
+% ======================================================
+% Impostazioni siunitx (opzionale, ma utile)
+% ======================================================
+\sisetup{
+    output-decimal-marker = {,}, % Usa la virgola come separatore decimale
+    uncertainty-mode = separate, % Mostra incertezza come ±
+    separate-uncertainty = true, % Forza la separazione
+    locale = IT, % Impostazioni locali italiane (es. per la virgola)
+    group-digits = false, % Evita di raggruppare le cifre (es. 10000 vs 10 000)
+    per-mode=symbol % usa / per le unità composte es. km/h
 }
 
-\pdfsuppresswarningpagegroup=1
-\title{Circuiti 1}
+% ======================================================
+% Appendice con le tabelle dati
+% ======================================================
+\usepackage{titling}
+\usepackage{appendix}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref} % Per riferimenti cliccabili (opzionale ma utile)
+\usepackage[italian,nameinlink]{cleveref} % Per riferimenti più intelligenti (\cref, \Cref)
+
+\renewcommand{\appendixname}{Appendice} % Traduce "Appendix" in "Appendice"
+\renewcommand{\appendixtocname}{Appendici} % Traduce "Appendices" nel ToC
+\renewcommand{\appendixpagename}{Appendici} % Traduce "Appendices" nell'header/footer
+
+% Configurazioni cleveref per l'italiano
+\crefname{section}{sezione}{sezioni}
+\Crefname{section}{Sezione}{Sezioni}
+\crefname{table}{tabella}{tabelle}
+\Crefname{table}{Tabella}{Tabelle}
+\crefname{figure}{figura}{figure}
+\Crefname{figure}{Figura}{Figure}
+\crefname{equation}{equazione}{equazioni}
+\Crefname{equation}{Equazione}{Equazioni}
+\crefname{footnote}{nota}{note}
+\Crefname{footnote}{Nota}{Note}
+
+
+\title{Circuiti 1 - T2A 29}
 \author{Alessio Ramirez, Michele Rota, Sofia Zocchi}
+\date{Giugno 2025}
 \begin{document}
 \maketitle
 
@@ -64,6 +93,7 @@ nella configurazione \ref{fig:2} in parallelo con il generatore.
 \label{fig:2}
 \end{center}
 
+
 Per entrambe le configurazioni abbiamo raccolto almeno dieci misure della coppia corrente-tensione per due diversi resistori, uno con resistenza piccola ($10\si{\ohm}$) e uno con resistenza grande ($1\si{\mega\ohm}$).
 Nell'utilizzare il carico resistivo più basso è stato possibile variare la tensione soltanto in un range ristretto di valori,
 al fine di non raggiungere valori elevati di V così da evitare il passaggio di correnti troppo intense attraverso l'alimentatore o il multimetro da banco.
@@ -96,60 +126,13 @@ fornirebbe misure di \( V \) non corrispondenti alla differenza di potenziale ai
 Al contrario per \(R=1\si{\mega\ohm}\) alta rispetto alla resistenza dell'amperometro, è preferibile la configurazione \ref{fig:2}.
 Infatti se si utilizzasse la configurazione \ref{fig:1} l'amperometro misurerebbe una corrente che non corrisponde a quella che scorre attraverso la resistenza, poichè essa andrebbe a dividersi tra il tratto di circuito contenente \(R_v\) e quello contenente \(R\).
 \subsection{Dati}
-Riportiamo nella tabelle sottostanti le coppie di valori \(I-V\) misurati con entrambe le configurazioni, dapprima impostando una resistenza di $1\si{\mega\ohm}$ e poi una da $10\si{\ohm}$.
-L'errore sulla tensione è stato stimato utilizzando la sensibilità del voltmetro: \( \si{\delta_{V}=0.01 V} \). Per le misure con \(R=1\si{\mega\ohm}\) per determinare l'incertezza relativa alle misure di corrente abbiamo osservato il valore di \(I\) restituito dall'amperometro nella situazione di circuito aperto, definendo quindi \( \si{\delta_{I}=0.003 {\micro\ampere}} \). Per le misure con \(R=10\si{\ohm}\) abbiamo invece valutato la fluttuazione delle misure di corrente lette dall'amperometro, dal momento che essere risultavano maggiori di $0.003 \si{\micro\ampere}$.
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-$I_1$ $\times 10^{-8}[A]$ & $V_1$ $\times 10^{-2}[V]$ & $I_2$ $\times 10^{-8}[A]$ & $V_2$ $\times 10^{-2}[V]$ \\
-\hline
-$6 \pm 3$ & $1 \pm 1$ & $3 \pm 3$ & $1 \pm 1$ \\
-$114 \pm 3$ & $101 \pm 1$ & $104 \pm 3$ & $102 \pm 1$ \\
-$222 \pm 3$ & $200 \pm 1$ & $202 \pm 3$ & $200 \pm 1$ \\
-$331 \pm 3$ & $300 \pm 1$ & $303 \pm 3$ & $301 \pm 1$ \\
-$443 \pm 3$ & $403 \pm 1$ & $403 \pm 3$ & $400 \pm 1$ \\
-$551 \pm 3$ & $501 \pm 1$ & $502 \pm 3$ & $500 \pm 1$ \\
-$675 \pm 3$ & $616 \pm 1$ & $603 \pm 3$ & $601 \pm 1$ \\
-$775 \pm 3$ & $702 \pm 1$ & $707 \pm 3$ & $705 \pm 1$ \\
-$886 \pm 3$ & $802 \pm 1$ & $803 \pm 3$ & $800 \pm 1$ \\
-$997 \pm 3$ & $902 \pm 1$ & $903 \pm 3$ & $900 \pm 1$ \\
-$1104 \pm 3$ & $1001 \pm 1$ & $1007 \pm 3$ & $1004 \pm 1$ \\
-$1216 \pm 3$ & $1103 \pm 1$ & $1108 \pm 3$ & $1104 \pm 1$ \\
-$1322 \pm 3$ & $1200 \pm 1$ & $1202 \pm 3$ & $1199 \pm 1$ \\
-$1434 \pm 3$ & $1301 \pm 1$ & $1303 \pm 3$ & $1300 \pm 1$ \\
-$1548 \pm 3$ & $1404 \pm 1$ & $1404 \pm 3$ & $1400 \pm 1$ \\
-$1653 \pm 3$ & $1500 \pm 1$ & $1504 \pm 3$ & $1501 \pm 1$ \\
-$1762 \pm 3$ & $1600 \pm 1$ & $1605 \pm 3$ & $1602 \pm 1$ \\
-$1873 \pm 3$ & $1700 \pm 1$ & $1704 \pm 3$ & $1701 \pm 1$ \\
-$1984 \pm 3$ & $1801 \pm 1$ & $1804 \pm 3$ & $1800 \pm 1$ \\
-$2093 \pm 3$ & $1900 \pm 1$ & $1906 \pm 3$ & $1903 \pm 1$ \\
-$2204 \pm 3$ & $2001 \pm 1$ & $2003 \pm 3$ & $2000 \pm 1$ \\
-\hline
-\end{tabular}
-\captionof{table}{resistenza $1\si{\mega\ohm}$}
-\vspace{0.3cm}
-\begin{tabular}{|c|c|c|c|}
-\hline
-$I_1$ $\times 10^{-5}$ [A]& $V_1$ $\times 10^{-2}$ [V]& $I_2$ $\times 10^{-6}$ [A]& $V_2$ $\times 10^{-2}$ [V]\\
-\hline
-$12.039 \pm 0.002$ & $0 \pm 1$ & $168.30 \pm 0.02$ & $2 \pm 1$ \\
-$5920 \pm 1$ & $53 \pm 1$ & $45591.00 \pm 0.01$ & $50 \pm 1$ \\
-$11229 \pm 1$ & $100 \pm 1$ & $95510 \pm 10$ & $101 \pm 1$ \\
-$16817 \pm 1$ & $151 \pm 1$ & $145610 \pm 20$ & $154 \pm 1$ \\
-$22394 \pm 1$ & $201 \pm 1$ & $190020 \pm 10$ & $200 \pm 1$ \\
-$27907 \pm 1$ & $250 \pm 1$ & $239410 \pm 10$ & $253 \pm 1$ \\
-$33541 \pm 3$ & $301 \pm 1$ & $284450 \pm 10$ & $300 \pm 1$ \\
-$39240 \pm 5$ & $353 \pm 1$ & $334040 \pm 10$ & $354 \pm 1$ \\
-$44400 \pm 4$ & $400 \pm 1$ & $378750 \pm 100$ & $401 \pm 1$ \\
-$49920 \pm 10$ & $450 \pm 1$ & $424040 \pm 50$ & $450 \pm 1$ \\
-0 & $0 \pm 1$ & $473200 \pm 100$ & $504 \pm 1$ \\
-\hline
-\end{tabular}
-\captionof{table}{resistenza $10 \si{\ohm}$}
-\end{center}
+Riportiamo nelle \cref{tab:resistenza1M,tab:resistenza10} le coppie di valori \(I-V\) misurati con entrambe le configurazioni, dapprima impostando una resistenza di $1\si{\mega\ohm}$ e poi una da $10\si{\ohm}$.
+L'errore sulla tensione è stato stimato utilizzando la sensibilità del voltmetro: \( \si{\delta_{V}=0.01 V} \). Per le misure con \(R=1\si{\mega\ohm}\) per determinare l'incertezza relativa alle misure
+di corrente abbiamo osservato il valore di \(I\) restituito dall'amperometro nella situazione di circuito aperto, definendo quindi \( \si{\delta_{I}=0.003 {\micro\ampere}} \). Per le misure con \(R=10\si{\ohm}\) abbiamo invece valutato la fluttuazione delle misure di corrente lette dall'amperometro, dal momento che essere risultavano maggiori di $0.003 \si{\micro\ampere}$.
 
 Nelle tabelle seguenti sono invece visibili i valori di tensione, corrente e resistenza utilizzati per ricavare le resistenze interne dei multimetri.
-L'incertezza sui valori di \(I\) e di \(V\) è stata ricavata come nel caso precedente, mentre per \(R\) abbiamo considerato l'errore relativo riportato sulla cassetta di resistenze, pari all'1\%.
+L'incertezza sui valori di \(I\) e di \(V\) è stata ricavata come nel caso precedente, mentre per \(R\) abbiamo considerato l'errore relativo
+riportato sulla cassetta di resistenze, pari all'1\%.
 
 \begin{center}
 \begin{tabular}{|l|c c c c c|}
@@ -486,9 +469,10 @@ Abbiamo disposto il cellulare con l’app bussola sul supporto in modo tale che 
 fosse perpendicolare all'asse del solenoide. In questo modo il campo magnetico generato dal passaggio di corrente (diretto lungo l'asse della bobina) aveva direzione perpendicolare
 al campo magnetico terrestre (diretto lungo la direzione nord-sud). Abbiamo poi collegato la bobina all’alimentatore in regime di corrente continua e ne abbiamo aumentato gradualmente il valore,
 osservando una progressiva rotazione dell'ago magnetico. Così facendo abbiamo raccolto 25 coppie di valori corrente-angolo di rotazione.
-I valori di corrente sono stati utilizzati per determinare l'intensità del campo magnetico interno al solenoide, ricavato a partire dalla relazione \( B_s = \frac {\mu_0NI}{L} \),
+I valori di corrente sono stati utilizzati per determinare l'intensità del campo magnetico interno al solenoide. Dal momento che il solenoide è finito puo essere approssimato ad N spire sovrapposte e quindi
+il suo campo magnetico può essere ricavato a partire dalla relazione \( B_s = \frac {\mu_0NI}{d} \),
 dove \(\mu_0\) rappresenta la permeabilità magnetica del vuoto, \( \mathit{I} \) la corrente,
-mentre \( \mathit{N=21} \) e \( \mathit{L=0.05m} \) indicano rispettivamente il numero di spire e la lunghezza del solenoide.
+mentre \( \mathit{N=21} \) e \( \mathit{d=0.24m} \) indicano rispettivamente il numero di spire e il diametro del solenoide.
 A partire dalle rotazioni è invece stata calcolata la tangente di ogni angolo.
 \subsection{Dati}
 Nella tabella e nel grafico sottostanti sono riportati i valori di corrente $I$ e dell'angolo di rotazione $\theta$.
@@ -537,7 +521,7 @@ $67 \pm 1$ & $0.24 \pm 0.01$ \\
 Abbiamo riportato in figura i valori di $B_s$ e $\tan(\theta)$ con i rispettivi errori.
 Per ricavare l'incertezza su $\tan(\theta)$ e $B_s$ sono state utilizzate le formule:
 \begin{align*}
-	 & \delta_{\tan} = \frac {1}{1+\theta^2}\delta_\theta \quad \text{e} \quad \delta_{B_s} = \frac {\mu_0N}{L}\delta_I
+	 & \delta_{\tan} = \frac {1}{1+\theta^2}\delta_\theta \quad \text{e} \quad \delta_{B_s} = \frac {\mu_0N}{d}\delta_I
 \end{align*}
 
 \begin{center}
@@ -608,4 +592,56 @@ $B_t$ [T] & $(7.9 \pm 0.2) \times 10^{-5}$ \\
 \hline
 \end{tabular}
 \end{center}
+\section{Tabelle}
+\begin{table}[htbp]
+\centering
+\caption{dati con resistenza $1 \si{\mega\ohm}$}
+\label{tab:resistenza1M}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$I_1$ & $V_1$ & $I_2$ & $V_2$ \\\hline\hline
+60 ± 30 nA & 13 ± 10 mV & 30 ± 30 nA & 10 ± 10 mV \\
+1.14 ± 0.03 µA & 1.01 ± 0.01 V & 1.04 ± 0.03 µA & 1.02 ± 0.01 V \\
+2.22 ± 0.03 µA & 2.01 ± 0.01 V & 2.02 ± 0.03 µA & 2.00 ± 0.01 V \\
+3.31 ± 0.03 µA & 3.00 ± 0.01 V & 3.03 ± 0.03 µA & 3.01 ± 0.01 V \\
+4.43 ± 0.03 µA & 4.03 ± 0.01 V & 4.03 ± 0.03 µA & 4.00 ± 0.01 V \\
+5.51 ± 0.03 µA & 5.01 ± 0.01 V & 5.02 ± 0.03 µA & 5.00 ± 0.01 V \\
+6.75 ± 0.03 µA & 6.16 ± 0.01 V & 6.03 ± 0.03 µA & 6.01 ± 0.01 V \\
+7.75 ± 0.03 µA & 7.02 ± 0.01 V & 7.07 ± 0.03 µA & 7.05 ± 0.01 V \\
+8.86 ± 0.03 µA & 8.02 ± 0.01 V & 8.03 ± 0.03 µA & 8.00 ± 0.01 V \\
+9.97 ± 0.03 µA & 9.02 ± 0.01 V & 9.03 ± 0.03 µA & 9.00 ± 0.01 V \\
+11.04 ± 0.03 µA & 10.01 ± 0.01 V & 10.07 ± 0.03 µA & 10.04 ± 0.01 V \\
+12.16 ± 0.03 µA & 11.03 ± 0.01 V & 11.08 ± 0.03 µA & 11.04 ± 0.01 V \\
+13.22 ± 0.03 µA & 12.00 ± 0.01 V & 12.02 ± 0.03 µA & 11.99 ± 0.01 V \\
+14.34 ± 0.03 µA & 13.01 ± 0.01 V & 13.03 ± 0.03 µA & 13.00 ± 0.01 V \\
+15.48 ± 0.03 µA & 14.04 ± 0.01 V & 14.04 ± 0.03 µA & 14.00 ± 0.01 V \\
+16.53 ± 0.03 µA & 15.00 ± 0.01 V & 15.04 ± 0.03 µA & 15.01 ± 0.01 V \\
+17.62 ± 0.03 µA & 16.00 ± 0.01 V & 16.05 ± 0.03 µA & 16.02 ± 0.01 V \\
+18.73 ± 0.03 µA & 17.00 ± 0.01 V & 17.04 ± 0.03 µA & 17.01 ± 0.01 V \\
+19.84 ± 0.03 µA & 18.01 ± 0.01 V & 18.04 ± 0.03 µA & 18.00 ± 0.01 V \\
+20.93 ± 0.03 µA & 19.00 ± 0.01 V & 19.06 ± 0.03 µA & 19.03 ± 0.01 V \\
+22.04 ± 0.03 µA & 20.01 ± 0.01 V & 20.03 ± 0.03 µA & 20.00 ± 0.01 V \\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}[htbp]
+\centering
+\caption{dati con resistenza 10$\si{\ohm}$}
+\label{tab:resistenza10}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$I_1$ & $V_1$ & $I_2$ & $V_2$ \\\hline\hline
+45.59100 ± 0.00001 mA & 498 ± 1 mA & 120.39 ± 0.02 µA & 1 ± 1 mV \\
+95.51 ± 0.01 mA & 1.006 ± 0.001 A & 59.20 ± 0.01 mA & 530 ± 1 mV \\
+145.61 ± 0.02 mA & 1.535 ± 0.001 A & 112.29 ± 0.01 mA & 1.005 ± 0.001 V \\
+190.02 ± 0.01 mA & 2.003 ± 0.001 A & 168.17 ± 0.01 mA & 1.506 ± 0.001 V \\
+239.41 ± 0.01 mA & 2.527 ± 0.001 A & 223.94 ± 0.01 mA & 2.006 ± 0.001 V \\
+284.45 ± 0.01 mA & 3.005 ± 0.001 A & 279.07 ± 0.01 mA & 2.502 ± 0.001 V \\
+334.04 ± 0.01 mA & 3.535 ± 0.001 A & 335.41 ± 0.03 mA & 3.011 ± 0.001 V \\
+378.8 ± 0.1 mA & 4.014 ± 0.001 A & 392.40 ± 0.05 mA & 3.528 ± 0.001 V \\
+424.04 ± 0.05 mA & 4.502 ± 0.001 A & 444.00 ± 0.04 mA & 4.000 ± 0.001 V \\
+473.2 ± 0.1 mA & 5.037 ± 0.001 A & 499.2 ± 0.1 mA & 4.505 ± 0.001 V \\
+\hline
+\end{tabular}
+\end{table}
 \end{document}

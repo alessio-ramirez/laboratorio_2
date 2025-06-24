@@ -1,7 +1,9 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+from burger_lib.guezzi import *
 import numpy as np
 import matplotlib.pyplot as plt
-from liblab import *
-from guezzi import *
 
 def linear_func(x, a, b):
     return a + b * x
@@ -18,19 +20,17 @@ tangenti = np.tan (theta_rad)
 tan_err = 1/(1+tangenti**2) * theta_err
 N = 31
 L = 0.0425 #metri
-B = (4*np.pi*10**-7) * N * i / L
-B_err = (4*np.pi*10**-7) * N / L * np.full_like(i, i_err) #ampere
+d = 0.24 #metri
+B = (4*np.pi*10**-7) * N * i / d
+B_err = (4*np.pi*10**-7) * N / d * np.full_like(i, i_err) #ampere
 #ax.scatter(B, tangenti)
 
 #la relazione è: tan(theta)=B_solenoide/B_terrestre
 
 B_terr_att = 50 * 10**(-6) #campo terrestre medio
-B_ = create_dataset (B, B_err) 
-tangenti_ = create_dataset (tangenti, tan_err)
-create_best_fit_line(B_, tangenti_, func=linear_func, p0=[[1,1]])
-params, params_err = perform_fit(B_, tangenti_, linear_func, p0=[1,1]) 
-a, m = params
-da, m_err = params_err
-print (1/m)
-print(1/m**2 * m_err)
-test_comp(B_terr_att, 10**(-6), 1/m, 1/m**2 * m_err)
+B_ = Measurement(B, B_err, name='B', unit='T') 
+tangenti_ = Measurement(tangenti, tan_err, name='$tan(\\theta)')
+fit= perform_fit(B_, tangenti_, linear_func, p0=[[1,1]])
+a, m = (fit.parameters['a'], fit.parameters['m'])
+B_s = 1/m
+print(f"z-score tra B terrestre e B sperimentale: {test_comp(B_terr_att, B_s)['z_score']}")
