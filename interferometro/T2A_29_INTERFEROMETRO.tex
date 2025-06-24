@@ -97,16 +97,17 @@ La distanza tra lente e parete, rimasta fissa per tutte le misure, è stata misu
 
 \begin{table}[htbp]
 \centering
-\caption{Dati Figura di Interferenza (Fabry-Perot)}
-\begin{tabular}{|c|c|c|}
-\hline
-Diametro [\si{\milli\meter}] & $\cos(\theta)$ & $N$ \\\hline\hline
+\caption{Dati figura di interferenza (Fabry-Perot)}
+\begin{tabular}{ccc}
+\toprule
+Diametro [\si{\milli\meter}] & $\cos(\theta)$ & $N$ \\
+\midrule
 \num{20 \pm 1} & \num{0.999969 \pm 0.000003}  & 5 \\
 \num{36 \pm 1} & \num{0.999901 \pm 0.000006}  & 4 \\
 \num{48 \pm 1} & \num{0.999824 \pm 0.000007}  & 3 \\
 \num{57 \pm 1} & \num{0.999752 \pm 0.000009}  & 2 \\
 \num{65 \pm 1} & \num{0.999680 \pm 0.000010}  & 1 \\
-\hline
+\bottomrule
 \end{tabular}
 \label{tab:fabry-perot-dati}
 \end{table}
@@ -114,7 +115,9 @@ Diametro [\si{\milli\meter}] & $\cos(\theta)$ & $N$ \\\hline\hline
 
 \subsection{Analisi Dati}
 Invertendo la \cref{eq:max-interferenza-fabry-perot} abbiamo dunque ricavato la seguente:
-\[\cos \theta = \frac{N\lambda}{2d} + A\]
+\begin{align}
+    \cos \theta = \frac{N\lambda}{2d} + A
+\end{align}
 Tale relazione è stata quindi utilizzata per realizzare un'interpolazione,
 con $d$ e $A$ parametri liberi e $\lambda=\SI{632.6}{\nano\meter}$ lunghezza d'onda del laser He-Ne è stata assunta senza errore. La presenza del termine di shift $A$ è giustificata sia dagli effetti di riflessione sia dal fatto che non è possibile determinare con certezza l'ordine assoluto $N$, con conseguenti effetti sistematici.
 Il grafico dell'interpolazione è visibile in \cref{fig:fabry-perot-interpolazione}, i risultati in \cref{tab:fabry-perot-risultati}.
@@ -128,17 +131,19 @@ Il grafico dell'interpolazione è visibile in \cref{fig:fabry-perot-interpolazio
 
 \begin{table}[htbp]
 \centering
-\caption{Risultati Interpolazione (Fabry-Perot)}
-\begin{tabular}{|l|ccccc|}
-\hline
-Parametri & A & d [\si{\milli\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & \num{996.0 \pm 0.077 e-3} & \num{4.3 \pm 1.4} & \num{2.53e-3} & 3 & \num{8.42e-4} \\\hline
+\caption{Risultati interpolazione (Fabry-Perot)}
+\begin{tabular}{cccccc}
+\toprule
+Parametri & $A$ & $d$ [\si{\milli\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\
+\midrule
+Risultati & \num{0.996 \pm 0.000077} & \num{4.3 \pm 1.4} & \num{2.53e-3} & 3 & \num{8.42e-4} \\
+\bottomrule
 \end{tabular}
 \label{tab:fabry-perot-risultati}
 \end{table}
 
 \subsection{Conclusioni}
-Dall'interpolazione e dai risultati del test del chi quadro, visibili in \cref{tab:fabry-perot-risultati}, si evince che la legge prevista è compatibile con l'osservazione sperimentale. Inoltre il valore di $d$, ampiezza della cavità, risulta coerente con quanto atteso. L'esperimento dimostra quindi che la condizione $\delta_r\frac{\lambda}{2\pi}+2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot. 
+Dall'interpolazione e dai risultati del test del chi quadro, visibili in \cref{tab:fabry-perot-risultati}, si evince che la legge prevista è compatibile con l'osservazione sperimentale. Inoltre il valore di $d$, ampiezza della cavità, risulta avere un ordine di grandezza ragionevole\footnote{Non è stata fatta una stima precisa di $d$, ma un valore su altri ordini di grandezza avrebbe senz'altro rappresentato dei problemi col modello sperimentale.}. L'esperimento dimostra quindi che la condizione $\delta_r\frac{\lambda}{2\pi}+2d \cos \theta = N\lambda$ descrive accuratamente la posizione angolare dei massimi di interferenza nell'interferometro di Fabry-Perot.
 
 \section{Calibrazione micrometro con interferometro di Fabry-Perot}
 \subsection{Obiettivo}
@@ -165,10 +170,12 @@ In \cref{tab:micrometro-fabry-perot} sono riportati i valori di $\Delta N$, ai q
 \begin{table}[htbp]
 \centering
 \caption{Shift di frangia osservato (interferometro di Fabry-Perot)}
-\begin{tabular}{|l|ccccccc|}
-\hline
-Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & \num{24 \pm 1} & \num{23 \pm 1} & \num{23 \pm 1} & \num{24 \pm 1} & \num{25 \pm 1} & \num{25 \pm 1} & \num{23 \pm 1} \\\hline
+\begin{tabular}{cccccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$\Delta N$ & \num{24 \pm 1} & \num{23 \pm 1} & \num{23 \pm 1} & \num{24 \pm 1} & \num{25 \pm 1} & \num{25 \pm 1} & \num{23 \pm 1} \\
+\bottomrule
 \end{tabular}
 \label{tab:micrometro-fabry-perot}
 \end{table}
@@ -190,10 +197,12 @@ Quanto calcolato dalle \cref{eq:calibrazione-micrometro-fabry-perot-approssimata
 \begin{table}[htbp]
 \centering
 \caption{Distanze calibrazione micrometro (interferometro di Fabry-Perot)}
-\begin{tabular}{|l|ccccccc|}
-\hline
-Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta d$ [\si{\micro\meter}] & \num{7.6 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.6 \pm 0.3}  & \num{7.9 \pm 0.3} & \num{7.9 \pm 0.3} & \num{7.3 \pm 0.3} \\\hline
+\begin{tabular}{cccccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$\Delta d$ [\si{\micro\meter}] & \num{7.6 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.3 \pm 0.3}  & \num{7.6 \pm 0.3}  & \num{7.9 \pm 0.3} & \num{7.9 \pm 0.3} & \num{7.3 \pm 0.3} \\
+\bottomrule
 \end{tabular}
 \label{tab:distanze-calibrazione-fabry-perot}
 \end{table}
@@ -214,20 +223,22 @@ Per effettuare le misure è stato creato un interferometro di Michelson la cui r
 \caption{Configurazione interferometro Michelson (da manuale PASCO)}
 \label{fig:configurazione-michelson}
 \end{figure}
-L'interferometro è composto da un laser che invia un raggio luminoso ad una lente divergente, la quale rende i raggi della sorgente paralleli fra di loro. Il raggio collimato incide poi su uno specchio semi-riflettente creando così due diversi fasci che compiono percorsi separati per poi incontrarsi nuovamente su uno schermo. I diversi raggi incidenti compiono cammini ottici differenti (percorrono distanze diverse), quindi quando incidono sullo schermo creano una figura di interferenza. Tale figura è osservabile a occhio nudo e si presenta come un'alternanza di cerchi concentrici; ciascun cerchio rappresenta una regione di interferenza costruttiva. Variando la posizione dello specchio mobile è possibile cambiare anche il cammino ottico dei due raggi e dunque osservare uno shift della figura di interferenza. In tal caso si osserverà un'alternanza di frange concentriche il cui numero varierà secondo la relazione: 
+L'interferometro è composto da un raggio laser che viene fatto divergere da una lente convergente posta dopo la sorgente. Il fascio luminoso, a forma di cono, incide su uno specchio semiriflettente che lo divide in due. I due fasci risultanti percorrono cammini ottici differenti prima di ricombinarsi e proiettare su uno schermo una figura di interferenza, formata da frange circolari concentriche. Queste frange nascono dalla differenza di cammino ottico tra i due fasci e dall'angolo di incidenza di ciascun raggio. Ciascuna frangia luminosa rappresenta una regione di interferenza costruttiva. Variando la posizione dello specchio mobile è possibile cambiare anche il cammino ottico dei due fasci, e dunque osservare uno shift della figura di interferenza. In tal caso si osserverà un'alternanza di frange concentriche il cui numero varierà secondo la relazione: 
 \begin{center}
     $2 \Delta d=\Delta N \lambda $
 \end{center}
-dove $\Delta d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=\SI{632.6}{\nano\meter}$ è la lunghezza d'onda del fascio incidente ed è considerabile valore noto. Lo spostamento dello specchio mobile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un nonio con scala graduata di precisione \SI{1}{\micro\meter}. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, variando la posizione dello specchio mobile e contando ad occhio le frange.
+dove $\Delta d$ è lo spostamento dello specchio, $\Delta N$ è il numero di frange che si alternano ad una data posizione e $\lambda=\SI{632.6}{\nano\meter}$ è la lunghezza d'onda del fascio incidente ed è assunta come nota. Lo spostamento dello specchio mobile è possibile grazie all'apparato, il quale consente di variarne la posizione mediante un nonio con scala graduata di precisione \SI{1}{\micro\meter}. Il conteggio dei massimi della figura di interferenza è stato effettuato manualmente, al variare  della posizione dello specchio mobile.
 \subsection{Dati}
 In \cref{tab:micrometro-michelson} sono riportati i valori di $\Delta N$ contati in laboratorio per ciascuna delle 7 misure effettuate. Per effettuare tale misura abbiamo variato la posizione dello specchio di un valore costante tramite il micrometro sull'apparato e abbiamo contato il relativo numero di frange che si alternavano sullo schermo. L'errore sul numero di frange contate associato a ciascun valore è di $\pm1$ ed è motivato dal fatto che le frange si devono presentare in valori discreti e dal fatto che il conteggio è stato effettuato manualmente. 
 \begin{table}[htbp]
 \centering
 \caption{Shift di frangia osservato (interferometro di Michelson)}
-\begin{tabular}{|l|ccccccc|}
-\hline
-Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta N$ & \num{23 \pm 1} & \num{25 \pm 1} & \num{26 \pm 1} & \num{23 \pm 1} & \num{26 \pm 1} & \num{24 \pm 1} & \num{24 \pm 1} \\\hline
+\begin{tabular}{cccccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$\Delta N$ & \num{23 \pm 1} & \num{25 \pm 1} & \num{26 \pm 1} & \num{23 \pm 1} & \num{26 \pm 1} & \num{24 \pm 1} & \num{24 \pm 1} \\
+\bottomrule
 \end{tabular}
 \label{tab:micrometro-michelson}
 \end{table}
@@ -239,16 +250,23 @@ A partire dai dati raccolti siamo riusciti a calcolare il valore di $d$ atteso t
 Otteniamo così vari valori di $d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
 \begin{table}[htbp]
 \centering
-\caption{Valore di $d$ calcolato}
-\begin{tabular}{|l|ccccccc|}
-\hline
-Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta d$ [\si{\micro\meter}] & \num{7.3 \pm 0.3} & \num{7.9 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.3 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.6 \pm 0.3} & \num{7.6 \pm 0.3} \\\hline
+\caption{Valore di $\Delta d$ calcolato}
+\begin{tabular}{cccccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$\Delta d$ [\si{\micro\meter}] & \num{7.3 \pm 0.3} & \num{7.9 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.3 \pm 0.3} & \num{8.2 \pm 0.3} & \num{7.6 \pm 0.3} & \num{7.6 \pm 0.3} \\
+\bottomrule
 \end{tabular}
 \label{tab:valori-d-michelson}
 \end{table} 
 Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati. Otteniamo così $\Delta d_{best}=\SI{7.7 \pm 0.1}{\micro\meter}$.
-Siccome i valori degli spostamenti dello specchio mobile per gli esperimenti di Fabry-Perot e di Michelson sono uguali in quanto abbiamo ruotato il nonio in modo identico nel corso delle misurazioni, ci aspettiamo compatibilità tra i valori di $\Delta d$ ottenuti nelle due configurazioni. Abbiamo quindi effettuato il t-test con $t=\frac{|\Delta d_{Michelson}-\Delta d_{Fabry-Perot}|}{\sqrt{2\sigma^2}}=\num{1.42}$, il quale equivale a una probabilità entro t-sigma $p=\num{0.84}$
+Siccome i valori degli spostamenti dello specchio mobile per gli esperimenti di Fabry-Perot e di Michelson sono uguali, in quanto abbiamo ruotato il nonio in modo identico nel corso delle misurazioni, ci aspettiamo compatibilità tra i valori di $\Delta d$ ottenuti nelle due configurazioni. Abbiamo quindi effettuato il t-test con:
+\begin{equation}
+    t = \frac{|\Delta d_{\text{Michelson}} - \Delta d_{\text{Fabry-Perot}}|}{\sqrt{2\sigma^2}} = \num{1.42}
+\end{equation}
+il quale equivale a una probabilità entro t-sigma $p = \num{0.84}$.
+
 \subsection{Conclusioni}
 Innanzitutto possiamo osservare che i valori di $\Delta d$ sono compatibili fra di loro, inoltre la sensibilità ottenuta mediante la misura indiretta di $\Delta d$, ricavata osservando il passaggio di frange, risulta notevolmente maggiore rispetto a quella del micrometro, dunque l'utilizzo dell'interferometro ha permesso di misurare distanze in modo più preciso.
 
@@ -276,11 +294,13 @@ Abbiamo considerato noti i valori di $\lambda=\SI{632.6}{\nano\meter}$ lunghezza
 \centering
 \caption{Variazioni di pressione e shift di frange}
 \label{tab:delta-p-e-delta-n}
-\begin{tabular}{|l|ccccccc|}
-\hline
-Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline\hline
-$\Delta P$ [\si{\kilo\pascal}] & \num{10 \pm 2} & \num{20 \pm 2} & \num{30 \pm 2} & \num{40 \pm 2} & \num{50 \pm 2} & \num{60 \pm 2} & \num{70 \pm 2} \\\hline
-$\Delta N$ & \num{3 \pm 1} & \num{6 \pm 1} & \num{9 \pm 1} & \num{12 \pm 1} & \num{15 \pm 1} & \num{18 \pm 1} & \num{21 \pm 1} \\\hline
+\begin{tabular}{cccccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\midrule
+$\Delta P$ [\si{\kilo\pascal}] & \num{10 \pm 2} & \num{20 \pm 2} & \num{30 \pm 2} & \num{40 \pm 2} & \num{50 \pm 2} & \num{60 \pm 2} & \num{70 \pm 2} \\
+$\Delta N$ & \num{3 \pm 1} & \num{6 \pm 1} & \num{9 \pm 1} & \num{12 \pm 1} & \num{15 \pm 1} & \num{18 \pm 1} & \num{21 \pm 1} \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -304,18 +324,27 @@ Quanto ricavato dall'interpolazione e i risultati del suo test del chi quadro è
 \centering
 \caption{Risultati fit indice di rifrazione aria}
 \label{tab:fit-indice-rifrazione-aria}
-\begin{tabular}{|l|cccc|}
-\hline
-Parametri & m [\si{\per\pascal}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & \num{3.16 \pm 0.10 e-7} & 0 & 6 & 0 \\\hline
+\begin{tabular}{ccccc}
+\toprule
+Parametri & $m$ [\si{\per\pascal}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\
+\midrule
+Risultati & \num{3.16 \pm 0.10 e-7} & 0 & 6 & 0 \\
+\bottomrule
 \end{tabular}
 \end{table}
 
-Stimato $m_s$ abbiamo poi ricavato l'indice di rifrazione dell'aria a pressione atmosferica ($P_{atm}= \SI{101.325}{\kilo\pascal}$) come:
-$n_s = 1+m_sP_{atm}$ con errore $\delta_n = \delta_{m_s}P_{atm}$, ottenendo $n_s =\num{1.00032 \pm 0.00001}$.
+Stimato $m_s$, abbiamo poi ricavato l'indice di rifrazione dell'aria a pressione atmosferica ($P_{\text{atm}} = \SI{101.325}{\kilo\pascal}$) come:
+\begin{equation}
+    n_s = 1 + m_s P_{\text{atm}}
+\end{equation}
+con errore $\delta_n = \delta_{m_s} P_{\text{atm}}$, ottenendo $n_s = \num{1.00032 \pm 0.00001}$.
 
 \subsection{Conclusione}
-Come è possibile osservare dall'esito estremamente favorevole del test del chi quadro, riportato in \cref{tab:fit-indice-rifrazione-aria}, possiamo considerare il fit realizzato in accordo con i dati sperimentali. Abbiamo poi osservato come aver ottenuto un valore di $\chi^2/\nu$ nullo non sia da attribuirsi ad errori sovrastimati, infatti anche diminuendo l'errore sui valori di $\Delta N$ e $\Delta P$ si otterrebbe $\chi^2/\nu= 0$, data la completa esattezza. Infine abbiamo confrontato l'indice di rifrazione ricavato sperimentalmente con quello atteso per una temperatura di \SI{25}{\celsius} (pari circa a quella del laboratorio): $n_{att} =\num{1.00029}$. Abbiamo utilizzato come test di compatibilità il t-test ottenendo $t= \frac{n_s-n_{att}}{\delta_{n_s}}=3$, esito al quale corrisponde p-value=0. Tale incompatibilità può essere attribuita alla dipendenza dell'indice di rifrazione dell'aria dalla temperatura. Seppur questa dipendenza sia minima essa può causare una variazione di $n_{att}$ coerente con lo scostamento $n_s-n_{att}$.
+Come è possibile osservare dall'esito estremamente favorevole del test del chi quadro, riportato in \cref{tab:fit-indice-rifrazione-aria}, possiamo considerare il fit realizzato in accordo con i dati sperimentali. Abbiamo poi osservato come aver ottenuto un valore di $\chi^2/\nu$ nullo non sia da attribuirsi ad errori sovrastimati, infatti anche diminuendo l'errore sui valori di $\Delta N$ e $\Delta P$ si otterrebbe $\chi^2/\nu= 0$, data la completa esattezza. Infine abbiamo confrontato l'indice di rifrazione ricavato sperimentalmente con quello atteso per una temperatura di \SI{25}{\celsius} (pari circa a quella del laboratorio): $n_{\text{att}} = \num{1.00029}$. Abbiamo utilizzato come test di compatibilità il t-test ottenendo:
+\begin{equation}
+    t = \frac{n_s - n_{\text{att}}}{\delta_{n_s}} = 3
+\end{equation}
+esito al quale corrisponde p-value = 0. Tale incompatibilità può essere attribuita alla dipendenza dell'indice di rifrazione dell'aria dalla temperatura. Seppur questa dipendenza sia minima essa può causare una variazione di $n_{\text{att}}$ coerente con lo scostamento $n_s - n_{\text{att}}$.
 
 \section{Misura dell'indice di rifrazione del vetro}
 \subsection{Obiettivo}
@@ -342,12 +371,14 @@ In \cref{tab:valori-michelson-vetro} sono riportati i valori di $\Delta N$ osser
 \centering
 \caption{Dati interferometro Michelson con vetro}
 \label{tab:valori-michelson-vetro}
-\begin{tabular}{|l|ccccc|}
-\hline
-Label & 1 & 2 & 3 & 4 & 5 \\\hline\hline
-$\theta_f$ [\si{\degree}] & \num{2.0 \pm 0.1} & \num{4.0 \pm 0.1} & \num{6.0 \pm 0.1} & \num{8.0 \pm 0.1} & \num{10.0 \pm 0.1} \\\hline
-$\theta$ [\si{\degree}] & \num{2.0 \pm 0.2} & \num{4.0 \pm 0.2} & \num{6.0 \pm 0.2} & \num{8.0 \pm 0.2} & \num{10.0 \pm 0.2} \\\hline
-$\Delta N$ & \num{3 \pm 1} & \num{13 \pm 1} & \num{26 \pm 1} & \num{58 \pm 2} & \num{87 \pm 3} \\\hline
+\begin{tabular}{cccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+$\theta_f$ [\si{\degree}] & \num{2.0 \pm 0.1} & \num{4.0 \pm 0.1} & \num{6.0 \pm 0.1} & \num{8.0 \pm 0.1} & \num{10.0 \pm 0.1} \\
+$\theta$ [\si{\degree}] & \num{2.0 \pm 0.2} & \num{4.0 \pm 0.2} & \num{6.0 \pm 0.2} & \num{8.0 \pm 0.2} & \num{10.0 \pm 0.2} \\
+$\Delta N$ & \num{3 \pm 1} & \num{13 \pm 1} & \num{26 \pm 1} & \num{58 \pm 2} & \num{87 \pm 3} \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -356,24 +387,26 @@ Il conteggio di $\Delta N$ è stato effettuato da 2 persone contemporaneamente, 
 A partire dai dati raccolti abbiamo calcolato l'indice di rifrazione del vetro per ciascuna coppia di dati, i vari valori di $n_{vetro}$ ottenuti dalla \cref{eq:indice-rifrazione-vetro} sono riportati in \cref{tab:indice-rifrazione-vetro}. L'errore $\delta_{n_{vetro}}$ è stato ricavato applicando la propagazione degli errori alla \cref{eq:indice-rifrazione-vetro} rispetto all'incertezza su $\Delta N$ e $d$.
 \begin{table}[htbp]
 \centering
-\caption{Indice rifrazione vetro}
+\caption{Indice di rifrazione del vetro}
 \label{tab:indice-rifrazione-vetro}
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Misura} & \( n_{\text{vetro}} \) \\
-\hline
+\begin{tabular}{cc}
+\toprule
+\textbf{Misura} & $n_{\text{vetro}}$ \\
+\midrule
 1 & \num{1.3 \pm 0.5} \\
 2 & \num{1.3 \pm 0.3} \\
 3 & \num{1.3 \pm 0.2} \\
 4 & \num{1.4 \pm 0.1} \\
 5 & \num{1.4 \pm 0.1} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
+
 L'indice di rifrazione del vetro è stato infine valutato come media dei vari valori ottenuti, così da ridurne l'incertezza relativa. Abbiamo ricavato:
-\begin{center}
-    $n_{vetro}=\num{1.34 \pm 0.07}$
-\end{center}
+\begin{equation}
+    n_{\text{vetro}} = \num{1.34 \pm 0.07}
+\end{equation}
+
 \subsection{Conclusioni}
 Non conoscendo in maniera esatta l'indice di rifrazione della lastra di vetro presente in laboratorio non possiamo affermare nulla riguardo alla compatibilità del valore trovato. Tuttavia, in generale, i vari tipi di vetro presentano un indice di rifrazione superiore a \num{1.5}, che è superiore a quello da noi calcolato. In conclusione l'indice di rifrazione trovato non sembra essere compatibile con il valore atteso di $n>\num{1.5}$. 
 
@@ -404,11 +437,14 @@ dove $r_N$ è la distanza tra l'immagine del raggio indeflesso e di quello rifle
 \caption{Dati della figura di interferenza (righello)}
 \label{tab:interferenza-righello}
 \centering
-\begin{tabular}{|l|ccccc|}
-\hline
-$r_N$ [\si{\milli\meter}] & \num{70 \pm 2} & \num{85 \pm 2} & \num{96 \pm 2} & \num{110 \pm 2} & \num{120 \pm 2} \\\hline
-$\cos(\theta_i) - \cos(\theta_N)$ [\num{e-6}] & \num{0.872 \pm 0.200} & \num{1.6 \pm 0.2} & \num{2.3 \pm 0.3} & \num{3.2 \pm 0.4} & \num{3.9 \pm 0.4} \\\hline
-$N$ & 1 & 2 & 3 & 4 & 5 \\\hline
+\begin{tabular}{cccccc}
+\toprule
+Misura & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+$r_N$ [\si{\milli\meter}] & \num{70 \pm 2} & \num{85 \pm 2} & \num{96 \pm 2} & \num{110 \pm 2} & \num{120 \pm 2} \\
+$\cos(\theta_i) - \cos(\theta_N)$ [\num{e-6}] & \num{0.872 \pm 0.200} & \num{1.6 \pm 0.2} & \num{2.3 \pm 0.3} & \num{3.2 \pm 0.4} & \num{3.9 \pm 0.4} \\
+$N$ & 1 & 2 & 3 & 4 & 5 \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -427,16 +463,18 @@ L'interpolazione
 \end{figure}
 
 \begin{table}[htbp]
-\caption{Risultati del Fit - Interferenza del Righello}
+\caption{Risultati del fit -- Interferenza del righello}
 \label{tab:interferenza-righello-risultati}
 \centering
-\begin{tabular}{|l|cccc|}
-\hline
-Parametri & $\lambda$ [\si{\nano\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\\hline\hline
-Risultati & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\\hline
+\begin{tabular}{ccccc}
+\toprule
+Parametri & $\lambda$ [\si{\nano\meter}] & $\chi^2$ & DoF & $\chi^2/\nu$ \\
+\midrule
+Risultati & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\
+\bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Conclusioni}
-La lunghezza d'onda stimata è $\lambda = \SI{792 \pm 45}{\nano\meter}$, che è incompatibile con il valore noto di $\lambda = \SI{632.8}{\nano\meter}$ per il laser He-Ne ($\approx \num{3.5} \sigma$, p-value = \num{0.0001}). Il fit, avendo un chi quadro ridotto, suggerisce che la legge usata descriva correttamente il fenomeno, dal punto di vista della relazione lineare tra $\cos(\theta_i) - \cos(\theta_N)$ e $N$, e la grossa incertezza sulla misura di $L$ non compromette questo risultato, infatti ipotizzando un errore del millimetro risulterebbe comunque un chi quadro ridotto di \num{0.328}. Ipotizziamo dunque che la legge racchiuda correttamente la fisica dietro il fenomeno, ma manchi di qualche fattore correttivo dovuto alla non idealità del sistema. 
+La lunghezza d'onda stimata è $\lambda = \SI{792 \pm 45}{\nano\meter}$, che è incompatibile con il valore noto di $\lambda = \SI{632.8}{\nano\meter}$ per il laser He-Ne ($\approx \num{3.5}\sigma$, p-value = \num{0.0001}). Il fit, avendo un chi quadro ridotto, suggerisce che la legge usata descriva correttamente il fenomeno dal punto di vista della relazione lineare tra $\cos(\theta_i) - \cos(\theta_N)$ e $N$. La grossa incertezza sulla misura di $L$ non compromette questo risultato: infatti, ipotizzando un errore del millimetro, risulterebbe comunque un chi quadro ridotto di \num{0.328}. Ipotizziamo dunque che la legge racchiuda correttamente la fisica dietro il fenomeno, ma manchi di qualche fattore correttivo dovuto alla non idealità del sistema.
 \end{document}
