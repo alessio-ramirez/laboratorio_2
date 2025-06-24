@@ -42,7 +42,6 @@ corrente contuinua, fenomeni elettromagnetici. Più precisamente le misure effet
 	\item realizzare un partitore resistivo e studiarne il funzionamento
 	\item misurare la caratteristica tensione-corrente di un diodo
 	\item osservare gli effetti del campo magnetico generato da una spira percorsa da corrente
-
 \end{itemize}
 
 \section{Legge di Ohm}
@@ -241,21 +240,21 @@ $1.8 \pm 0.7$ & $10596156 \pm 113146$ \\
 \captionof{table}{resistenze interne multimetri}
 \end{center}
 
-Al fine di quantificare il bias abbiamo poi osservato, a partire dall'analisi circuitale dei circuiti riportati in figura 3 e 4, come la relazione \(R=\frac{V}{I}\) sia in realtà esatta soltanto considerando come \(R\) la resistenza equivalente. In particolar modo per la configurazione 1 e per la configurazione 2 otteniamo rispettivamente:
+Al fine di quantificare il bias abbiamo poi osservato, a partire dall'analisi circuitale dei circuiti riportati in figura 3 e 4, come la relazione $R=\frac{V}{I}$ sia in realtà esatta soltanto considerando come $R$ la resistenza equivalente. In particolar modo per la configurazione 1 e per la configurazione 2 otteniamo rispettivamente:
 \begin{align*}
-	 & R_{1eq}=\frac{RR_v}{R+R_v} \quad \text{e} \quad R_{2eq}=R+R_a
+	R_{1,\text{eq}}=\frac{RR_v}{R+R_v} \quad \text{e} \quad R_{2,\text{eq}}=R+R_a
 \end{align*}
-Ne consegue che le misure di \(R\) sono affette da bias pari a:
+Ne consegue che le misure di $R$ sono affette da bias pari a:
 \begin{align*}
-	 & bias_1= R-(\frac{RR_v}{R+R_v})  \quad \text{e} \quad bias_2=R-(R+R_a)
+	 & \text{bias}_1= R-\left(\frac{RR_v}{R+R_v}\right)  \quad \text{e} \quad \text{bias}_2=R-(R+R_a)
 \end{align*}
-Tenendo conto del ragionamento precedente, per calcolare \(bias_1\) abbiamo considerato \(R = 10\si{\ohm}\) (configurazione 1 migliore per resistenza piccola), mentre per \(bias_2\) abbiamo sostituito il valore di \(R=1\si{\mega\ohm}\) (configurazione 2 migliore per resistenza grande).
+Tenendo conto del ragionamento precedente, per calcolare $\text{bias}_1$ abbiamo considerato $R = 10\si{\ohm}$ (configurazione 1 migliore per resistenza piccola), mentre per $\text{bias}_2$ abbiamo sostituito il valore di $R=1\si{\mega\ohm}$ (configurazione 2 migliore per resistenza grande).
 In seguito riportiamo i valori di tali bias.
 
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
-bias1 & bias2 \\
+$\text{bias}_1$ & $\text{bias}_2$ \\
 \hline
 $9.44\times 10^{-6}$ & $1.79$ \\
 \hline
@@ -263,8 +262,8 @@ $9.44\times 10^{-6}$ & $1.79$ \\
 \captionof{table}{bias di misura}
 \end{center}
 
-Possiamo quindi osservare \(bias_1 < \delta_{R_1} = 179\) e \(bias_2 < \delta_{R_2} = 0.03\); essendo minori dell'incertezza di misura possono essere trascurati.
-Dopodichè abbiamo valutato la compatibilità dei valori delle resistenze inserite nel circuito con i valori di \(R\) ricavati con entrambe le configurazioni. Per fare ciò è stato utilizzato il t-test con \( t = \frac {R - R_{nota}}{\sqrt{\delta_{R}^2+\delta_{R{nota}}^2}} \), i cui esiti sono raccolti in tabella.
+Possiamo quindi osservare $\text{bias}_1 < \delta_{R_1} = 179$ e $\text{bias}_2 < \delta_{R_2} = 0.03$; essendo minori dell'incertezza di misura possono essere trascurati.
+Dopodichè abbiamo valutato la compatibilità dei valori delle resistenze inserite nel circuito con i valori di $R$ ricavati con entrambe le configurazioni. Per fare ciò è stato utilizzato il t-test con $t = \frac {R - R_{\text{nota}}}{\sqrt{\delta_{R}^2+\delta_{R_{\text{nota}}}^2}}$, i cui esiti sono raccolti in tabella.
 
 \begin{center}
 \begin{tabular}{|l|c|c|}
@@ -305,22 +304,22 @@ Inoltre \( \mathit{R_1} \) e \( \mathit{R_2} \) devono essere scelte in modo che
 	\label{fig:partitore}
 \end{center}
 \subsection{Metodo}
-Abbiamo realizzato il partitore resistivo utilizzando la breadbord, nella quale abbiamo inserito le resistenze \( \mathit{R_1} \) e \( \mathit{R_2} \),
+Abbiamo realizzato il partitore resistivo utilizzando la breadbord, nella quale abbiamo inserito le resistenze $R_1$ e $R_2$,
 e collegandola al generatore e alla cassetta di resistenze, scelta per rappresentare $R_{\text{load}}$, così da poterne variare agevolmente i valori.
-Al fine di rendere il valore della differenza di potenziale \( \mathit{V_{out}} \) costante, cioè indipendente da \( \mathit{R_{\text{load}}} \),
-\( \mathit{R_{\text{load}}} \) deve assumere valori molto elevati, così che la corrente scorra principalmente nel tratto di circuito non contenente \( \mathit{R_{\text{load}}} \)
+Al fine di rendere il valore della differenza di potenziale $V_{\text{out}}$ costante, cioè indipendente da $R_{\text{load}}$,
+$R_{\text{load}}$ deve assumere valori molto elevati, così che la corrente scorra principalmente nel tratto di circuito non contenente $R_{\text{load}}$
 e quindi non si abbia caduta di potenziale ai suoi capi.
-Di fatto la corrente sceglie il percorso contenente \( \mathit{R_1} \) e \( \mathit{R_2} \).
-Per avere \( \mathit{V_{\text{in}} \approx 0.5V_{\text{out}}} \) le due cadute di tensione ai capi di \( \mathit{R_1} \) e \( \mathit{R_2} \) devono essere identiche, ossia, essendo attraversate dalla stessa corrente, \( \mathit{R_1=R_2} \).
-Utilizzando le resistenze a disposizione abbiamo potuto garantire soltanto \( \mathit{R_1\approx R_2} \), e non una esatta corrispondenza, infatti \( \mathit{R_1=21.67 \si{\ohm}} \) e \( \mathit{R_2=21.65 \si{\ohm}} \).
+Di fatto la corrente sceglie il percorso contenente $R_1$ e $R_2$.
+Per avere $V_{\text{in}} \approx 0.5V_{\text{out}}$ le due cadute di tensione ai capi di $R_1$ e $R_2$ devono essere identiche, ossia, essendo attraversate dalla stessa corrente, $R_1=R_2$.
+Utilizzando le resistenze a disposizione abbiamo potuto garantire soltanto $R_1\approx R_2$, e non una esatta corrispondenza, infatti $R_1=21.67 \si{\ohm}$ e $R_2=21.65 \si{\ohm}$.
 Dopo aver realizzato il partitore resistivo sulla breadboard, per verificare che esso rispetti le caratteristiche richieste, è stato necessario inserirvi il voltmetro,
-così da poter misurare i valori di \( \mathit{V_{\text{in}}} \) e \( \mathit{V_{\text{out}}} \). Per misurare \( \mathit{V_{\text{in}}} \) il voltmetro è stato inserito in parallelo con l'alternatore,
-mentre per la misura di \( \mathit{V_{\text{out}}} \) lo abbiamo collegato in parallelo con \( \mathit{R_{load}} \) (e quindi anche con la resistenza equivalente a \( \mathit{R_1} \) e \( \mathit{R_2} \)).
-Abbiamo quindi effettuato 5 misure di \( \mathit{V_{\text{in}}} \) e \( \mathit{V_{\text{out}}} \) al variare di \( \mathit{R_{\text{load}}} \) tra 1 \(\si{\mega\ohm}\) e 5 \(\si{\mega\ohm}\),  mantenendo costante la tensione erogata dal generatore.
+così da poter misurare i valori di $V_{\text{in}}$ e $V_{\text{out}}$. Per misurare $V_{\text{in}}$ il voltmetro è stato inserito in parallelo con l'alternatore,
+mentre per la misura di $V_{\text{out}}$ lo abbiamo collegato in parallelo con $R_{\text{load}}$ (e quindi anche con la resistenza equivalente a $R_1$ e $R_2$).
+Abbiamo quindi effettuato 5 misure di $V_{\text{in}}$ e $V_{\text{out}}$ al variare di $R_{\text{load}}$ tra 1 \si{\mega\ohm} e 5 \si{\mega\ohm},  mantenendo costante la tensione erogata dal generatore.
 \subsection{Dati}
-Nella tabella sottostante sono riportati i valori di \emph{$V_{\text{in}}$, $V_{\text{out}}$} e \emph{$R_{\text{load}}$} con i rispettivi errori.
-Le incertezze di \( \mathit{V_{\text{in}}} \) e \( \mathit{V_{\text{out}}} \) sono state stimate utilizzando la sensibilità del voltmetro, quindi \( \mathit{\delta_{V_{\text{in}}}=\delta_{V_{\text{out}}}=0.001 V} \);
-mentre per determinare \( \mathit{\delta_{R_{\text{load}}}} \) abbiamo preso in considerazione l'errore relativo dell'1\% indicato sulla cassetta di resistenze.
+Nella tabella sottostante sono riportati i valori di $V_{\text{in}}$, $V_{\text{out}}$ e $R_{\text{load}}$ con i rispettivi errori.
+Le incertezze di $V_{\text{in}}$ e $V_{\text{out}}$ sono state stimate utilizzando la sensibilità del voltmetro, quindi $\delta_{V_{\text{in}}}=\delta_{V_{\text{out}}}=0.001 V$;
+mentre per determinare $\delta_{R_{\text{load}}}$ abbiamo preso in considerazione l'errore relativo dell'1\% indicato sulla cassetta di resistenze.
 
 \begin{center}
 \begin{tabular}{|l|c c c c c|}
@@ -336,38 +335,38 @@ mentre per determinare \( \mathit{\delta_{R_{\text{load}}}} \) abbiamo preso in 
 \end{center}
 
 \subsection{Analisi dati}
-Il grafico sotto riportato rappresenta le coppie di valori \( \mathit{V_{\text{out}}} \)-\( \mathit{R_{\text{load}}} \) con i relativi errori.
+Il grafico sotto riportato rappresenta le coppie di valori $V_{\text{out}}$-$R_{\text{load}}$ con i relativi errori.
 
 \begin{center}
     \includegraphics[width=0.5\textwidth]{grafici/partitore_resistivo.png}
 \end{center}
 \subsection{Conclusione}
-Come si può osservare dal grafico il valore della resistenza di carico non è completamente ininfluente su \( \mathit{V_{\text{out}}} \).
-Al variare di \( \mathit{R_{\text{load}}} \) si hanno infatti fluttuazioni di \( \mathit{V_{\text{out}}} \); indice del fatto che, seppur \( \mathit{R_{\text{load}}} \) sia molto elevata, essa ha un valore finito e quindi
-parte della corrente continua a fluire all'interno del componente resistivo. A conferma di ciò possiamo osservare come si raggiungano valori di \( \mathit{V_{\text{out}}} \) più alti all'aumentare di \( \mathit{R_{\text{load}}} \).
-Inoltre, come atteso, per \( \mathit{R_1 \approx R_2} \) si ha \( \mathit{V_{\text{in}} \approx 0.5V_{\text{out}}} \).
+Come si può osservare dal grafico il valore della resistenza di carico non è completamente ininfluente su $V_{\text{out}}$.
+Al variare di $R_{\text{load}}$ si hanno infatti fluttuazioni di $V_{\text{out}}$; indice del fatto che, seppur $R_{\text{load}}$ sia molto elevata, essa ha un valore finito e quindi
+parte della corrente continua a fluire all'interno del componente resistivo. A conferma di ciò possiamo osservare come si raggiungano valori di $V_{\text{out}}$ più alti all'aumentare di $R_{\text{load}}$.
+Inoltre, come atteso, per $R_1 \approx R_2$ si ha $V_{\text{in}} \approx 0.5V_{\text{out}}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Caratteristica tensione-corrente di un diodo}
 \subsection{Obiettivo}
-Misurare tensione e corrente ai capi di un diodo e verificare che le informazioni raccolte rispettino quanto previsto dalla legge di Shockley: \(I = I_0 \left( e^{\frac{qV}{gkT}} - 1 \right)\).
-Dove \( I \) è la corrente che attraversa il diodo mentre \( V \) è la tensione applicata. \( I_0 \) indica invece la corrente di saturazione inversa, \( g \) è una costante dipendente dal diodo,
-\( k \) è la costante di Boltzmann (\( 1.38 \times 10^{-23} \, \text{J/K} \)), \( T \) è la temperatura in Kelvin, e \( q \) è la carica dell'elettrone (\( 1.60 \times 10^{-19} \) C).
-Utilizzare poi i dati per stimare la costante del diodo \( g \) e la corrente di saturazione inversa \( I_0 \).
+Misurare tensione e corrente ai capi di un diodo e verificare che le informazioni raccolte rispettino quanto previsto dalla legge di Shockley: $I = I_0 \left( e^{\frac{qV}{gkT}} - 1 \right)$.
+Dove $I$ è la corrente che attraversa il diodo mentre $V$ è la tensione applicata. $I_0$ indica invece la corrente di saturazione inversa, $g$ è una costante dipendente dal diodo,
+$k$ è la costante di Boltzmann ($1.38 \times 10^{-23} \, \text{J/K}$), $T$ è la temperatura in Kelvin, e $q$ è la carica dell'elettrone ($1.60 \times 10^{-19}$ C).
+Utilizzare poi i dati per stimare la costante del diodo $g$ e la corrente di saturazione inversa $I_0$.
 \subsection{Metodo}
 Abbiamo innanzitutto realizzato il circuito, ripetendo la proceduta utilizzata per la verifica della Legge di Ohm, inserendo all'interno della breadboard il diodo e scollegandola dalla cassetta di resistenze.
 Per compiere le misurazioni di corrente e tensione sono state utilizzate per il collegamento dei multimetri sia la configurazione \ref{fig:1} che la configurazione \ref{fig:2},
 per ciascuna delle quali abbiamo raccolto 21 misure della coppia \( I-V \). A partire dai valori di tensione e corrente abbiamo poi ricavato la resistenza equivalente,
 dipendente dalla tensione tramite la relazione \( R_{eq} = \frac {V}{I} \), di conseguenza non costante; il diodo rappresenta infatti un componente non Ohmico.
-Dal confronto di \(R_{eq}\) con le resistenze interne degli strumenti di misura è stato possibile supporre quale configurazione garantisse misurazioni più accurate.
-Abbiamo proceduto con un ragionamento analogo a quello effettuato in precendenza per il calcolo del valore della resistenza, ricavando quindi che per \(R_{eq}\) basse rispetto alla resistenza del voltometro è preferibile la configurazione \ref{fig:1}, mentre, per \(R_{eq}\) alte rispetto alla resistenza dell'amperometro, la configurazione \ref{fig:2} rappresenta la scelta migliore.
+Dal confronto di $R_{\text{eq}}$ con le resistenze interne degli strumenti di misura è stato possibile supporre quale configurazione garantisse misurazioni più accurate.
+Abbiamo proceduto con un ragionamento analogo a quello effettuato in precendenza per il calcolo del valore della resistenza, ricavando quindi che per $R_{\text{eq}}$ basse rispetto alla resistenza del voltometro è preferibile la configurazione \ref{fig:1}, mentre, per $R_{\text{eq}}$ alte rispetto alla resistenza dell'amperometro, la configurazione \ref{fig:2} rappresenta la scelta migliore.
 \subsection{Dati}
-Riportiamo nelle tabelle qui di seguito i valori di \(V\) e \(I\), affiancati dalla corrispettiva \(R_{eq}\), e relativi alle misure sul diodo per entrambe le configurazioni. L'errore su \(V\) e \(I\) è stato stimato considerando la fluttuazione dei valori mostrati dagli strumenti di misura.
+Riportiamo nelle tabelle qui di seguito i valori di \(V\) e \(I\), affiancati dalla corrispettiva \(R_{\text{eq}}\), e relativi alle misure sul diodo per entrambe le configurazioni. L'errore su \(V\) e \(I\) è stato stimato considerando la fluttuazione dei valori mostrati dagli strumenti di misura.
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
-I $\times 10^{-3}[A]$ & V $\times 10^{-3}[V]$ & $R_{eq} [\si{\ohm}]$\\
+$I \times 10^{-3}[A]$ & $V \times 10^{-3}[V]$ & $R_{\text{eq}}$ [$\si{\ohm}$]\\
 \hline
 $0.00003 \pm 0.00001$ & $100 \pm 1$ & 3.33 \\
 $0.00005 \pm 0.00001$ & $212 \pm 1$ & 4.24 \\
@@ -375,21 +374,21 @@ $0.0002 \pm 0.00002$ & $309 \pm 1$ & 1.54 \\
 $0.00341 \pm 0.00001$ & $396 \pm 1$ & 0.116 \\
 $0.0769 \pm 0.0001$ & $501 \pm 1$ & 0.00652 \\
 $0.91 \pm 0.002$ & $600 \pm 1$ & 0.000659 \\
-$10.5 \pm 0.4$ & $700 \pm 1$ & 6.67e-05 \\
-$109 \pm 1$ & $796 \pm 1$ & 7.3e-06 \\
-$490 \pm 1$ & $880 \pm 1$ & 1.8e-06 \\
+$10.5 \pm 0.4$ & $700 \pm 1$ & $6.67 \times 10^{-5}$ \\
+$109 \pm 1$ & $796 \pm 1$ & $7.3 \times 10^{-6}$ \\
+$490 \pm 1$ & $880 \pm 1$ & $1.8 \times 10^{-6}$ \\
 $0.253 \pm 0.003$ & $559 \pm 1$ & 0.00221 \\
 $2.764 \pm 0.002$ & $655 \pm 1$ & 0.000237 \\
 $4.653 \pm 0.002$ & $675 \pm 1$ & 0.000145 \\
-$32.9 \pm 0.1$ & $746 \pm 1$ & 2.27e-05 \\
-$64 \pm 0.5$ & $773 \pm 1$ & 1.21e-05 \\
-$253 \pm 1$ & $836 \pm 1$ & 3.3e-06 \\
-$214 \pm 1$ & $823 \pm 1$ & 3.85e-06 \\
+$32.9 \pm 0.1$ & $746 \pm 1$ & $2.27 \times 10^{-5}$ \\
+$64 \pm 0.5$ & $773 \pm 1$ & $1.21 \times 10^{-5}$ \\
+$253 \pm 1$ & $836 \pm 1$ & $3.3 \times 10^{-6}$ \\
+$214 \pm 1$ & $823 \pm 1$ & $3.85 \times 10^{-6}$ \\
 $1.14 \pm 0.01$ & $624 \pm 1$ & 0.000545 \\
 $0.00459 \pm 0.00001$ & $421 \pm 1$ & 0.0917 \\
 $1.661 \pm 0.001$ & $638 \pm 1$ & 0.000384 \\
-$18.1 \pm 0.1$ & $724 \pm 1$ & 4e-05 \\
-$55 \pm 1$ & $762 \pm 1$ & 1.38e-05 \\
+$18.1 \pm 0.1$ & $724 \pm 1$ & $4 \times 10^{-5}$ \\
+$55 \pm 1$ & $762 \pm 1$ & $1.38 \times 10^{-5}$ \\
 \hline
 \end{tabular}
 \captionof{table}{configurazione 1}
@@ -398,7 +397,7 @@ $55 \pm 1$ & $762 \pm 1$ & 1.38e-05 \\
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
-I $\times 10^{-6}[A]$ & V $\times 10^{-3}[V]$ & $R_{eq} [\si{\ohm}]$\\
+$I \times 10^{-6}[A]$ & $V \times 10^{-3}[V]$ & $R_{\text{eq}}$ [$\si{\ohm}$]\\
 \hline
 $0.02 \pm 0.01$ & $16 \pm 1$ & 0.78 \\
 $0.02 \pm 0.01$ & $18 \pm 1$ & 0.857 \\
@@ -427,7 +426,8 @@ $1658 \pm 2$ & $805 \pm 1$ & 0.000486 \\
 \end{center}
 
 \subsection{Analisi dati}
-Di seguito si riportano i grafici ottenuti dall'interpolazione esponenziale dei dati raccolti precedentemente. Per il grafico  \(I-V\) ci aspettiamo un andamento esponenziale dato dalla legge di Shockley:  \(I = I_0 \left( e^{\frac{qV}{gkT}} - 1 \right)\) già esposta in precedenza. I valori di \( k \) e \( q \) sono noti e costanti, per quanto riguarda la temperatura \( T \) consideriamo la temperatura dell'ambiente  \(T=300K\) e la ipotizziamo costante. 
+Di seguito si riportano i grafici ottenuti dall'interpolazione esponenziale dei dati raccolti precedentemente. Per il grafico  $I$-$V$ ci aspettiamo un andamento esponenziale dato dalla legge di Shockley:  $I = I_0 \left( e^{\frac{qV}{gkT}} - 1 \right)$ già esposta in precedenza. I valori di $k$ e $q$ sono noti e costanti, per quanto riguarda la temperatura $T$ consideriamo la temperatura dell'ambiente  $T=300K$ e la ipotizziamo costante.
+
 \begin{center}
     \includegraphics[width=0.75\linewidth]{grafici/diodo_1.png}
     \captionof{figure}{Diodo, configurazione 1}
@@ -441,18 +441,18 @@ Di seguito si riportano i grafici ottenuti dall'interpolazione esponenziale dei 
 \end{center}
 Come si può notare dai risultati del test del chi quadro, per entrambe le configurazione il fit esponenziale non risulta essere un buon fit.
 Per quanto riguarda la configurazione 2 ciò è giustificabile considerando che,          all'aumentare della tensione, la resistenza equivalente diminuisce esponenzialmente, e per resistenze basse abbiamo già illustrato come la configurazione 2 non garantisca buone misurazioni. 
-Inoltre utilizzando la configurazione 2 siamo riusciti a raggiungere valori di corrente notevolmente più bassi rispetto a quelli misurati con la configurazione 1. Tale discrepanza è da attribuirsi alla non idealità degli strumenti di misura. Inserendo infatti il voltmetro a capi della serie amperometro-diodo la resistenza interna dell'amperometro (\(R_a=1.8 \si\ohm\)) "oscura" la resistenza del diodo \(R_{eq}\), la quale per valori alti di corrente-tensione risulta dell'ordine di \(\times 10^-4\si\ohm\). Di conseguenza non si riesce a misurare correttamente l'effetto del diodo sul circuito.
+Inoltre utilizzando la configurazione 2 siamo riusciti a raggiungere valori di corrente notevolmente più bassi rispetto a quelli misurati con la configurazione 1. Tale discrepanza è da attribuirsi alla non idealità degli strumenti di misura. Inserendo infatti il voltmetro a capi della serie amperometro-diodo la resistenza interna dell'amperometro ($R_a=1.8 \si{\ohm}$) "oscura" la resistenza del diodo $R_{\text{eq}}$, la quale per valori alti di corrente-tensione risulta dell'ordine di $\times 10^{-4}\si{\ohm}$. Di conseguenza non si riesce a misurare correttamente l'effetto del diodo sul circuito.
 Tuttavia ciò non spiega il perchè anche la configurazione 1 fallisca quando si ha a che fare con tensioni alte e quindi resistenze equivalenti basse.
-Una spiegazione di tale fenomeno si può imputare al fatto che la legge di Shokley dipenda esponenzialmente dall'inverso della temperatura del diodo, la quale aumenta con l'aumentare della corrente che attraversa il sistema. Dunque l'ipotesi che la temperatura sia costante durante tutto l'esperimento è errata, e la curva esponenziale ottenuta non è infine uguale a quella attesa. Sempre per la prima configurazione abbiamo tentato di interpolare solo i dati corrispondenti a resistenze equivalenti basse, cioà ad alte tensioni, e ad aumentare gli errori sulle correnti a un errore relativo del 10\%; infatti, nonostante questi non fossero considerati come la sensibilità dell'amperometro, ma come le fluttuazioni di misura, erano sottostimati: non tenevano conto delle incertezze dovute alla non idealità degli strumenti e alla temperatura non costante.
-Di seguito riportiamo quanto ottenuto ripetendo l'interpolazione.
+Una spiegazione di tale fenomeno si può imputare al fatto che la legge di Shokley dipenda esponenzialmente dall'inverso della temperatura del diodo, la quale aumenta con l'aumentare della corrente che attraversa il sistema. Dunque l'ipotesi che la temperatura sia costante durante tutto l'esperimento è errata, e la curva esponenziale ottenuta non è infine uguale a quella attesa. Sempre per la prima configurazione abbiamo tentato di interpolare solo i dati corrispondenti a resistenze equivalenti basse, cioè ad alte tensioni, e ad aumentare gli errori sulle correnti a un errore relativo del 10\%; infatti, nonostante questi non fossero considerati come la sensibilità dell'amperometro, ma come le fluttuazioni di misura, erano sottostimati: non tenevano conto delle incertezze dovute alla non idealità degli strumenti e alla temperatura non costante.
+
 \begin{center}
     \includegraphics[width=0.7\textwidth]{grafici/diodo_sad.png}
     \captionof{figure}{Configurazione 1 con errore relativo del 10\%}
 \end{center}
 Dai parametri ottenuti risulta un chi quadro ridotto non compatibile con le misure \footnote{il chi quadro ridotto atteso è di 1 con deviazione standard stimata di $\sqrt{\frac{2}{13}} \approx 0.4$, e quello ottenuto dista circa 6 deviazioni standard}, certamente aumentando ancora gli errori si otterrebbe un risultato compatibile, tuttavia un errore relativo maggiore del 10\% non verificherebbe in modo attendibile la legge di Shockley.
 \subsection{Conclusione}
-In conclusione non possiamo dire verificata la legge di Shockley, dal momento che un fit esponenziale dei dati non è da considerarsi una buona interpolazione, come mostrato dai risultati del test del chi quadro, visibili nei grafici. Si può osservare inoltre che la curva interpolata cresce molto più rapidamente rispetto ai punti presi sperimentalmente. Ciò è concorde con l'aumento di temperatura dovuto a correnti alte; infatti il termine \(T\), trovandosi al denominatore, al suo aumentare fa in modo che la curva si appiattisca. 
-Riportiamo comunque una stima del valore della corrente di saturazione inversa \(I_0\) e della costante \( g \) propria del diodo. 
+In conclusione non possiamo dire verificata la legge di Shockley, dal momento che un fit esponenziale dei dati non è da considerarsi una buona interpolazione, come mostrato dai risultati del test del chi quadro, visibili nei grafici. Si può osservare inoltre che la curva interpolata cresce molto più rapidamente rispetto ai punti presi sperimentalmente. Ciò è concorde con l'aumento di temperatura dovuto a correnti alte; infatti il termine $T$, trovandosi al denominatore, al suo aumentare fa in modo che la curva si appiattisca. 
+Riportiamo comunque una stima del valore della corrente di saturazione inversa $I_0$ e della costante $g$ propria del diodo. 
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
@@ -480,7 +480,7 @@ $(1.39 \pm 1.01)\times10^-9 $ & $1.99 \pm 0.13$ \\
 \section{Campo magnetico indotto da corrente}
 \subsection{Obiettivo}
 Verificare che il passaggio di corrente in una bobina generi un campo magnetico al suo interno.
-Sfruttare una bussola per attuare le misurazioni, osservando come la corrente in circolo nella bobina incida sull'orientazione di un ago magnetico posto al suo interno.
+Sfruttare una bussola per attuare le misurazioni, osservando come la corrente in circolo nella bobina incida sull'orientamento di un ago magnetico posto al suo interno.
 \subsection{Metodo}
 Abbiamo disposto il cellulare con l’app bussola sul supporto in modo tale che la bussola si trovasse al centro della bobina e che la direzione nord-sud da essa indicata
 fosse perpendicolare all'asse del solenoide. In questo modo il campo magnetico generato dal passaggio di corrente (diretto lungo l'asse della bobina) aveva direzione perpendicolare
@@ -491,9 +491,9 @@ dove \(\mu_0\) rappresenta la permeabilità magnetica del vuoto, \( \mathit{I} \
 mentre \( \mathit{N=21} \) e \( \mathit{L=0.05m} \) indicano rispettivamente il numero di spire e la lunghezza del solenoide.
 A partire dalle rotazioni è invece stata calcolata la tangente di ogni angolo.
 \subsection{Dati}
-Nella tabella e nel grafico sottostanti sono riportati i valori di corrente \( \mathit{I} \) e dell'angolo di rotazione \(\theta\).
+Nella tabella e nel grafico sottostanti sono riportati i valori di corrente $I$ e dell'angolo di rotazione $\theta$.
 Per la misura di entrambi abbiamo considerato come errore la sensibilità degli strumenti:
-\( \mathit{\delta_I=0.01A} \) (sensibilità del generatore di corrente) e \( \mathit{\delta_\theta=\SI{1}{\degree}} \) (sensibilità della bussola).
+$\delta_I=0.01A$ (sensibilità del generatore di corrente) e $\delta_\theta=\SI{1}{\degree}$ (sensibilità della bussola).
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -534,10 +534,10 @@ $67 \pm 1$ & $0.24 \pm 0.01$ \\
     \includegraphics[width=0.8\textwidth]{grafici/bussola.png}
 \end{center}
 \subsection{Analisi dati}
-Abbiamo riportato in figura i valori di \( \mathit{B_s} \) e \( \mathit{tan(\theta)} \) con i rispettivi errori.
-Per ricavare l'incertezza su \( \mathit{tan(\theta)} \) e \( \mathit{B_s} \) sono state utilizzate le formule:
+Abbiamo riportato in figura i valori di $B_s$ e $\tan(\theta)$ con i rispettivi errori.
+Per ricavare l'incertezza su $\tan(\theta)$ e $B_s$ sono state utilizzate le formule:
 \begin{align*}
-	 & \delta_{tan} = \frac {1}{1+\theta^2}\delta_\theta \quad \text{e} \quad \delta_{B_s} = \frac {\mu_0N}{L}\delta_I
+	 & \delta_{\tan} = \frac {1}{1+\theta^2}\delta_\theta \quad \text{e} \quad \delta_{B_s} = \frac {\mu_0N}{L}\delta_I
 \end{align*}
 
 \begin{center}
@@ -575,14 +575,14 @@ $(1.8699 \pm 0.0078) \times 10^{-4}$ & $2.36 \pm 0.0074$ \\
 \end{center}
 
 Tali dati sono stati poi interpolati con una legge di tipo lineare.
-Ci aspettiamo infatti che essi siano legati dalla relazione \( tan(\theta) = \frac {B_s}{B_t} \) (dove \( \mathit{B_t} \) indica il campo magnetico terrestre),
+Ci aspettiamo infatti che essi siano legati dalla relazione $\tan(\theta) = \frac {B_s}{B_t}$ (dove $B_t$ indica il campo magnetico terrestre),
 la quale esprime come la presenza di un campo magnetico esterno perpendicolare al campo terrestre causi uno spostamento angolare.
 
 \begin{center}
     \includegraphics[width=0.8\textwidth]{grafici/campo_magnetico.png}
 \end{center}
-I risultati dell'interpolazione sono osservabili in seguito. \( \mathit{m} \) indica il coefficiente angolare della retta e \( \mathit{a} \) la sua intercetta,
-\( \mathit{\delta_m} \) e \( \mathit{\delta_a} \) i loro errori.
+I risultati dell'interpolazione sono osservabili in seguito. $m$ indica il coefficiente angolare della retta e $a$ la sua intercetta,
+$\delta_m$ e $\delta_a$ i loro errori.
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -598,13 +598,13 @@ $10710.00 \pm 0.03$ & $-0.15 \pm 0.03$ \\
 \subsection{Conclusione}
 A partire dai parametri ricavati tramite l'interpolazione lineare abbiamo potuto determinare una stima del campo magnetico terrestre;
 possiamo infatti dedurre il campo magnetico terrestre dal coefficiente angolare della retta che meglio approssima la relazione tra i dati.
-Risulta \( B_t = \frac {1}{m} \) con errore \( \delta_{B_t} = \frac {1}{m^2}\delta_m \).
+Risulta $B_t = \frac {1}{m}$ con errore $\delta_{B_t} = \frac {1}{m^2}\delta_m$.
 I valori ottenuti sono raccolti nella tabella sottostante.
 
 \begin{center}
 \begin{tabular}{|l|c|}
 \hline
-\(B_t\) [T] & $(7.9 \pm 0.2) \times 10^-5$ \\
+$B_t$ [T] & $(7.9 \pm 0.2) \times 10^{-5}$ \\
 \hline
 \end{tabular}
 \end{center}
