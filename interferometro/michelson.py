@@ -23,11 +23,14 @@ def aria_index(delta_P, m) :
 s = Measurement(3, magnitude=-2) #spessore vacuum cell
 delta_n = [3, 6, 9, 12, 15, 18, 21]
 delta_P = [10, 20, 30, 40, 50, 60, 70] #kPa
-delta_P = Measurement(delta_P, 2, magnitude=3)
-delta_n = Measurement(delta_n)
+delta_P = Measurement(delta_P, 2, magnitude=3, name="$\\Delta P$", unit="Pa")
+delta_n = Measurement(delta_n, 1, name="$\\Delta N$", )
+#latex_table_data(delta_P, delta_n, orientation='h')
 
 fit = perform_fit(delta_P, delta_n, aria_index, method='odr')
-plot_fit(fit, show_plot=True, show_params=True)
+plot_fit(fit, save_path='./grafici/indice_aria.pdf', plot_residuals=True, title='Scorrimento di frange al variare della pressione')
+indice_aria = fit.parameters['m'] * 101.325e3 + 1
+print(f"indice aria = {indice_aria.to_eng_string(sig_figs_error=3)}")
 
 #MISURA INDICE RIFRAZIONE VETRO
 lambd = 632.8e-9
@@ -40,7 +43,7 @@ delta_n = [3, 13, 26, 58, 87]
 delta_n_err = [1, 1, 1, 2, 3]
 delta_n = Measurement(delta_n, delta_n_err)
 n_vetro = (2*t-delta_n*lambd)*(1-np.cos(theta))/(2*t*(1-np.cos(theta))-delta_n*lambd)
-print(n_vetro)
+#print(n_vetro)
 n_vetro_m = weighted_mean(n_vetro)
-print(n_vetro_m)
+#print(n_vetro_m)
 
