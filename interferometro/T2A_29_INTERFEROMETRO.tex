@@ -247,7 +247,7 @@ A partire dai dati raccolti siamo riusciti a calcolare il valore di $d$ atteso t
 \begin{center}
     $\Delta d=\frac{\Delta N \lambda}{2}$
 \end{center}
-Otteniamo così vari valori di $d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
+Otteniamo così vari valori di $\Delta d$ i quali sono riportati in \cref{tab:valori-d-michelson}:
 \begin{table}[htbp]
 \centering
 \caption{Valore di $\Delta d$ calcolato}
@@ -260,7 +260,7 @@ $\Delta d$ [\si{\micro\meter}] & \num{7.3 \pm 0.3} & \num{7.9 \pm 0.3} & \num{8.
 \end{tabular}
 \label{tab:valori-d-michelson}
 \end{table} 
-Il valore di $d$ finale è stato poi considerato come la media dei vari valori di $d$ ricavati. Otteniamo così $\Delta d_{best}=\SI{7.7 \pm 0.1}{\micro\meter}$.
+Il valore di $\Delta d$ finale è stato poi considerato come la media dei vari valori di $\Delta d$ ricavati. Otteniamo così $\Delta d_{best}=\SI{7.7 \pm 0.1}{\micro\meter}$.
 Siccome i valori degli spostamenti dello specchio mobile per gli esperimenti di Fabry-Perot e di Michelson sono uguali, in quanto abbiamo ruotato il nonio in modo identico nel corso delle misurazioni, ci aspettiamo compatibilità tra i valori di $\Delta d$ ottenuti nelle due configurazioni. Abbiamo quindi effettuato il t-test con:
 \begin{equation}
     t = \frac{|\Delta d_{\text{Michelson}} - \Delta d_{\text{Fabry-Perot}}|}{\sqrt{2\sigma^2}} = \num{1.42}
@@ -357,7 +357,7 @@ Per effettuare le misure è stato creato un interferometro di Michelson (descrit
 \caption{Configurazione interferometro Michelson con lastra di vetro (da manuale PASCO)}
 \label{fig:michelson-vetro}
 \end{figure}
-La lastra di vetro inclinabile è attaccata ad un'asta di metallo che permette di leggere l'angolo di inclinazione su di una scala graduata. Abbiamo dunque osservato lo shift di frange, campionando $\Delta N$ in funzione dell'angolo di inclinazione della lastra $\theta$. Osserviamo che vi era un angolo di inversione in prossimità del quale le frange cambiavano direzione. Abbiamo dunque deciso di campionare angoli maggiori dell'angolo di inversione per evitare problemi con l'applicazione delle formule. In particolare abbiamo iniziato a misurare gli angoli proprio a partire dall'angolo di minima deviazione, il quale si trovava ad un angolo di $\theta_i = \SI{0 \pm 0.2}{\degree}$ rispetto al goniometro; la misura dell'angolo finale sarà dunque equivalente al valore letto sul goniometro, tale considerazione influisce unicamente sull'errore. L'errore sull'angolo iniziale è dovuto allo spessore delle linee e dal fatto che fosse difficile individuare il punto preciso in cui le linee cominciavano a muoversi, sia a causa della sensibilità dello strumento sia a causa dello spessore delle linee stesse. La relazione che lega l'indice di rifrazione del vetro all'angolo di inclinazione e al numero di frange è la seguente:
+La lastra di vetro inclinabile è attaccata ad un'asta di metallo che permette di leggere l'angolo di inclinazione su di una scala graduata. Abbiamo dunque osservato lo shift di frange, campionando $\Delta N$ in funzione dell'angolo di inclinazione della lastra $\theta$. Osserviamo che vi era un angolo di inversione in prossimità del quale le frange cambiavano direzione. Abbiamo dunque deciso di campionare angoli maggiori dell'angolo di inversione per evitare problemi con l'applicazione delle formule. In particolare abbiamo iniziato a misurare gli angoli proprio a partire dall'angolo di minima deviazione, il quale si trovava ad un angolo di $\theta_i = \SI{0 \pm 0.2}{\degree}$ rispetto al goniometro; la misura dell'angolo finale sarà dunque equivalente al valore letto sul goniometro, tale considerazione influisce unicamente sull'errore. L'errore sull'angolo iniziale è dovuto allo spessore delle frange, il quale rendeva difficile individuare il punto preciso in cui le linee cominciavano a muoversi. La relazione che lega l'indice di rifrazione del vetro all'angolo di inclinazione e al numero di frange è la seguente:
 \begin{align}
     n_{\text{vetro}} = \frac{(2d - \Delta N \lambda)(1 - \cos\theta)}{2d(1 - \cos\theta) - \Delta N \lambda}
 \label{eq:indice-rifrazione-vetro}
@@ -421,7 +421,7 @@ Quando un fascio laser monocromatico e coerente incide obliquamente su un righel
 \end{align}
 dove $d=\SI{1}{\milli\meter}$ è il passo del reticolo, in questo caso la distanza tra le incisioni del righello, $\theta_i$ è l'angolo di incidenza del fascio laser, $\theta_N$ è l'angolo corrispondente al massimo di ordine $N$, e $\lambda$ è la lunghezza d'onda del laser, stimato come $\lambda=\SI{632.8}{\nano\meter}$ per il laser He-Ne utilizzato.
 
-La distanza tra la parete e il punto di riflessione del laser sul righello è stata stimata come $L=\SI{124 \pm 5}{\centi\meter}$, il motivo di un'incertezza così alta è dovuto al fatto che non è stato possibile individuare con precisione il punto di riflessione corrispondente al primo massimo. Il righello presentava una "striscia" di punti di diffrazione, tuttavia questa incertezza, come si vedrà dall'analisi dati, non ha un impatto significativo sul risultato finale. $\theta_i$ è stato dunque calcolato con $L$ e la distanza tra l'immagine del raggio indeflesso e di quello riflesso, $r$, con la seguente relazione:
+La distanza tra la parete e il punto di riflessione del laser sul righello è stata stimata come $L=\SI{124 \pm 5}{\centi\meter}$, il motivo di un'incertezza così alta è dovuto al fatto che non è stato possibile individuare con precisione il punto in cui il laser incideva sul righello. Il righello presentava infatti una "striscia" di punti di diffrazione, tuttavia questa incertezza, come si vedrà dall'analisi dati, non ha un impatto significativo sul risultato finale. $\theta_i$ è stato dunque calcolato con $L$ e la distanza tra l'immagine del raggio indeflesso e di quello riflesso, $r$, con la seguente relazione:
 \begin{align}   
     \theta_i = \arctan\left(\frac{r}{L}\right)
 \end{align}
@@ -476,5 +476,5 @@ Risultati & \num{792 \pm 45} & \num{0.393} & 4 & \num{0.0983} \\
 \end{table}
 
 \subsection{Conclusioni}
-La lunghezza d'onda stimata è $\lambda = \SI{792 \pm 45}{\nano\meter}$, che è incompatibile con il valore noto di $\lambda = \SI{632.8}{\nano\meter}$ per il laser He-Ne ($\approx \num{3.5}\sigma$, p-value = \num{0.0001}). Il fit, avendo un chi quadro ridotto, suggerisce che la legge usata descriva correttamente il fenomeno dal punto di vista della relazione lineare tra $\cos(\theta_i) - \cos(\theta_N)$ e $N$. La grossa incertezza sulla misura di $L$ non compromette questo risultato: infatti, ipotizzando un errore del millimetro, risulterebbe comunque un chi quadro ridotto di \num{0.328}. Ipotizziamo dunque che la legge racchiuda correttamente la fisica dietro il fenomeno, ma manchi di qualche fattore correttivo dovuto alla non idealità del sistema.
+La lunghezza d'onda stimata è $\lambda = \SI{792 \pm 45}{\nano\meter}$, che è incompatibile con il valore noto di $\lambda = \SI{632.8}{\nano\meter}$ per il laser He-Ne ($\approx \num{3.5}\sigma$, p-value = \num{0.0001}). Il fit, avendo un chi quadro ridotto di \num{0,0983}, suggerisce che la legge usata descriva correttamente il fenomeno dal punto di vista della relazione lineare tra $\cos(\theta_i) - \cos(\theta_N)$ e $N$. La grossa incertezza sulla misura di $L$ non compromette questo risultato: infatti, ipotizzando un errore del millimetro, risulterebbe comunque un chi quadro ridotto di \num{0.328}. Ipotizziamo dunque che la legge racchiuda correttamente la fisica dietro il fenomeno, ma manchi di qualche fattore correttivo dovuto alla non idealità del sistema.
 \end{document}
