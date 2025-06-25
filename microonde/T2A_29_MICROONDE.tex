@@ -60,6 +60,8 @@
 
 \begin{document}
 \maketitle
+\tableofcontents
+\newpage
 \section{Caratterizzazione del fascio}
 \subsection{Polarizzazione}
 \subsubsection{Obiettivo}
@@ -87,7 +89,7 @@ Una volta raccolti i dati, ne abbiamo quindi valutato l'accordo con le \cref{eq:
 
 \subsubsection{Dati}
 Abbiamo raccolto i valori di tensione misurati in seguito ad una rotazione del ricevitore attorno al proprio asse di un angolo $\alpha$ compreso tra $\ang{0}$ e $\ang{180}$, 
-ogni $\ang{5}$\footnote{Tutti gli angoli misurati in gradi sono stati poi convertiti in radianti per le analisi, e sono riportati in radianti nelle tabelle.}.
+ogni $\ang{5}$\footnote{Tutti gli angoli misurati in gradi sono stati poi convertiti in radianti per le analisi, e sono riportati in radianti nelle tabelle e nei grafici.}.
 Abbiamo considerato come errore sul valore di $\alpha$ la sensibilità del goniometro montato sul ricevitore, il quale indicava angoli in multipli di $\ang{5}$,
 dunque l'errore è stato assunto pari a $\ang{3}$ (circa $\SI{50}{\milli\radian}$), mentre, per quanto riguarda l'incertezza sul segnale, abbiamo osservato le fluttuazioni del valore di tensione restituito dal voltmetro.
 Sono stati così stimati errori variabili, differenti da misura a misura, e corrispondenti a metà dell'intervallo entro cui oscillavano i valori di tensione.
@@ -316,18 +318,18 @@ Distanza [\si{\milli\metre}] & Tensione [\si{\volt}] \\\hline\hline
 	\label{fig:distanza_massimi}
 \end{figure}
 \textbf{Dipendenza del segnale dall'angolo $\theta$:}
-I dati della \Cref{tab:dati_ampgeom_angolo}, riportati nel grafico in \Cref{fig:theta_qualitativo}, mostrano che il segnale è massimo quando emettitore e ricevitore sono allineati ($\theta=0$) e decresce rapidamente all'aumentare dell'angolo $|\theta|$, indicando una significativa direzionalità del fascio. Per angoli superiori a circa $\SI{0.7}{\radian}$ ($\approx \ang{40}$), il segnale tende ad annullarsi. L'andamento appare qualitativamente simmetrico rispetto a $\theta=0$. Non è stato tentato un fit analitico specifico per questa dipendenza angolare.
+I dati della \Cref{tab:dati_ampgeom_angolo}, riportati nel grafico in \Cref{fig:theta_qualitativo}, mostrano che il segnale è massimo quando emettitore e ricevitore sono allineati ($\theta=0$) e decresce rapidamente all'aumentare del modulo dell'angolo $|\theta|$, indicando una significativa direzionalità del fascio. Per angoli superiori a circa $\SI{0.7}{\radian}$ ($\approx \ang{40}$), il segnale tende ad annullarsi. L'andamento appare qualitativamente simmetrico rispetto a $\theta=0$. Non è stato tentato un fit analitico specifico per questa dipendenza angolare.
 
 \textbf{Onde stazionarie e stima della lunghezza d'onda $\lambda$:}
 I dati in \Cref{tab:dati_ampgeom_ondestazionarie}, rappresentati nel grafico in \Cref{fig:onde_stazionarie} mostrano chiare oscillazioni del segnale al variare della distanza $r$ su piccola scala. Queste oscillazioni sono dovute all'interferenza tra l'onda emessa e quelle riflesse tra emettitore e ricevitore, la quale porta alla formazione di onde stazionarie. Note le condizioni che descrivono l'instaurarsi di onde stazionarie, possiamo dedurre che la distanza tra due massimi (o minimi) consecutivi della figura di interferenza è pari a mezza lunghezza d'onda ($\lambda/2$).
-Analizzando le posizioni dei massimi e dei minimi più evidenti, ad esempio considerando un massimo a $\SI{890 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{876.5 \pm 0.7}{\milli\metre}$ (media pesata di 877 e 876), oppure un minimo a $\SI{898 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{883 \pm 0.7}{\milli\metre}$ (media pesata di 884, 882), si osserva una distanza tra massimi consecutivi di circa $\SI{13.5 \pm 1.2}{\milli\metre}$ e tra minimi consecutivi di circa $\SI{15 \pm 1.2}{\milli\metre}$. Una stima combinata per $\lambda/2$ è $\SI{14.25 \pm 0.85}{\milli\metre}$ (media pesata e propagazione dell'errore).
+Analizzando le posizioni dei massimi e dei minimi più evidenti, ad esempio considerando un massimo a $\SI{890 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{876.5 \pm 0.7}{\milli\metre}$ (media pesata di 877 e 876), oppure un minimo a $\SI{898 \pm 1}{\milli\metre}$ e un successivo a circa $\SI{883 \pm 0.7}{\milli\metre}$ (media pesata di 884 e 882), si osserva una distanza tra massimi consecutivi di circa $\SI{13.5 \pm 1.2}{\milli\metre}$ e tra minimi consecutivi di circa $\SI{15 \pm 1.2}{\milli\metre}$. Una stima combinata per $\lambda/2$ è $\SI{14.25 \pm 0.85}{\milli\metre}$, ottenuta dalla media pesata e dalla propagazione dell'errore.
 Da ciò si ricava la lunghezza d'onda:
 $\lambda = 2 \times (\lambda/2) = 2 \times \SI{14.25 \pm 0.87}{\milli\metre} = \SI{28.5 \pm 1.7}{\milli\metre} = \SI{2.85 \pm 0.17}{\centi\metre}$.
 Questo valore è compatibile con la lunghezza d'onda attesa di circa $\SI{3}{\centi\metre}$.
 
 \textbf{Andamento generale dell'ampiezza con la distanza $r$ (studio dei massimi):}
 I dati in \Cref{tab:dati_ampgeom_massimi_distanza}, rappresentati nel grafico in \Cref{fig:distanza_massimi} mostrano che l'ampiezza del segnale, proporzionale alla tensione misurata nei massimi delle onde stazionarie, aumenta al diminuire della distanza $r$. Se il fascio di microonde prodotto fosse un'onda sferica ideale e il ricevitore misurasse un segnale proporzionale all'intensità del campo elettrico, ci si aspetterebbe una dipendenza $V(r) \propto 1/r^2$. Al contrario se il fronte d'onda del fascio di microonde fosse cilindrico si avrebbe $V(r) \propto 1/r$.
-È stato tentato un fit dei dati con un modello del tipo $V(r) = C + A/r$. I parametri ottenuti per $A$ e $C$ sono riportati nella \Cref{tab:risultati_fit_ampgeom_1_su_r}. Si noti che è stato tentato un fit con $1/r^2$ che è risultato totalmente incompatibile, come si può dedurre anche dal grafico (non riportato con tale fit per brevità).
+È stato tentato un fit dei dati con un modello del tipo $V(r) = C + A/r$. I parametri ottenuti per $A$ e $C$ sono riportati nella \Cref{tab:risultati_fit_ampgeom_1_su_r}. Abbiamo anche tentato un fit con $1/r^2$, il quale è risultato totalmente incompatibile, come si può dedurre anche dall'andamento dei dati nel grafico \Cref{fig:distanza_massimi}.
 
 \begin{table}[htbp]
 \centering
@@ -340,7 +342,7 @@ Fit $A/r+C$ & \num{1.542 \pm 0.046} & \num{-998 \pm 60} & 14 & 5.74 & 0.0001 \\\
 \end{tabular}
 \end{table}
 
-Il valore del $\chi^2/\nu = \num{5.74}$ per 14 gradi di libertà indica una scarsa compatibilità del modello con i dati sperimentali (p-value \num{0.0001}), il che suggerisce che il modello $A/r + C$ non è adeguato, o che vi sono problemi nella procedura di fit o nell'interpretazione dei parametri riportati.
+Il valore del $\chi^2/\nu = \num{5.74}$ per 14 gradi di libertà indica una scarsa compatibilità del modello con i dati sperimentali (p-value \num{0.0001}), il che suggerisce che il modello $V(r) = C+A/r$ non è adeguato, o che vi sono problemi nella procedura di fit o nell'interpretazione dei parametri riportati.
 Come indicato nel manuale di laboratorio, effetti al contorno, la natura non puntiforme della sorgente e del ricevitore (dovuta alla presenza degli horn), e possibili riflessioni ambientali possono influenzare l'andamento del segnale, rendendo i modelli più semplici, quali quello di fronte d'onda sferico o cilindrico, inadeguati per una descrizione precisa.
 
 \subsubsection{Conclusioni}
@@ -348,7 +350,7 @@ L'analisi dell'ampiezza e della geometria del fascio ha permesso di:
 \begin{itemize}
     \item Confermare la natura direzionale del fascio di microonde, poiché il segnale misurato decade rapidamente allontanandosi dall'asse di emissione.
     \item Osservare chiaramente il fenomeno delle onde stazionarie dovute alle riflessioni multiple tra emettitore e ricevitore. Dall'analisi delle posizioni dei massimi e minimi di queste onde, è stato possibile stimare la lunghezza d'onda delle microonde, risultata pari a $\lambda = \SI{2.85 \pm 0.17}{\centi\metre}$. Questo valore è compatibile con quello atteso di circa $\SI{3}{\centi\metre}$.
-    \item Studiare l'andamento dell'ampiezza del segnale (ai massimi delle onde stazionarie) in funzione della distanza $r$. Si osserva un aumento del segnale al diminuire di $r$. Tuttavia, un modello semplice di dipendenza $V(r) = C+A/r$ non descrive adeguatamente i dati, come indicato dal valore elevato del $\chi^2/\nu$ del fit e dalla problematica interpretazione dei parametri. Questa discrepanza è probabilmente dovuta alla complessità del sistema reale, che include la direttività degli horn, la loro prossimità, e possibili effetti di interferenza e diffrazione non modellizzati.
+    \item Studiare l'andamento dell'ampiezza del segnale (ai massimi delle onde stazionarie) in funzione della distanza $r$. Si osserva un aumento del segnale al diminuire di $r$. Tuttavia, un modello semplice di dipendenza $V(r) = C+A/r$ non descrive adeguatamente i dati, come indicato dal valore elevato del $\chi^2/\nu$ del fit e dalla problematica interpretazione dei parametri. Questa discrepanza è probabilmente dovuta alla complessità del sistema reale, che include la direttività degli horn, la loro prossimità, e possibili effetti di interferenza e diffrazione non modellizzabili.
 \end{itemize}
 
 
@@ -358,7 +360,7 @@ Osservare come il fenomeno della rifrazione sia influenzato dalla polarizzazione
 
 \subsection{Metodo}
 Poiché avevamo a disposizione una sorgente d'onda polarizzata, ne abbiamo innanzitutto determinato la direzione di polarizzazione. Per fare ciò, è stata montata tra emettitore e ricevitore un'apposita griglia metallica e, variandone la posizione, è stata individuata la condizione tale per cui il segnale misurato risultava nullo, deducendo quindi informazioni sulla polarizzazione dell'onda in esame. Da tale osservazione abbiamo ricavato che disponendo emettitore, e quindi anche ricevitore, con il lato più corto parallelo al tavolo (configurazione~1) si aveva radiazione polarizzata parallelamente al piano di incidenza; viceversa, ruotando l'emettitore (configurazione~2) si otteneva un segnale con polarizzazione perpendicolare al piano di incidenza. Ci attendiamo quindi di poter determinare una stima dell'angolo di Brewster\footnote{Se un'onda polarizzata incide su una superficie di separazione tra due mezzi con polarizzazione parallela al piano di incidenza, l'intensità della radiazione riflessa e della radiazione trasmessa dipendono dall'angolo di incidenza. In particolare, in corrispondenza dell'angolo di Brewster, l'intensità dell'onda riflessa è nulla e, di conseguenza, quella dell'onda trasmessa è massima.} mediante l'utilizzo della prima configurazione.
-Per osservare la variazione del segnale trasmesso correlata ad un diverso angolo di incidenza, abbiamo disposto sorgente e ricevitore frontalmente, a distanza fissa, e abbiamo ruotato gradualmente la lastra di polietilene posta tra i due. Ciò è stato possibile in quanto la lastra si poteva montare su di un goniometro che ne misurava quindi facilmente la rotazione. A tale rotazione corrispondeva una variazione dell'angolo di incidenza sia durante la rifrazione aria-polietilene (onda in entrata nella lastra) sia durante la rifrazione polietilene-aria (onda in uscita dalla lastra). L'informazione raccolta infatti dal ricevitore, e osservata sotto forma di tensione sul display del voltmetro, era correlata a un doppio fenomeno di rifrazione, tale per cui l'onda trasmessa ritornava in asse con l'onda incidente e quindi con la congiungente emettitore-ricevitore. 
+Per osservare la variazione del segnale trasmesso correlata ad un diverso angolo di incidenza, abbiamo disposto sorgente e ricevitore frontalmente, a distanza fissa, e abbiamo ruotato gradualmente la lastra di polietilene posta tra i due. Ciò è stato possibile in quanto la lastra si poteva montare su di un goniometro che ne misurava facilmente la rotazione. A tale rotazione corrispondeva una variazione dell'angolo di incidenza sia durante la rifrazione aria-polietilene (onda in entrata nella lastra) sia durante la rifrazione polietilene-aria (onda in uscita dalla lastra). L'informazione raccolta infatti dal ricevitore, e osservata sotto forma di tensione sul display del voltmetro, era correlata a un doppio fenomeno di rifrazione, tale per cui l'onda trasmessa ritornava in asse con l'onda incidente e quindi con la congiungente emettitore-ricevitore. 
 
 \subsection{Dati}
 Al fine di studiare l'intensità dell'onda trasmessa e la sua correlazione con l'angolo di incidenza, abbiamo misurato il segnale recepito dal ricevitore al variare dell'inclinazione della lastra di polietilene. Quest'ultima è stata ruotata di $\ang{5}$ alla volta. Il segnale osservato è stato misurato come tensione, quindi in volt. Gli angoli riportati corrispondono invece all'angolo formato dalla perpendicolare alla lastra con la direzione della radiazione incidente, diretta lungo l'asse emettitore-ricevitore (convertiti in radianti per coerenza). Per quanto riguarda la stima delle incertezze, abbiamo considerato fisso l'errore sull'angolo di incidenza, pari alla sensibilità del goniometro: $\delta_{\theta}=\ang{2}$ (circa $\SI{30}{\milli\radian}$). Per le tensioni, invece, abbiamo valutato come oscillava il segnale restituito dal voltmetro, ottenendo errori variabili, corrispondenti a metà dell'intervallo di oscillazione. Quanto misurato per ciascuna direzione di polarizzazione è riportato nelle \Cref{tab:brewster_par,tab:brewster_perp}.
@@ -463,15 +465,17 @@ $\theta_{att}$ [\si{\degree}] & Probabilità entro z sigma \\
 
 \section{Interferenza a doppia fenditura}
 \subsection{Obiettivo}
-L'obiettivo di questa esperienza è ricostruire la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che attraversa una doppia fenditura ed incide su uno schermo.
+Studiare la figura di interferenza generata da un'onda elettromagnetica nello spettro delle microonde dopo che attraversa una doppia fenditura.
+
 \subsection{Metodo}
-Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde nella posizione fissa $x=\SI{0}{\centi\metre}$ ed il ricevitore ad una posizione fissa $x=\SI{110}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Il campionamento è stato effettuato mantenendo sorgente e ricevitore a distanza fissa e variando unicamente l'angolo del ricevitore. Sopra al supporto centrale abbiamo costruito una doppia fenditura composta da tre lamine metalliche fissate su alcuni supporti magnetici. Le fenditure hanno ampiezza $a=\SI{1.5}{\centi\metre}$ e sono poste a una distanza $d=\SI{7.5 \pm 0.1}{\centi\metre}$ fra di loro. Possiamo supporre che tali lamine riflettano la quasi totalità del segnale elettromagnetico incidente ($R\approx0$ ; $T\approx1$), di conseguenza il segnale misurato dal ricevitore sarà influenzato unicamente dalla radiazione passante per le due fenditure. L'ampiezza delle fenditure è stata scelta in modo da essere simile alla lunghezza d'onda delle microonde, nel caso dell'emettitore presente in laboratorio si ha $\lambda \approx \SI{3}{\centi\metre}$.
-Per l'esperienza abbiamo tenuto un'amplificazione del segnale del ricevitore di $1\times$.
+Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde nella posizione fissa $x=\SI{0}{\centi\metre}$ ed il ricevitore ad una posizione fissa $x=\SI{110}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Il campionamento è stato effettuato senza scorrere sorgente e ricevitore lungo la guida, ma variando unicamente l'angolo a cui si trovava il ricevitore rispetto alla congiungente con l'emettitore. Sopra al supporto centrale abbiamo costruito una doppia fenditura, realizzata mediante l'utilizzo di tre lamine metalliche. Le fenditure hanno ampiezza $a=\SI{1.5}{\centi\metre}$ e sono poste a una distanza $d=\SI{7.5 \pm 0.1}{\centi\metre}$ fra di loro. Possiamo supporre che tali lamine riflettano la quasi totalità del segnale elettromagnetico incidente, ossia che non si abbia segnale trasmesso,($R\approx1$ , $T\approx0$); di conseguenza il segnale misurato dal ricevitore sarà dovuto unicamente alla radiazione che attraversa le due fenditure. L'ampiezza delle fenditure è stata scelta in modo da essere confrontabile con la lunghezza d'onda delle microonde, nel caso dell'emettitore presente in laboratorio si ha $\lambda \approx \SI{3}{\centi\metre}$.
+
 \subsection{Dati}
-Nella \Cref{tab:dati_doppia_fenditura} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore mediante un multimetro da banco in funzione dell'angolo di inclinazione del ricevitore stesso rispetto alle fenditure.
+Nella \Cref{tab:dati_doppia_fenditura} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore mediante un multimetro da banco in funzione dell'angolo di rotazione del ricevitore stesso rispetto all'emettitore.
+
 \begin{table}[H]
 \centering
-\caption{Tensioni in funzione degli angoli nella doppia fenditura.}
+\caption{Tensione al variare di $\theta$ (doppia fenditura)}
 \label{tab:dati_doppia_fenditura}
 \begin{tabular}{|c|c|}
 \hline
@@ -499,9 +503,10 @@ $\theta$ [\si{\radian}] & Tensione [\si{\volt}] \\
 \hline
 \end{tabular}
 \end{table}
-Gli errori sugli angoli sono stati scelti valutando la sensibilità del goniometro montato sul supporto ($\ang{2}$ o $\SI{0.035}{\radian}$) mentre gli errori sulle tensioni sono stati valutati considerando l'oscillazione dei valori misurati. Il campionamento è stato effettuato per angoli $\theta$ compresi tra $\ang{0}$ e $\ang{45}$. Questa scelta è stata fatta per limiti strutturali dell'apparato, per il quale abbiamo ritenuto inaffidabili i dati misurati oltre tale angolo. L'apparato avrebbe consentito la misurazione di angoli compresi fra $\ang{0}$ e $\ang{-45}$, tuttavia non è stato possibile effettuare tali misure per questioni tempistiche.
+Gli errori sugli angoli sono stati scelti valutando la sensibilità del goniometro montato sul supporto ($\delta_{\theta} = \ang{2}$ = $\SI{0.035}{\radian}$), mentre gli errori sulle tensioni sono stati valutati considerando l'oscillazione dei valori misurati dal voltmetro. Il campionamento è stato effettuato per angoli $\theta$ compresi tra $\ang{0}$ e $\ang{45}$. La scelta di tale intervallo scelta è dovuta ai limiti strutturali dell'apparato, a causa dei quali abbiamo ritenuto inattendibili i valori di segnale misurati oltre $\theta=\ang{45}$. Infatti per valori di $\theta$ superiori l'onda prodotta dall'emettitore giungeva al ricevitore direttamente, senza prima incidere sullo schermo con doppia fenditura, avendo esso un'estensione finita.
+
 \subsection{Analisi dati}
-Studiando l'andamento della tensione indotta sul ricevitore in funzione dell'angolo ci aspettiamo di trovare una figura formata da massimi e minimi. In particolare ci aspettiamo di trovare una figura di interferenza composta da massimi e minimi che si alternano a frequenza costante ma con ampiezza decrescente con l'aumento del modulo dell'angolo.
+Studiando l'andamento della tensione misurata dal ricevitore in funzione dell'angolo $\theta$ ci aspettiamo di trovare un andamento oscillante, caratterizzato dalla presenza di massimi e minimi. In particolare ci aspettiamo di trovare una figura di interferenza costituita dal succedersi di massimi e minimi, i quali si alternano a frequenza costante (cioè la distanza tra un massimo e il successivo è fissa, lo stesso vale per i minimi), ma a cui corrispondo segnali con intensità decrescente all'aumentare dell'angolo, a causa degli effetti di diffrazione.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{grafici/max_doppiafenditura.pdf}
@@ -513,8 +518,8 @@ Per una figura di interferenza a doppia fenditura con radiazione che incide su s
     I(\theta)=4I_0\cos^2\left(\pi\frac{d \sin(\theta)}{\lambda}\right)
     \label{eq:doppia_fenditura_intensita}
 \end{equation}
-I massimi si avranno quando $\cos^2\left(\pi\frac{d\sin\theta}{\lambda}\right)=1$ ovvero quando $d\sin(\theta)=k\lambda$, con $k \in \mathbb{Z}$. Nel nostro caso non possiamo considerare l'approssimazione di schermo piano per tutti i dati. Possiamo ritenere affidabile questa formula solo per il primo massimo ($k=1$). Possiamo così ricavare la lunghezza d'onda del fascio incidente considerando un valore di $k=1$ e $\theta$ in corrispondenza del primo massimo (diverso da zero).
-Non consideriamo il massimo in $\theta=0$ poiché i dati a nostra disposizione rappresentano solo metà del picco. Per ricavare l'angolo in corrispondenza del quale si trova il massimo successivo, utilizziamo un'interpolazione parabolica del tipo $y=ax^2+bx+c$ (con $x=\theta$ in radianti e $y=V$ in volt) grazie alla quale possiamo ricavare i parametri della parabola a,b,c e dunque l'angolo $\theta_{max}$ per il quale si ha il massimo. In particolare avremo:
+I massimi si avranno quando $\cos^2\left(\pi\frac{d\sin\theta}{\lambda}\right)=1$, ovvero quando $d\sin(\theta)=k\lambda$, con $k \in \mathbb{Z}$. Nel nostro caso non possiamo considerare l'approssimazione di schermo piano per tutti i dati. Possiamo ritenere affidabile questa formula solo per il primo massimo ($k=1$). Possiamo quindi ricavare la lunghezza d'onda del fascio incidente considerando $k=1$ e stimando il valore di $\theta$ in corrispondenza del quale si ha il primo massimo.\footnote{Non consideriamo il massimo di interferenza presente a $\theta=\ang{0}$, in quanto non risulta utile alla stima di $\lambda$}
+Per ricavare tale angolo, utilizziamo un'interpolazione parabolica del tipo $y=ax^2+bx+c$ (con $x=\theta$ in radianti e $y=V$ in volt). Dai parametri della parabola $a,b,c$ ricaviamo l'angolo $\theta_{max}$ tramite le relazioni:
 \begin{align}
   \theta_{\text{max}} = -\dfrac{b}{2a} \qquad & \text{e}\qquad
   \delta_{\theta_{\text{max}}} = \sqrt{\left(\dfrac{1}{2a}\delta_b\right)^2 + \left(\dfrac{b}{2a^2}\delta_a\right)^2}. \label{eq:angolo_max_doppia_fenditura}
@@ -531,21 +536,14 @@ Fit max di interferenza & \num{-47.3 \pm 8.8} & \num{31.7 \pm 5.9} & \num{-4.61 
 \end{tabular}
 \end{table}
 Dall'angolo massimo possiamo ricavare la lunghezza d'onda del fascio ed il relativo errore che saranno:
-\begin{minipage}{0.45\textwidth}
-\centering
-$\lambda = \frac{d \sin(\theta_{\text{max}})}{k}$
-\end{minipage}
-\hfill
-\begin{minipage}{0.45\textwidth}
-\centering
-$\delta_{\lambda} = \sqrt{ \delta_{\theta_{\text{max}}}^2 \left( \frac{d \cos(\theta_{\text{max}})}{k} \right)^2 + \delta_d^2 \left( \frac{\sin(\theta_{\text{max}})}{k} \right)^2 }$
-\end{minipage}
-\vspace{\baselineskip}
+\begin{align}
+  \lambda = \dfrac{d \sin(\theta_{\text{max}})}{k} \qquad & \text{e} \qquad \delta_{\lambda} = \sqrt{ \delta_{\theta_{\text{max}}}^2 \left( \dfrac{d \cos(\theta_{\text{max}})}{k} \right)^2 + \delta_d^2 \left( \dfrac{\sin(\theta_{\text{max}})}{k} \right)^2 }. \label{eq:lambda_delta_combined_doppia_fenditura}
+\end{align}
 
-Per il primo massimo ($k=1$) e convertendo $\theta_{\text{max}}$ in radianti per il calcolo, si avrà:
+Per il primo massimo ($k=1$) e per i valori di $\theta_{\text{max}}$ precedentemente ricati, si avrà:
 \begin{table}[H]
 \centering
-\caption{Valore di $\lambda$ con errore.}
+\caption{Valore di $\lambda_{\text{sper}}$ e suo errore.}
 \label{tab:valori_di_lambda}
 \begin{tabular}{|c|c|}
 \hline
@@ -571,13 +569,13 @@ $0.85$ & $0.60$ \\
 
 
 \subsection{Conclusioni}
-Basandoci sui dati ottenuti dagli esperimenti e dai test di compatibilità possiamo affermare che il valore di $\lambda$ ricavato mediante la legge attesa nel limite di $\theta$ piccolo è compatibile con il valore di $\lambda$ atteso ($\approx \SI{3}{\centi\metre}$). In generale non abbiamo però una legge specifica su cui basarci per l'intera figura, infatti il campionamento non è stato effettuato su uno schermo piano bensì su una semicirconferenza, inoltre l'emissione dell'onda non è ideale e gli effetti di bordo non sono trascurabili, né per quanto riguarda l'emettitore né per quanto riguarda il ricevitore. Dunque dobbiamo limitarci a fornire unicamente un'osservazione qualitativa globale del fenomeno. In particolare possiamo riconoscere 3 massimi e 2 minimi che si alternano ad intervalli angolari non regolari. Inoltre si ha tensione massima per un angolo di $\ang{0}$. In conclusione possiamo affermare che esiste una relazione periodica fra l'angolo e l'intensità misurata, dunque si ha un effetto di interferenza evidente.
+Basandoci su quanto ottenuto dal test di compatibilità, possiamo affermare che il valore di $\lambda$ ricavato mediante studio della figura di interferenza (nel limite di $\theta$ piccolo) è compatibile con il valore di $\lambda$ atteso ($\approx \SI{3}{\centi\metre}$). In generale non abbiamo però una legge specifica su cui basarci per analizzare l'intera figura, infatti il campionamento non è stato effettuato su uno schermo piano bensì su una semicirconferenza. Inoltre l'emissione dell'onda non è ideale, non essendo gli effetti di bordo dovuti agli horn trascurabili. Possiamo dunque limitarci a fornire solamente un'osservazione qualitativa del fenomeno. In particolare possiamo riconoscere la presenza di 3 massimi e 2 minimi, i quali però non si alternano ad intervalli angolari esattamente regolari. Inoltre si ha tensione massima per un angolo di $\ang{0}$. In conclusione possiamo affermare che esiste una relazione periodica fra l'angolo $\theta$ a cui è valutato il segnale e l'intensità misurata.
 
 \section{Interferometro di Fabry-Perot}
 \subsection{Obiettivo}
-L'obiettivo di questa esperienza è studiare la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che attraversa una cavità di Fabry-Perot.
+Studiare la figura di interferenza di un'onda elettromagnetica nello spettro delle microonde che si crea quando essa attraversa una cavità di Fabry-Perot. Dedurre una stima della lunghezza d'onda del fascio utilizzato.
 \subsection{Metodo}
-Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde ad una posizione fissa pari a $x=\SI{30}{\centi\metre}$ ed il ricevitore ad una posizione fissa di $x=\SI{104}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Nel mezzo abbiamo creato una cavità di Fabry-Perot composta da due lamine semiriflettenti montate su supporti magnetici e poste ad una distanza $d$ fra di loro. Lo schema della configurazione è rappresentato nella \Cref{fig:Configurazione_Fabry_Perot}. I supporti sono stati montati da parti opposte rispetto al supporto centrale in modo da poter campionare una distanza maggiore. Le lamine, l'emettitore ed il ricevitore sono stati posizionati in modo da essere allineati, ciò è stato possibile grazie al goniometro montato sull'apparato.
+Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde ad una posizione fissa pari a $x=\SI{30}{\centi\metre}$ ed il ricevitore ad una posizione fissa di $x=\SI{104}{\centi\metre}$ rispetto al riferimento montato sull'apparato. Nel mezzo abbiamo creato una cavità di Fabry-Perot composta da due lamine semiriflettenti montate su supporti magnetici e poste ad una distanza $d$ fra di loro. Lo schema della configurazione è rappresentato nella \Cref{fig:Configurazione_Fabry_Perot}. I supporti sono stati montati da parti opposte rispetto al supporto centrale in modo da poter campionare una distanza $d$ maggiore. Le lamine, l'emettitore ed il ricevitore sono stati posizionati in modo da essere allineati, ciò è stato possibile grazie al goniometro montato sull'apparato.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{grafici/Fabry-Perot_configurazione.png}
@@ -588,7 +586,7 @@ Per realizzare l'esperimento abbiamo posizionato l'emettitore di microonde ad un
 Nella \Cref{tab:dati_Fabry_Perot} riportiamo i dati raccolti durante l'esperienza. In particolare è stata campionata la tensione elettrica misurata dal ricevitore in funzione della distanza reciproca $d$ fra le lamine.
 \begin{table}[H]
 \centering
-\caption{Dati della dimensione della cavità $d$ in funzione della tensione, Fabry-Perot.}
+\caption{Tensione al variare di $d$ dimensione della cavità di Fabry-Perot}
 \label{tab:dati_Fabry_Perot}
 \begin{tabular}{|c|c|}
 \hline $d$ [\si{\centi\metre}] & Tensione [\si{\volt}] \\
@@ -611,24 +609,21 @@ Nella \Cref{tab:dati_Fabry_Perot} riportiamo i dati raccolti durante l'esperienz
 \hline
 \end{tabular}
 \end{table}
-Gli errori sulle tensioni sono stati valutati considerando le oscillazioni sui valori misurati dallo strumento, per le distanze abbiamo invece deciso di utilizzare un errore fisso di $\SI{2}{\milli\metre}$. Tale errore è stato scelto considerando la somma fra la sensibilità dello strumento, pari a $\SI{1}{\milli\metre}$ e lo spessore delle lamine, pari a circa $\SI{1}{\milli\metre}$. Tali fattori rendevano infatti difficile un preciso posizionamento delle lamine stesse sul supporto.
+Gli errori sulle tensioni sono stati valutati considerando le oscillazioni sui valori misurati dallo strumento, per le distanze abbiamo invece deciso di utilizzare un errore fisso di $\SI{2}{\milli\metre}$. Tale errore è stato scelto considerando la somma fra la sensibilità dello strumento, pari a $\SI{1}{\milli\metre}$ e lo spessore delle lamine, pari a circa $\SI{1}{\milli\metre}$, il quale rendeva difficile un preciso posizionamento delle lamine stesse sul supporto.
 \subsection{Analisi dati}
-A partire dai dati raccolti durante l'esperienza abbiamo creato un grafico della tensione misurata in funzione della dimensione della cavità $d$. Ci aspettiamo che la radiazione riflessa sulla prima lamina semiriflettente crei interferenza con la radiazione riflessa dalla seconda lamina semiriflettente. I dati ottenuti sono stati graficati e sono rappresentati nel \Cref{fig:grafico_Fabry_Perot}:
+A partire dai dati raccolti durante l'esperienza abbiamo creato un grafico della tensione misurata in funzione della dimensione della cavità $d$. Ci aspettiamo che la radiazione riflessa sulla prima lamina semi riflettente crei interferenza con la radiazione riflessa dalla seconda lamina semi riflettente. Quanto misurato è visibile in \Cref{fig:grafico_Fabry_Perot}:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{grafici/fabriperot.pdf}
+    \includegraphics[width=0.8\linewidth]{grafici/fabriperot.pdf}
     \caption{Grafico interferenza da cavità di Fabry-Perot.}
     \label{fig:grafico_Fabry_Perot}
 \end{figure}
 
-
-
-
-Ci aspettiamo dunque di osservare un'alternanza di picchi secondo la legge $2\delta cos(\theta)=m\lambda$, nel nostro caso $\theta=0$, dunque ci aspettiamo di osservare i massimi ad un intervallo spaziale $\delta=\frac{m\lambda}{2}$ con $m\in\mathbb{N}$. Dai grafici osserviamo che vi sono 4 massimi ad una distanza reciproca costante di $1,5cm$. Calcolando la media delle distanze a cui si trovano i $4$ massimi trovati con i relativi errori otteniamo una distanza spaziale media di $\delta=(1.5\pm 0.1)cm$.  
+La posizione dei massimi è descritta dalla legge $2\delta cos(\theta)=m\lambda$, nel nostro caso $\theta=0$, dunque ci aspettiamo di osservare i massimi ad un intervallo spaziale $\delta=\frac{m\lambda}{2}$ con $m\in\mathbb{N}$. Dal grafico possiamo osservare la presenza di 4 massimi ad una distanza reciproca costante di $1,5cm$. Calcolando la media delle distanze a cui si trovano i 4 massimi individuati, otteniamo $\delta_m=(1.5\pm 0.1)cm$.  
 
 
 \subsection{Conclusioni}
-Dall'osservazione dei dati ottenuti possiamo affermare che il valore dell'intervallo spaziale di alternazione di massimi $\delta$ misurato in laboratorio è compatibile con quello atteso di $\delta=\frac{\lambda}{2}=1.5cm$. Possiamo dunque affermare che la legge attesa è compatibile con i dati sperimentali. Per quanto riguarda le ampiezze dei picchi, possiamo osservare che esse diminuiscono all'aumentare della dimensione della cavità, tuttavia non abbiamo alcuna legge da avvalorare osservando tale fenomeno.
+Considerando la lunghezza d'onda del fascio utilizzato ($\lambda_{\text{att}} \approx 3 cm$, come indicato sul manuale), possiamo affermare che il valore dell'intervallo spaziale $\delta_m$ tra i massimi misurato in laboratorio è compatibile con quello atteso ($\delta_{\text{att}}=\frac{\lambda_{\text{att}}}{2}=1.5cm$). Possiamo dunque considerare verificata la legge che descrive la posizione dei massimi di interferenza per interferenza di Fabry-Perot. Per quanto riguarda invece l'intensità del segnale misurato in corrispondenza picchi, possiamo osservare come essa diminuisca all'aumentare della dimensione della cavità; tuttavia non abbiamo alcuna spiegazione al verificarsi di tale fenomeno.
 
 \section{Diffrazione di Bragg}
 \subsection{Obiettivo}
